@@ -1,0 +1,18 @@
+import CWGPU
+
+{% for enum in model.types_by_category('enum') %}
+public enum {{ enum.swift_name }}: UInt32 {
+    {% for value in enum.values %}
+    case {{ value.swift_name }} = {{ value.value }}
+    {% endfor %}
+
+    init(cValue: {{ enum.c_name }}) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: {{ enum.c_name }} {
+        return {{ enum.c_name }}(rawValue: self.rawValue)
+    }
+}
+
+{% endfor %}
