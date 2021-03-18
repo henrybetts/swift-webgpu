@@ -1,4 +1,4 @@
-import CWGPU
+import CWebGPU
 
 {% for enum in model.types_by_category('enum') %}
 public enum {{ enum.swift_name }}: UInt32 {

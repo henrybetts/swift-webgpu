@@ -4,19 +4,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-wgpu",
+    name: "swift-webgpu",
     products: [
         .library(
-            name: "WGPU",
-            targets: ["WGPU"]),
+            name: "WebGPU",
+            targets: ["WebGPU"]),
     ],
     dependencies: [
     ],
     targets: [
         .systemLibrary(
-            name: "CWGPU"),
+            name: "CWebGPU"),
         .target(
-            name: "WGPU",
-            dependencies: ["CWGPU"]),
+            name: "WebGPU",
+            dependencies: ["CWebGPU"]),
     ]
 )

@@ -10,7 +10,7 @@ if __name__ == '__main__':
         model = Model(json.load(f))
 
     template_dir = 'templates'
-    output_dir = '../Sources/WGPU'
+    output_dir = '../Sources/WebGPU'
 
     templates_paths = glob(os.path.join(template_dir, '*.template'))
 

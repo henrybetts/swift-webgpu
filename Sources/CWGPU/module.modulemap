@@ -1,3 +1,0 @@
-module CWGPU [system] {
-    header "shim.h"
-}

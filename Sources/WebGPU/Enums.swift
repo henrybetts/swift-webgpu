@@ -1,4 +1,4 @@
-import CWGPU
+import CWebGPU
 
 public enum AdapterType: UInt32 {
     case discreteGpu = 0

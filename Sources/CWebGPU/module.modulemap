@@ -1,0 +1,3 @@
+module CWebGPU [system] {
+    header "shim.h"
+}
