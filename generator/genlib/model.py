@@ -24,10 +24,6 @@ class EnumValue:
         self.requires_prefix = requires_prefix
 
     @property
-    def c_name(self) -> str:
-        return camel_case(self.name)
-
-    @property
     def swift_name(self) -> str:
         name = 'type ' + self.name if self.requires_prefix else self.name
         return swift_safe(camel_case(name.lower()))
@@ -46,6 +42,7 @@ class Model:
 
         category_types = {
             'enum': EnumType,
+            'bitmask': EnumType,
         }
 
         for name, type_data in data.items():
