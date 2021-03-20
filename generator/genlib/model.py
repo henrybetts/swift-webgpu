@@ -1,4 +1,4 @@
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Optional, List
 from .nameutils import camel_case, pascal_case, swift_safe
 
 
@@ -15,6 +15,38 @@ class Type:
     @property
     def swift_name(self) -> str:
         return pascal_case(self.name.lower())
+
+    def link(self, types: Dict[str, 'Type']):
+        pass
+
+
+class NativeType(Type):
+    def __init__(self, name: str, data: Dict):
+        super().__init__(name, data)
+
+    @property
+    def c_name(self) -> str:
+        return {
+            'void': 'Void',
+            'void *': 'UnsafeMutableRawPointer!',
+            'void const *': 'UnsafeRawPointer!',
+            'char': 'CChar',
+            'float': 'Float',
+            'double': 'Double',
+            'uint8_t': 'UInt8',
+            'uint16_t': 'UInt16',
+            'uint32_t': 'UInt32',
+            'uint64_t': 'UInt64',
+            'int32_t': 'Int32',
+            'int64_t': 'Int64',
+            'size_t': 'Int',
+            'int': 'Int32',
+            'bool': 'Bool'
+        }[self.name]
+
+    @property
+    def swift_name(self) -> str:
+        return self.c_name
 
 
 class EnumValue:
@@ -36,6 +68,51 @@ class EnumType(Type):
         self.values = [EnumValue(value['name'], value['value'], self.requires_prefix) for value in data['values']]
 
 
+class Member:
+    def __init__(self, name: str, type_: Type, annotation: Optional[str], length: Optional[str], optional: bool):
+        self.name = name
+        self.type = type_
+        self.annotation = annotation
+        self.length = length
+        self.optional = optional
+
+    @property
+    def c_name(self) -> str:
+        return camel_case(self.name)
+
+    @property
+    def swift_name(self) -> str:
+        return swift_safe(camel_case(self.name.lower()))
+
+    @property
+    def c_type(self) -> str:
+        if self.annotation == 'const*':
+            if self.type.name == 'void':
+                return 'UnsafeRawPointer!'
+            return f'UnsafePointer<{self.type.c_name}>!'
+
+        if self.annotation == '*':
+            if self.type.name == 'void':
+                return 'UnsafeMutableRawPointer!'
+            return f'UnsafeMutablePointer<{self.type.c_name}>!'
+
+        return self.type.c_name
+
+
+class StructureType(Type):
+    def __init__(self, name: str, data: Dict):
+        super().__init__(name, data)
+        self.extensible = data.get('extensible', False)
+        self.chained = data.get('chained', False)
+        self.members: List[Member] = []
+
+    def link(self, types: Dict[str, Type]):
+        self.members = [
+            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'), m.get('optional', False))
+            for m in self.data['members']
+        ]
+
+
 class ObjectType(Type):
     def __init__(self, name: str, data: Dict):
         super().__init__(name, data)
@@ -46,8 +123,10 @@ class Model:
         self.types: Dict[str, Type] = {}
 
         category_types = {
+            'native': NativeType,
             'enum': EnumType,
             'bitmask': EnumType,
+            'structure': StructureType,
             'object': ObjectType,
         }
 
@@ -59,6 +138,9 @@ class Model:
 
             if type_:
                 self.types[name] = type_(name, type_data)
+
+        for type_ in self.types.values():
+            type_.link(self.types)
 
     def types_by_category(self, category: str) -> Iterable[Type]:
         return filter(lambda t: t.category == category, self.types.values())

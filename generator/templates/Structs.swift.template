@@ -1,0 +1,10 @@
+import CWebGPU
+
+{% for struct in model.types_by_category('structure') %}
+public struct {{ struct.swift_name }} {
+    {% for member in struct.members %}
+    public var {{ member.swift_name }}: {{ member.c_type }}
+    {% endfor %}
+}
+
+{% endfor %}
