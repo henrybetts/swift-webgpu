@@ -36,6 +36,11 @@ class EnumType(Type):
         self.values = [EnumValue(value['name'], value['value'], self.requires_prefix) for value in data['values']]
 
 
+class ObjectType(Type):
+    def __init__(self, name: str, data: Dict):
+        super().__init__(name, data)
+
+
 class Model:
     def __init__(self, data: Dict):
         self.types: Dict[str, Type] = {}
@@ -43,6 +48,7 @@ class Model:
         category_types = {
             'enum': EnumType,
             'bitmask': EnumType,
+            'object': ObjectType,
         }
 
         for name, type_data in data.items():
