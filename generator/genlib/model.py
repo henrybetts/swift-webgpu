@@ -134,6 +134,12 @@ class Member:
 
     @property
     def conversion(self) -> typeconversion.Conversion:
+        if self.annotation == 'const*' and self.length:
+            return typeconversion.implicit_conversion
+
+        if self.type.category == 'enum':
+            return typeconversion.enum_conversion
+
         return typeconversion.implicit_conversion
 
 

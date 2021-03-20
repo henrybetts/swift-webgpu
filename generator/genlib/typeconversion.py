@@ -10,3 +10,5 @@ class Conversion:
 
 
 implicit_conversion = Conversion('{{ value }}')
+
+enum_conversion = Conversion('{{ value }}.cValue')

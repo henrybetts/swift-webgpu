@@ -15,8 +15,8 @@ public struct AdapterProperties {
             vendorID: self.vendorId, 
             name: self.name, 
             driverDescription: self.driverDescription, 
-            adapterType: self.adapterType, 
-            backendType: self.backendType
+            adapterType: self.adapterType.cValue, 
+            backendType: self.backendType.cValue
         )
         return try body(&cStruct)
     }
@@ -69,7 +69,7 @@ public struct BufferBindingLayout {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBufferBindingLayout>) throws -> R) rethrows -> R {
         var cStruct = WGPUBufferBindingLayout(
             nextInChain: nil, 
-            type: self.type, 
+            type: self.type.cValue, 
             hasDynamicOffset: self.hasDynamicOffset, 
             minBindingSize: self.minBindingSize
         )
@@ -83,7 +83,7 @@ public struct SamplerBindingLayout {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSamplerBindingLayout>) throws -> R) rethrows -> R {
         var cStruct = WGPUSamplerBindingLayout(
             nextInChain: nil, 
-            type: self.type
+            type: self.type.cValue
         )
         return try body(&cStruct)
     }
@@ -97,8 +97,8 @@ public struct TextureBindingLayout {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUTextureBindingLayout>) throws -> R) rethrows -> R {
         var cStruct = WGPUTextureBindingLayout(
             nextInChain: nil, 
-            sampleType: self.sampleType, 
-            viewDimension: self.viewDimension, 
+            sampleType: self.sampleType.cValue, 
+            viewDimension: self.viewDimension.cValue, 
             multisampled: self.multisampled
         )
         return try body(&cStruct)
@@ -113,9 +113,9 @@ public struct StorageTextureBindingLayout {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUStorageTextureBindingLayout>) throws -> R) rethrows -> R {
         var cStruct = WGPUStorageTextureBindingLayout(
             nextInChain: nil, 
-            access: self.access, 
-            format: self.format, 
-            viewDimension: self.viewDimension
+            access: self.access.cValue, 
+            format: self.format.cValue, 
+            viewDimension: self.viewDimension.cValue
         )
         return try body(&cStruct)
     }
@@ -140,12 +140,12 @@ public struct BindGroupLayoutEntry {
             nextInChain: nil, 
             binding: self.binding, 
             visibility: self.visibility, 
-            type: self.type, 
+            type: self.type.cValue, 
             hasDynamicOffset: self.hasDynamicOffset, 
             minBufferBindingSize: self.minBufferBindingSize, 
-            viewDimension: self.viewDimension, 
-            textureComponentType: self.textureComponentType, 
-            storageTextureFormat: self.storageTextureFormat, 
+            viewDimension: self.viewDimension.cValue, 
+            textureComponentType: self.textureComponentType.cValue, 
+            storageTextureFormat: self.storageTextureFormat.cValue, 
             buffer: self.buffer, 
             sampler: self.sampler, 
             texture: self.texture, 
@@ -178,9 +178,9 @@ public struct BlendDescriptor {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBlendDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPUBlendDescriptor(
-            operation: self.operation, 
-            srcFactor: self.srcFactor, 
-            dstFactor: self.dstFactor
+            operation: self.operation.cValue, 
+            srcFactor: self.srcFactor.cValue, 
+            dstFactor: self.dstFactor.cValue
         )
         return try body(&cStruct)
     }
@@ -195,7 +195,7 @@ public struct ColorStateDescriptor {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUColorStateDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPUColorStateDescriptor(
             nextInChain: nil, 
-            format: self.format, 
+            format: self.format.cValue, 
             alphaBlend: self.alphaBlend, 
             colorBlend: self.colorBlend, 
             writeMask: self.writeMask
@@ -348,9 +348,9 @@ public struct DepthStencilStateDescriptor {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDepthStencilStateDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPUDepthStencilStateDescriptor(
             nextInChain: nil, 
-            format: self.format, 
+            format: self.format.cValue, 
             depthWriteEnabled: self.depthWriteEnabled, 
-            depthCompare: self.depthCompare, 
+            depthCompare: self.depthCompare.cValue, 
             stencilFront: self.stencilFront, 
             stencilBack: self.stencilBack, 
             stencilReadMask: self.stencilReadMask, 
@@ -406,7 +406,7 @@ public struct VertexAttribute {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexAttribute>) throws -> R) rethrows -> R {
         var cStruct = WGPUVertexAttribute(
-            format: self.format, 
+            format: self.format.cValue, 
             offset: self.offset, 
             shaderLocation: self.shaderLocation
         )
@@ -423,7 +423,7 @@ public struct VertexBufferLayout {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexBufferLayout>) throws -> R) rethrows -> R {
         var cStruct = WGPUVertexBufferLayout(
             arrayStride: self.arrayStride, 
-            stepMode: self.stepMode, 
+            stepMode: self.stepMode.cValue, 
             attributeCount: self.attributeCount, 
             attributes: self.attributes
         )
@@ -439,7 +439,7 @@ public struct VertexStateDescriptor {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexStateDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPUVertexStateDescriptor(
             nextInChain: nil, 
-            indexFormat: self.indexFormat, 
+            indexFormat: self.indexFormat.cValue, 
             vertexBufferCount: self.vertexBufferCount, 
             vertexBuffers: self.vertexBuffers
         )
@@ -503,7 +503,7 @@ public struct QuerySetDescriptor {
         var cStruct = WGPUQuerySetDescriptor(
             nextInChain: nil, 
             label: self.label, 
-            type: self.type, 
+            type: self.type.cValue, 
             count: self.count, 
             pipelineStatistics: self.pipelineStatistics, 
             pipelineStatisticsCount: self.pipelineStatisticsCount
@@ -522,8 +522,8 @@ public struct RasterizationStateDescriptor {
     func withCStruct<R>(_ body: (UnsafePointer<WGPURasterizationStateDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPURasterizationStateDescriptor(
             nextInChain: nil, 
-            frontFace: self.frontFace, 
-            cullMode: self.cullMode, 
+            frontFace: self.frontFace.cValue, 
+            cullMode: self.cullMode.cValue, 
             depthBias: self.depthBias, 
             depthBiasSlopeScale: self.depthBiasSlopeScale, 
             depthBiasClamp: self.depthBiasClamp
@@ -557,7 +557,7 @@ public struct RenderBundleEncoderDescriptor {
             label: self.label, 
             colorFormatsCount: self.colorFormatsCount, 
             colorFormats: self.colorFormats, 
-            depthStencilFormat: self.depthStencilFormat, 
+            depthStencilFormat: self.depthStencilFormat.cValue, 
             sampleCount: self.sampleCount
         )
         return try body(&cStruct)
@@ -575,8 +575,8 @@ public struct RenderPassColorAttachmentDescriptor {
         var cStruct = WGPURenderPassColorAttachmentDescriptor(
             attachment: self.attachment, 
             resolveTarget: self.resolveTarget, 
-            loadOp: self.loadOp, 
-            storeOp: self.storeOp, 
+            loadOp: self.loadOp.cValue, 
+            storeOp: self.storeOp.cValue, 
             clearColor: self.clearColor
         )
         return try body(&cStruct)
@@ -597,12 +597,12 @@ public struct RenderPassDepthStencilAttachmentDescriptor {
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDepthStencilAttachmentDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPURenderPassDepthStencilAttachmentDescriptor(
             attachment: self.attachment, 
-            depthLoadOp: self.depthLoadOp, 
-            depthStoreOp: self.depthStoreOp, 
+            depthLoadOp: self.depthLoadOp.cValue, 
+            depthStoreOp: self.depthStoreOp.cValue, 
             clearDepth: self.clearDepth, 
             depthReadOnly: self.depthReadOnly, 
-            stencilLoadOp: self.stencilLoadOp, 
-            stencilStoreOp: self.stencilStoreOp, 
+            stencilLoadOp: self.stencilLoadOp.cValue, 
+            stencilStoreOp: self.stencilStoreOp.cValue, 
             clearStencil: self.clearStencil, 
             stencilReadOnly: self.stencilReadOnly
         )
@@ -653,7 +653,7 @@ public struct RenderPipelineDescriptor {
             vertexStage: self.vertexStage, 
             fragmentStage: self.fragmentStage, 
             vertexState: self.vertexState, 
-            primitiveTopology: self.primitiveTopology, 
+            primitiveTopology: self.primitiveTopology.cValue, 
             rasterizationState: self.rasterizationState, 
             sampleCount: self.sampleCount, 
             depthStencilState: self.depthStencilState, 
@@ -695,15 +695,15 @@ public struct SamplerDescriptor {
         var cStruct = WGPUSamplerDescriptor(
             nextInChain: nil, 
             label: self.label, 
-            addressModeU: self.addressModeU, 
-            addressModeV: self.addressModeV, 
-            addressModeW: self.addressModeW, 
-            magFilter: self.magFilter, 
-            minFilter: self.minFilter, 
-            mipmapFilter: self.mipmapFilter, 
+            addressModeU: self.addressModeU.cValue, 
+            addressModeV: self.addressModeV.cValue, 
+            addressModeW: self.addressModeW.cValue, 
+            magFilter: self.magFilter.cValue, 
+            minFilter: self.minFilter.cValue, 
+            mipmapFilter: self.mipmapFilter.cValue, 
             lodMinClamp: self.lodMinClamp, 
             lodMaxClamp: self.lodMaxClamp, 
-            compare: self.compare, 
+            compare: self.compare.cValue, 
             maxAnisotropy: self.maxAnisotropy
         )
         return try body(&cStruct)
@@ -768,10 +768,10 @@ public struct StencilStateFaceDescriptor {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUStencilStateFaceDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPUStencilStateFaceDescriptor(
-            compare: self.compare, 
-            failOp: self.failOp, 
-            depthFailOp: self.depthFailOp, 
-            passOp: self.passOp
+            compare: self.compare.cValue, 
+            failOp: self.failOp.cValue, 
+            depthFailOp: self.depthFailOp.cValue, 
+            passOp: self.passOp.cValue
         )
         return try body(&cStruct)
     }
@@ -855,10 +855,10 @@ public struct SwapChainDescriptor {
             nextInChain: nil, 
             label: self.label, 
             usage: self.usage, 
-            format: self.format, 
+            format: self.format.cValue, 
             width: self.width, 
             height: self.height, 
-            presentMode: self.presentMode, 
+            presentMode: self.presentMode.cValue, 
             implementation: self.implementation
         )
         return try body(&cStruct)
@@ -877,7 +877,7 @@ public struct TextureCopyView {
             texture: self.texture, 
             mipLevel: self.mipLevel, 
             origin: self.origin, 
-            aspect: self.aspect
+            aspect: self.aspect.cValue
         )
         return try body(&cStruct)
     }
@@ -913,9 +913,9 @@ public struct TextureDescriptor {
             nextInChain: nil, 
             label: self.label, 
             usage: self.usage, 
-            dimension: self.dimension, 
+            dimension: self.dimension.cValue, 
             size: self.size, 
-            format: self.format, 
+            format: self.format.cValue, 
             mipLevelCount: self.mipLevelCount, 
             sampleCount: self.sampleCount
         )
@@ -937,13 +937,13 @@ public struct TextureViewDescriptor {
         var cStruct = WGPUTextureViewDescriptor(
             nextInChain: nil, 
             label: self.label, 
-            format: self.format, 
-            dimension: self.dimension, 
+            format: self.format.cValue, 
+            dimension: self.dimension.cValue, 
             baseMipLevel: self.baseMipLevel, 
             mipLevelCount: self.mipLevelCount, 
             baseArrayLayer: self.baseArrayLayer, 
             arrayLayerCount: self.arrayLayerCount, 
-            aspect: self.aspect
+            aspect: self.aspect.cValue
         )
         return try body(&cStruct)
     }
