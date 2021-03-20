@@ -140,6 +140,9 @@ class Member:
         if self.type.category == 'enum':
             return typeconversion.enum_conversion
 
+        if self.type.category == 'bitmask':
+            return typeconversion.bitmask_conversion
+
         return typeconversion.implicit_conversion
 
 

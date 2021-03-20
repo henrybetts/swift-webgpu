@@ -139,7 +139,7 @@ public struct BindGroupLayoutEntry {
         var cStruct = WGPUBindGroupLayoutEntry(
             nextInChain: nil, 
             binding: self.binding, 
-            visibility: self.visibility, 
+            visibility: self.visibility.rawValue, 
             type: self.type.cValue, 
             hasDynamicOffset: self.hasDynamicOffset, 
             minBufferBindingSize: self.minBufferBindingSize, 
@@ -198,7 +198,7 @@ public struct ColorStateDescriptor {
             format: self.format.cValue, 
             alphaBlend: self.alphaBlend, 
             colorBlend: self.colorBlend, 
-            writeMask: self.writeMask
+            writeMask: self.writeMask.rawValue
         )
         return try body(&cStruct)
     }
@@ -228,7 +228,7 @@ public struct BufferDescriptor {
         var cStruct = WGPUBufferDescriptor(
             nextInChain: nil, 
             label: self.label, 
-            usage: self.usage, 
+            usage: self.usage.rawValue, 
             size: self.size, 
             mappedAtCreation: self.mappedAtCreation
         )
@@ -854,7 +854,7 @@ public struct SwapChainDescriptor {
         var cStruct = WGPUSwapChainDescriptor(
             nextInChain: nil, 
             label: self.label, 
-            usage: self.usage, 
+            usage: self.usage.rawValue, 
             format: self.format.cValue, 
             width: self.width, 
             height: self.height, 
@@ -912,7 +912,7 @@ public struct TextureDescriptor {
         var cStruct = WGPUTextureDescriptor(
             nextInChain: nil, 
             label: self.label, 
-            usage: self.usage, 
+            usage: self.usage.rawValue, 
             dimension: self.dimension.cValue, 
             size: self.size, 
             format: self.format.cValue, 
