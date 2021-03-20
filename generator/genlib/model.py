@@ -68,6 +68,12 @@ class EnumType(Type):
         self.values = [EnumValue(value['name'], value['value'], self.requires_prefix) for value in data['values']]
 
 
+class BitmaskType(EnumType):
+    @property
+    def c_name(self) -> str:
+        return super().c_name + 'Flags'
+
+
 class Member:
     def __init__(self, name: str, type_: Type, annotation: Optional[str], length: Optional[str], optional: bool):
         self.name = name
@@ -86,14 +92,19 @@ class Member:
 
     @property
     def c_type(self) -> str:
+        if self.type.name == 'void' and self.annotation == 'const*':
+            return 'UnsafeRawPointer!'
+
+        if self.type.name == 'void' and self.annotation == '*':
+            return 'UnsafeMutableRawPointer!'
+
+        if self.annotation == 'const*' and self.type.category == 'object':
+            return f'UnsafePointer<{self.type.c_name}?>!'
+
         if self.annotation == 'const*':
-            if self.type.name == 'void':
-                return 'UnsafeRawPointer!'
             return f'UnsafePointer<{self.type.c_name}>!'
 
         if self.annotation == '*':
-            if self.type.name == 'void':
-                return 'UnsafeMutableRawPointer!'
             return f'UnsafeMutablePointer<{self.type.c_name}>!'
 
         return self.type.c_name
@@ -125,7 +136,7 @@ class Model:
         category_types = {
             'native': NativeType,
             'enum': EnumType,
-            'bitmask': EnumType,
+            'bitmask': BitmaskType,
             'structure': StructureType,
             'object': ObjectType,
         }

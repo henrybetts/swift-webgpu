@@ -5,6 +5,24 @@ public struct {{ struct.swift_name }} {
     {% for member in struct.members %}
     public var {{ member.swift_name }}: {{ member.c_type }}
     {% endfor %}
+
+    func withCStruct<R>(_ body: (UnsafePointer<{{ struct.c_name }}>) throws -> R) rethrows -> R {
+        var cStruct = {{ struct.c_name }}(
+            {% if struct.extensible %}
+            nextInChain: nil{% if struct.members %}, {% endif %}
+
+            {% endif %}
+            {% if struct.chained %}
+            chain: WGPUChainedStruct(){% if struct.members %}, {% endif %}
+
+            {% endif %}
+            {% for member in struct.members %}
+            {{ member.c_name }}: self.{{ member.swift_name }}{% if not loop.last %}, {% endif %}
+
+            {% endfor %}
+        )
+        return try body(&cStruct)
+    }
 }
 
 {% endfor %}

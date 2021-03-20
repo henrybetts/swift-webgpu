@@ -8,14 +8,6 @@ public struct {{ bitmask.swift_name }}: OptionSet {
         self.rawValue = rawValue
     }
 
-    init(cValue: {{ bitmask.c_name }}) {
-        self.init(rawValue: cValue.rawValue)
-    }
-
-    var cValue: {{ bitmask.c_name }} {
-        return {{ bitmask.c_name }}(rawValue: self.rawValue)
-    }
-
     {% for value in bitmask.values %}
     public static let {{ value.swift_name }} = {{ bitmask.swift_name }}(rawValue: {{ value.value }})
     {% endfor %}

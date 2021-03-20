@@ -7,14 +7,6 @@ public struct BufferUsage: OptionSet {
         self.rawValue = rawValue
     }
 
-    init(cValue: WGPUBufferUsage) {
-        self.init(rawValue: cValue.rawValue)
-    }
-
-    var cValue: WGPUBufferUsage {
-        return WGPUBufferUsage(rawValue: self.rawValue)
-    }
-
     public static let none = BufferUsage(rawValue: 0)
     public static let mapRead = BufferUsage(rawValue: 1)
     public static let mapWrite = BufferUsage(rawValue: 2)
@@ -35,14 +27,6 @@ public struct ColorWriteMask: OptionSet {
         self.rawValue = rawValue
     }
 
-    init(cValue: WGPUColorWriteMask) {
-        self.init(rawValue: cValue.rawValue)
-    }
-
-    var cValue: WGPUColorWriteMask {
-        return WGPUColorWriteMask(rawValue: self.rawValue)
-    }
-
     public static let none = ColorWriteMask(rawValue: 0)
     public static let red = ColorWriteMask(rawValue: 1)
     public static let green = ColorWriteMask(rawValue: 2)
@@ -58,14 +42,6 @@ public struct MapMode: OptionSet {
         self.rawValue = rawValue
     }
 
-    init(cValue: WGPUMapMode) {
-        self.init(rawValue: cValue.rawValue)
-    }
-
-    var cValue: WGPUMapMode {
-        return WGPUMapMode(rawValue: self.rawValue)
-    }
-
     public static let none = MapMode(rawValue: 0)
     public static let read = MapMode(rawValue: 1)
     public static let write = MapMode(rawValue: 2)
@@ -76,14 +52,6 @@ public struct ShaderStage: OptionSet {
 
     public init(rawValue: UInt32) {
         self.rawValue = rawValue
-    }
-
-    init(cValue: WGPUShaderStage) {
-        self.init(rawValue: cValue.rawValue)
-    }
-
-    var cValue: WGPUShaderStage {
-        return WGPUShaderStage(rawValue: self.rawValue)
     }
 
     public static let none = ShaderStage(rawValue: 0)
@@ -97,14 +65,6 @@ public struct TextureUsage: OptionSet {
 
     public init(rawValue: UInt32) {
         self.rawValue = rawValue
-    }
-
-    init(cValue: WGPUTextureUsage) {
-        self.init(rawValue: cValue.rawValue)
-    }
-
-    var cValue: WGPUTextureUsage {
-        return WGPUTextureUsage(rawValue: self.rawValue)
     }
 
     public static let none = TextureUsage(rawValue: 0)
