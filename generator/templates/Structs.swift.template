@@ -3,7 +3,7 @@ import CWebGPU
 {% for struct in model.types_by_category('structure') %}
 public struct {{ struct.swift_name }} {
     {% for member in struct.members %}
-    public var {{ member.swift_name }}: {{ member.c_type }}
+    public var {{ member.swift_name }}: {{ member.swift_type }}
     {% endfor %}
 
     func withCStruct<R>(_ body: (UnsafePointer<{{ struct.c_name }}>) throws -> R) rethrows -> R {
@@ -17,7 +17,7 @@ public struct {{ struct.swift_name }} {
 
             {% endif %}
             {% for member in struct.members %}
-            {{ member.c_name }}: self.{{ member.swift_name }}{% if not loop.last %}, {% endif %}
+            {{ member.c_name }}: {{ member.conversion.get_c_value('self.' + member.swift_name) }}{% if not loop.last %}, {% endif %}
 
             {% endfor %}
         )

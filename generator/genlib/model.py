@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, Optional, List
 from .nameutils import camel_case, pascal_case, swift_safe
+from . import typeconversion
 
 
 class Type:
@@ -107,7 +108,33 @@ class Member:
         if self.annotation == '*':
             return f'UnsafeMutablePointer<{self.type.c_name}>!'
 
+        if self.type.category == 'object':
+            return f'{self.type.c_name}!'
+
         return self.type.c_name
+
+    @property
+    def swift_type(self) -> str:
+        if self.type.name == 'char' and self.annotation == 'const*':
+            swift_type = 'String'
+
+        elif self.annotation == 'const*' and self.length:
+            swift_type = f'[{self.type.swift_name}]'
+
+        elif not self.annotation or (self.annotation == 'const*' and self.type.category == 'structure'):
+            swift_type = self.type.swift_name
+
+        else:
+            return self.c_type
+
+        if self.optional:
+            swift_type += '?'
+
+        return swift_type
+
+    @property
+    def conversion(self) -> typeconversion.Conversion:
+        return typeconversion.implicit_conversion
 
 
 class StructureType(Type):
