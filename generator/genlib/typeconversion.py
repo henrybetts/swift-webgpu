@@ -38,6 +38,10 @@ implicit_conversion = Conversion('{{ value }}', None, '{{ value }}')
 implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                        ('{{ value }}.withUnsafeBufferPointer { buffer_{{ name }} in', '}'))
 
+optional_implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
+                                                ('{{ value }}.withOptionalUnsafeBufferPointer { buffer_{{ name }} in',
+                                                 '}'))
+
 enum_conversion = Conversion('{{ value }}.cValue')
 
 enum_array_conversion = Conversion('buffer_{{ name }}.baseAddress',

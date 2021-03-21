@@ -151,6 +151,9 @@ class Member:
             if self.type.category == 'object':
                 return typeconversion.object_array_conversion
 
+            if self.optional:
+                return typeconversion.optional_implicit_array_conversion
+            
             return typeconversion.implicit_array_conversion
 
         if self.type.category == 'enum':
