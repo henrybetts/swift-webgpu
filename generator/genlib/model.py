@@ -180,6 +180,10 @@ class StructureType(Type):
         self.members: List[Member] = []
 
     @property
+    def s_type(self) -> str:
+        return 'WGPUSType_' + pascal_case(self.name)
+
+    @property
     def swift_members(self) -> List[Member]:
         return [member for member in self.members if not member.length_of]
 

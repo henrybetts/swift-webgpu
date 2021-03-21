@@ -1,4 +1,6 @@
-/* String */
+import CWebGPU
+
+// MARK: String
 extension Optional where Wrapped == String {
     func withOptionalCString<R>(_ body: (UnsafePointer<CChar>?) throws -> R) rethrows -> R {
         guard let s = self else { return try body(nil) }
@@ -7,7 +9,7 @@ extension Optional where Wrapped == String {
 }
 
 
-/* Struct */
+// MARK: Struct
 protocol CStructConvertible {
     associatedtype CStruct
     func withCStruct<R>(_ body: (UnsafePointer<CStruct>) throws -> R) rethrows -> R
@@ -39,5 +41,22 @@ extension Array where Element: CStructConvertible {
         cStructs.reserveCapacity(self.count)
         var iterator = makeIterator()
         return try _withCStructBufferPointer(to: &cStructs, appending: &iterator, body)
+    }
+}
+
+
+// MARK: Extensible
+public protocol Extensible {
+    var nextInChain: Chained? { get }
+}
+
+public protocol Chained: Extensible {
+    func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R
+}
+
+extension Optional where Wrapped == Chained {
+    func withOptionalChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>?) throws -> R) rethrows -> R {
+        guard let s = self else { return try body(nil) }
+        return try s.withChainedCStruct(body)
     }
 }

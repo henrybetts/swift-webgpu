@@ -1,14 +1,23 @@
 import CWebGPU
 
 {% for struct in model.types_by_category('structure') %}
-public struct {{ struct.swift_name }}: CStructConvertible {
+public struct {{ struct.swift_name }}: CStructConvertible
+    {%- if struct.extensible %}, Extensible{% endif %}
+    {% if struct.chained %}, Chained{% endif %} {
     typealias CStruct = {{ struct.c_name }}
 
     {% for member in struct.swift_members %}
     public var {{ member.swift_name }}: {{ member.swift_type }}
     {% endfor %}
+    {% if struct.extensible or struct.chained %}
+
+    public var nextInChain: Chained?
+    {% endif %}
 
     func withCStruct<R>(_ body: (UnsafePointer<{{ struct.c_name }}>) throws -> R) rethrows -> R {
+        {% if struct.extensible or struct.chained %}
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        {% endif %}
         {% for member in struct.members %}
         {% if member.conversion.requires_closure %}
         return try {{ member.conversion.get_closure_head(member.target_swift_name, prefix='self.') }}
@@ -16,11 +25,11 @@ public struct {{ struct.swift_name }}: CStructConvertible {
         {% endfor %}
         var cStruct = {{ struct.c_name }}(
             {% if struct.extensible %}
-            nextInChain: nil{% if struct.members %}, {% endif %}
+            nextInChain: chainedCStruct{% if struct.members %}, {% endif %}
 
             {% endif %}
             {% if struct.chained %}
-            chain: WGPUChainedStruct(){% if struct.members %}, {% endif %}
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: {{ struct.s_type }}){% if struct.members %}, {% endif %}
 
             {% endif %}
             {% for member in struct.members %}
@@ -34,7 +43,19 @@ public struct {{ struct.swift_name }}: CStructConvertible {
         {{ member.conversion.get_closure_tail(member.target_swift_name, prefix='self.') }}
         {% endif %}
         {% endfor %}
+        {% if struct.extensible or struct.chained %}
+        }
+        {% endif %}
     }
+    {% if struct.chained %}
+
+    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
+        return try withCStruct { cStruct in
+            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
+            return try body(chainedCStruct)
+        }
+    }
+    {% endif %}
 }
 
 {% endfor %}
