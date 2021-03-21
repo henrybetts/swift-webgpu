@@ -197,9 +197,52 @@ class StructureType(Type):
             member.length_of = members_by_length.get(member.name)
 
 
+class Method:
+    def __init__(self, object_name: str, name: str, args: List[Member], return_type: Type):
+        self.object_name = object_name
+        self.name = name
+        self.args = args
+        self.return_type = return_type
+
+    @property
+    def c_name(self) -> str:
+        return 'wgpu' + pascal_case(self.object_name) + pascal_case(self.name)
+
+    @property
+    def swift_name(self) -> str:
+        return camel_case(self.name.lower())
+
+    @property
+    def swift_args(self) -> List[Member]:
+        return [arg for arg in self.args if not arg.length_of]
+
+
 class ObjectType(Type):
     def __init__(self, name: str, data: Dict):
         super().__init__(name, data)
+        self.methods: List[Method] = []
+
+    def link(self, types: Dict[str, Type]):
+        for method in self.data.get('methods', []):
+            args = [
+                Member(arg['name'], types[arg['type']], arg.get('annotation'), arg.get('length'),
+                       arg.get('optional', False))
+                for arg in method.get('args', [])
+            ]
+            args_by_length = {arg.length: arg for arg in args if arg.length}
+            for arg in args:
+                arg.length_of = args_by_length.get(arg.name)
+
+            returns = method.get('returns')
+            return_type = types[returns] if returns and returns != 'void' else None
+
+            self.methods.append(Method(self.name, method['name'], args, return_type))
+
+
+class CallbackType(Type):
+    @property
+    def swift_name(self) -> str:
+        return self.c_name
 
 
 class Model:
@@ -212,6 +255,7 @@ class Model:
             'bitmask': BitmaskType,
             'structure': StructureType,
             'object': ObjectType,
+            'callback': CallbackType,
         }
 
         for name, type_data in data.items():
