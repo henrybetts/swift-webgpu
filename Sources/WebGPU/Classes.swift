@@ -104,7 +104,7 @@ public class CommandEncoder {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuCommandEncoderBeginRenderPass(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -127,9 +127,9 @@ public class CommandEncoder {
         copySize.withCStruct { cStruct_copySize in
         wgpuCommandEncoderCopyBufferToTexture(
             self.object, 
-            cStruct_source.pointee, 
-            cStruct_destination.pointee, 
-            cStruct_copySize.pointee
+            cStruct_source, 
+            cStruct_destination, 
+            cStruct_copySize
         )
         }
         }
@@ -142,9 +142,9 @@ public class CommandEncoder {
         copySize.withCStruct { cStruct_copySize in
         wgpuCommandEncoderCopyTextureToBuffer(
             self.object, 
-            cStruct_source.pointee, 
-            cStruct_destination.pointee, 
-            cStruct_copySize.pointee
+            cStruct_source, 
+            cStruct_destination, 
+            cStruct_copySize
         )
         }
         }
@@ -157,9 +157,9 @@ public class CommandEncoder {
         copySize.withCStruct { cStruct_copySize in
         wgpuCommandEncoderCopyTextureToTexture(
             self.object, 
-            cStruct_source.pointee, 
-            cStruct_destination.pointee, 
-            cStruct_copySize.pointee
+            cStruct_source, 
+            cStruct_destination, 
+            cStruct_copySize
         )
         }
         }
@@ -328,7 +328,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateBindGroup(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -338,7 +338,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateBindGroupLayout(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -348,7 +348,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateBuffer(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -375,7 +375,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateComputePipeline(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -385,7 +385,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         wgpuDeviceCreateComputePipelineAsync(
             self.object, 
-            cStruct_descriptor.pointee, 
+            cStruct_descriptor, 
             callback, 
             userdata
         )
@@ -396,7 +396,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreatePipelineLayout(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -406,7 +406,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateQuerySet(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -416,7 +416,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         wgpuDeviceCreateRenderPipelineAsync(
             self.object, 
-            cStruct_descriptor.pointee, 
+            cStruct_descriptor, 
             callback, 
             userdata
         )
@@ -427,7 +427,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateRenderBundleEncoder(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -437,7 +437,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateRenderPipeline(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -457,7 +457,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateShaderModule(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -468,7 +468,7 @@ public class Device {
         let result = wgpuDeviceCreateSwapChain(
             self.object, 
             surface?.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -478,7 +478,7 @@ public class Device {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateTexture(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -588,7 +588,7 @@ public class Instance {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuInstanceCreateSurface(
             self.object, 
-            cStruct_descriptor.pointee
+            cStruct_descriptor
         )
         return .init(object: result)
         }
@@ -680,11 +680,11 @@ public class Queue {
         writeSize.withCStruct { cStruct_writeSize in
         wgpuQueueWriteTexture(
             self.object, 
-            cStruct_destination.pointee, 
+            cStruct_destination, 
             buffer_data.baseAddress, 
             .init(buffer_data.count), 
-            cStruct_dataLayout.pointee, 
-            cStruct_writeSize.pointee
+            cStruct_dataLayout, 
+            cStruct_writeSize
         )
         }
         }
@@ -699,10 +699,10 @@ public class Queue {
         options.withCStruct { cStruct_options in
         wgpuQueueCopyTextureForBrowser(
             self.object, 
-            cStruct_source.pointee, 
-            cStruct_destination.pointee, 
-            cStruct_copySize.pointee, 
-            cStruct_options.pointee
+            cStruct_source, 
+            cStruct_destination, 
+            cStruct_copySize, 
+            cStruct_options
         )
         }
         }
@@ -955,7 +955,7 @@ public class RenderPassEncoder {
         color.withCStruct { cStruct_color in
         wgpuRenderPassEncoderSetBlendColor(
             self.object, 
-            cStruct_color.pointee
+            cStruct_color
         )
         }
     }

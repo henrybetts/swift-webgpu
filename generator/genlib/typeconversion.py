@@ -55,6 +55,8 @@ optional_string_conversion = Conversion('cString_{{ name }}',
 struct_conversion = Conversion('cStruct_{{ name }}.pointee',
                                ('{{ value }}.withCStruct { cStruct_{{ name }} in', '}'))
 
+struct_pointer_conversion = Conversion('cStruct_{{ name }}', ('{{ value }}.withCStruct { cStruct_{{ name }} in', '}'))
+
 optional_struct_conversion = Conversion('cStruct_{{ name }}',
                                         ('{{ value }}.withOptionalCStruct { cStruct_{{ name }} in', '}'))
 

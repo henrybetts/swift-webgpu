@@ -160,7 +160,11 @@ class Member:
             return typeconversion.bitmask_conversion
 
         if self.type.category == 'structure':
-            return typeconversion.optional_struct_conversion if self.optional else typeconversion.struct_conversion
+            if self.optional:
+                return typeconversion.optional_struct_conversion
+            if self.annotation == 'const*':
+                return typeconversion.struct_pointer_conversion
+            return typeconversion.struct_conversion
 
         if self.type.category == 'object':
             return typeconversion.optional_object_conversion if self.optional else typeconversion.object_conversion
