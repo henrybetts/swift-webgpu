@@ -134,6 +134,9 @@ class Member:
 
     @property
     def conversion(self) -> typeconversion.Conversion:
+        if self.type.name == 'char' and self.annotation == 'const*':
+            return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
+
         if self.annotation == 'const*' and self.length:
             return typeconversion.implicit_conversion
 

@@ -9,16 +9,20 @@ public struct AdapterProperties {
     public var backendType: BackendType
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUAdapterProperties>) throws -> R) rethrows -> R {
+        return try self.name.withCString { cString_name in
+        return try self.driverDescription.withCString { cString_driverDescription in
         var cStruct = WGPUAdapterProperties(
             nextInChain: nil, 
             deviceID: self.deviceId, 
             vendorID: self.vendorId, 
-            name: self.name, 
-            driverDescription: self.driverDescription, 
+            name: cString_name, 
+            driverDescription: cString_driverDescription, 
             adapterType: self.adapterType.cValue, 
             backendType: self.backendType.cValue
         )
         return try body(&cStruct)
+        }
+        }
     }
 }
 
@@ -50,14 +54,16 @@ public struct BindGroupDescriptor {
     public var entries: [BindGroupEntry]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUBindGroupDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             layout: self.layout, 
             entryCount: self.entryCount, 
             entries: self.entries
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -161,13 +167,15 @@ public struct BindGroupLayoutDescriptor {
     public var entries: [BindGroupLayoutEntry]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupLayoutDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUBindGroupLayoutDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             entryCount: self.entryCount, 
             entries: self.entries
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -225,14 +233,16 @@ public struct BufferDescriptor {
     public var mappedAtCreation: Bool
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBufferDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUBufferDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             usage: self.usage.rawValue, 
             size: self.size, 
             mappedAtCreation: self.mappedAtCreation
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -257,11 +267,13 @@ public struct CommandBufferDescriptor {
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCommandBufferDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUCommandBufferDescriptor(
             nextInChain: nil, 
-            label: self.label
+            label: cString_label
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -269,11 +281,13 @@ public struct CommandEncoderDescriptor {
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCommandEncoderDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUCommandEncoderDescriptor(
             nextInChain: nil, 
-            label: self.label
+            label: cString_label
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -281,11 +295,13 @@ public struct ComputePassDescriptor {
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUComputePassDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUComputePassDescriptor(
             nextInChain: nil, 
-            label: self.label
+            label: cString_label
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -295,13 +311,15 @@ public struct ComputePipelineDescriptor {
     public var computeStage: ProgrammableStageDescriptor
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUComputePipelineDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUComputePipelineDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             layout: self.layout, 
             computeStage: self.computeStage
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -380,12 +398,14 @@ public struct FenceDescriptor {
     public var initialValue: UInt64
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUFenceDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUFenceDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             initialValue: self.initialValue
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -468,13 +488,15 @@ public struct PipelineLayoutDescriptor {
     public var bindGroupLayouts: [BindGroupLayout]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUPipelineLayoutDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUPipelineLayoutDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             bindGroupLayoutCount: self.bindGroupLayoutCount, 
             bindGroupLayouts: self.bindGroupLayouts
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -483,12 +505,14 @@ public struct ProgrammableStageDescriptor {
     public var entryPoint: String
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUProgrammableStageDescriptor>) throws -> R) rethrows -> R {
+        return try self.entryPoint.withCString { cString_entryPoint in
         var cStruct = WGPUProgrammableStageDescriptor(
             nextInChain: nil, 
             module: self.module, 
-            entryPoint: self.entryPoint
+            entryPoint: cString_entryPoint
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -500,15 +524,17 @@ public struct QuerySetDescriptor {
     public var pipelineStatisticsCount: UInt32
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUQuerySetDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUQuerySetDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             type: self.type.cValue, 
             count: self.count, 
             pipelineStatistics: self.pipelineStatistics, 
             pipelineStatisticsCount: self.pipelineStatisticsCount
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -536,11 +562,13 @@ public struct RenderBundleDescriptor {
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderBundleDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPURenderBundleDescriptor(
             nextInChain: nil, 
-            label: self.label
+            label: cString_label
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -552,15 +580,17 @@ public struct RenderBundleEncoderDescriptor {
     public var sampleCount: UInt32
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderBundleEncoderDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPURenderBundleEncoderDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             colorFormatsCount: self.colorFormatsCount, 
             colorFormats: self.colorFormats, 
             depthStencilFormat: self.depthStencilFormat.cValue, 
             sampleCount: self.sampleCount
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -618,15 +648,17 @@ public struct RenderPassDescriptor {
     public var occlusionQuerySet: QuerySet?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPURenderPassDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             colorAttachmentCount: self.colorAttachmentCount, 
             colorAttachments: self.colorAttachments, 
             depthStencilAttachment: self.depthStencilAttachment, 
             occlusionQuerySet: self.occlusionQuerySet
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -646,9 +678,10 @@ public struct RenderPipelineDescriptor {
     public var alphaToCoverageEnabled: Bool
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPipelineDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPURenderPipelineDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             layout: self.layout, 
             vertexStage: self.vertexStage, 
             fragmentStage: self.fragmentStage, 
@@ -663,6 +696,7 @@ public struct RenderPipelineDescriptor {
             alphaToCoverageEnabled: self.alphaToCoverageEnabled
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -692,9 +726,10 @@ public struct SamplerDescriptor {
     public var maxAnisotropy: UInt16
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSamplerDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUSamplerDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             addressModeU: self.addressModeU.cValue, 
             addressModeV: self.addressModeV.cValue, 
             addressModeW: self.addressModeW.cValue, 
@@ -707,6 +742,7 @@ public struct SamplerDescriptor {
             maxAnisotropy: self.maxAnisotropy
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -726,11 +762,13 @@ public struct ShaderModuleDescriptor {
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUShaderModuleDescriptor(
             nextInChain: nil, 
-            label: self.label
+            label: cString_label
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -752,11 +790,13 @@ public struct ShaderModuleWgslDescriptor {
     public var source: String
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleWGSLDescriptor>) throws -> R) rethrows -> R {
+        return try self.source.withCString { cString_source in
         var cStruct = WGPUShaderModuleWGSLDescriptor(
             chain: WGPUChainedStruct(), 
-            source: self.source
+            source: cString_source
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -781,11 +821,13 @@ public struct SurfaceDescriptor {
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUSurfaceDescriptor(
             nextInChain: nil, 
-            label: self.label
+            label: cString_label
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -793,11 +835,13 @@ public struct SurfaceDescriptorFromCanvasHtmlSelector {
     public var selector: String
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromCanvasHTMLSelector>) throws -> R) rethrows -> R {
+        return try self.selector.withCString { cString_selector in
         var cStruct = WGPUSurfaceDescriptorFromCanvasHTMLSelector(
             chain: WGPUChainedStruct(), 
-            selector: self.selector
+            selector: cString_selector
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -851,9 +895,10 @@ public struct SwapChainDescriptor {
     public var implementation: UInt64
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSwapChainDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUSwapChainDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             usage: self.usage.rawValue, 
             format: self.format.cValue, 
             width: self.width, 
@@ -862,6 +907,7 @@ public struct SwapChainDescriptor {
             implementation: self.implementation
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -909,9 +955,10 @@ public struct TextureDescriptor {
     public var sampleCount: UInt32
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUTextureDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUTextureDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             usage: self.usage.rawValue, 
             dimension: self.dimension.cValue, 
             size: self.size, 
@@ -920,6 +967,7 @@ public struct TextureDescriptor {
             sampleCount: self.sampleCount
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -934,9 +982,10 @@ public struct TextureViewDescriptor {
     public var aspect: TextureAspect
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUTextureViewDescriptor>) throws -> R) rethrows -> R {
+        return try self.label.withOptionalCString { cString_label in
         var cStruct = WGPUTextureViewDescriptor(
             nextInChain: nil, 
-            label: self.label, 
+            label: cString_label, 
             format: self.format.cValue, 
             dimension: self.dimension.cValue, 
             baseMipLevel: self.baseMipLevel, 
@@ -946,6 +995,7 @@ public struct TextureViewDescriptor {
             aspect: self.aspect.cValue
         )
         return try body(&cStruct)
+        }
     }
 }
 
