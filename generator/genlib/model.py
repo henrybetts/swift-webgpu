@@ -146,6 +146,9 @@ class Member:
         if self.type.category == 'bitmask':
             return typeconversion.bitmask_conversion
 
+        if self.type.category == 'structure':
+            return typeconversion.optional_struct_conversion if self.optional else typeconversion.struct_conversion
+
         return typeconversion.implicit_conversion
 
 
