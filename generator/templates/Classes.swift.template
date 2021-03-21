@@ -10,7 +10,7 @@ public class {{ object.swift_name }} {
     {% for method in object.methods %}
 
     public func {{ method.swift_name }}(
-    {%- for arg in method.args -%}
+    {%- for arg in method.swift_args -%}
     {{ arg.swift_name }}: {{ arg.swift_type }}{% if not loop.last %}, {% endif %}
     {%- endfor -%}
     ){% if method.return_type %} -> {{ method.return_type.swift_name }}{% endif %} {

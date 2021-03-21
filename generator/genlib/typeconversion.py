@@ -42,7 +42,7 @@ optional_implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                                 ('{{ value }}.withOptionalUnsafeBufferPointer { buffer_{{ name }} in',
                                                  '}'))
 
-enum_conversion = Conversion('{{ value }}.cValue')
+enum_conversion = Conversion('{{ value }}.cValue', None, '.init(cValue: {{ value }})')
 
 enum_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                    ('{{ value }}.map { $0.cValue }.withUnsafeBufferPointer { buffer_{{ name }} in',
@@ -51,7 +51,8 @@ enum_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
 bitmask_conversion = Conversion('{{ value }}.rawValue')
 
 string_conversion = Conversion('cString_{{ name }}',
-                               ('{{ value }}.withCString { cString_{{ name }} in', '}'))
+                               ('{{ value }}.withCString { cString_{{ name }} in', '}'),
+                               'String(cString: {{ value }})')
 
 optional_string_conversion = Conversion('cString_{{ name }}',
                                         ('{{ value }}.withOptionalCString { cString_{{ name }} in', '}'))
@@ -76,3 +77,5 @@ object_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                       '}'))
 
 length_conversion = Conversion('.init(buffer_{{ name }}.count)')
+
+userdata_conversion = Conversion('Unmanaged.passRetained(callback as AnyObject).toOpaque()')

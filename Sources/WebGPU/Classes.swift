@@ -23,14 +23,14 @@ public class Buffer {
         self.object = object
     }
 
-    public func mapAsync(mode: MapMode, offset: Int, size: Int, callback: WGPUBufferMapCallback, userdata: UnsafeMutableRawPointer!) {
+    public func mapAsync(mode: MapMode, offset: Int, size: Int, callback: BufferMapCallback) {
         wgpuBufferMapAsync(
             self.object, 
             mode.rawValue, 
             offset, 
             size, 
-            callback, 
-            userdata
+            bufferMapCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
     }
 
@@ -257,7 +257,7 @@ public class ComputePassEncoder {
         )
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsetCount: UInt32, dynamicOffsets: [UInt32]?) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]?) {
         dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
         wgpuComputePassEncoderSetBindGroup(
             self.object, 
@@ -381,13 +381,13 @@ public class Device {
         }
     }
 
-    public func createComputePipelineAsync(descriptor: ComputePipelineDescriptor, callback: WGPUCreateComputePipelineAsyncCallback, userdata: UnsafeMutableRawPointer!) {
+    public func createComputePipelineAsync(descriptor: ComputePipelineDescriptor, callback: CreateComputePipelineAsyncCallback) {
         descriptor.withCStruct { cStruct_descriptor in
         wgpuDeviceCreateComputePipelineAsync(
             self.object, 
             cStruct_descriptor, 
-            callback, 
-            userdata
+            createComputePipelineAsyncCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
         }
     }
@@ -412,13 +412,13 @@ public class Device {
         }
     }
 
-    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor, callback: WGPUCreateRenderPipelineAsyncCallback, userdata: UnsafeMutableRawPointer!) {
+    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor, callback: CreateRenderPipelineAsyncCallback) {
         descriptor.withCStruct { cStruct_descriptor in
         wgpuDeviceCreateRenderPipelineAsync(
             self.object, 
             cStruct_descriptor, 
-            callback, 
-            userdata
+            createRenderPipelineAsyncCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
         }
     }
@@ -520,19 +520,19 @@ public class Device {
         )
     }
 
-    public func setUncapturedErrorCallback(callback: WGPUErrorCallback, userdata: UnsafeMutableRawPointer!) {
+    public func setUncapturedErrorCallback(callback: ErrorCallback) {
         wgpuDeviceSetUncapturedErrorCallback(
             self.object, 
-            callback, 
-            userdata
+            errorCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
     }
 
-    public func setDeviceLostCallback(callback: WGPUDeviceLostCallback, userdata: UnsafeMutableRawPointer!) {
+    public func setDeviceLostCallback(callback: DeviceLostCallback) {
         wgpuDeviceSetDeviceLostCallback(
             self.object, 
-            callback, 
-            userdata
+            deviceLostCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
     }
 
@@ -543,11 +543,11 @@ public class Device {
         )
     }
 
-    public func popErrorScope(callback: WGPUErrorCallback, userdata: UnsafeMutableRawPointer!) -> Bool {
+    public func popErrorScope(callback: ErrorCallback) -> Bool {
         let result = wgpuDevicePopErrorScope(
             self.object, 
-            callback, 
-            userdata
+            errorCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
         return result
     }
@@ -567,12 +567,12 @@ public class Fence {
         return result
     }
 
-    public func onCompletion(value: UInt64, callback: WGPUFenceOnCompletionCallback, userdata: UnsafeMutableRawPointer!) {
+    public func onCompletion(value: UInt64, callback: FenceOnCompletionCallback) {
         wgpuFenceOnCompletion(
             self.object, 
             value, 
-            callback, 
-            userdata
+            fenceOnCompletionCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
     }
 }
@@ -624,7 +624,7 @@ public class Queue {
         self.object = object
     }
 
-    public func submit(commandCount: UInt32, commands: [CommandBuffer]) {
+    public func submit(commands: [CommandBuffer]) {
         commands.map { $0.object }.withUnsafeBufferPointer { buffer_commands in 
         wgpuQueueSubmit(
             self.object, 
@@ -652,16 +652,16 @@ public class Queue {
         }
     }
 
-    public func onSubmittedWorkDone(signalValue: UInt64, callback: WGPUQueueWorkDoneCallback, userdata: UnsafeMutableRawPointer!) {
+    public func onSubmittedWorkDone(signalValue: UInt64, callback: QueueWorkDoneCallback) {
         wgpuQueueOnSubmittedWorkDone(
             self.object, 
             signalValue, 
-            callback, 
-            userdata
+            queueWorkDoneCallback, 
+            Unmanaged.passRetained(callback as AnyObject).toOpaque()
         )
     }
 
-    public func writeBuffer(buffer: Buffer, bufferOffset: UInt64, data: [Void], size: Int) {
+    public func writeBuffer(buffer: Buffer, bufferOffset: UInt64, data: [Void]) {
         data.withUnsafeBufferPointer { buffer_data in
         wgpuQueueWriteBuffer(
             self.object, 
@@ -673,7 +673,7 @@ public class Queue {
         }
     }
 
-    public func writeTexture(destination: TextureCopyView, data: [Void], dataSize: Int, dataLayout: TextureDataLayout, writeSize: Extent3d) {
+    public func writeTexture(destination: TextureCopyView, data: [Void], dataLayout: TextureDataLayout, writeSize: Extent3d) {
         destination.withCStruct { cStruct_destination in
         data.withUnsafeBufferPointer { buffer_data in
         dataLayout.withCStruct { cStruct_dataLayout in
@@ -733,7 +733,7 @@ public class RenderBundleEncoder {
         )
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsetCount: UInt32, dynamicOffsets: [UInt32]?) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]?) {
         dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
         wgpuRenderBundleEncoderSetBindGroup(
             self.object, 
@@ -861,7 +861,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsetCount: UInt32, dynamicOffsets: [UInt32]?) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]?) {
         dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
         wgpuRenderPassEncoderSetBindGroup(
             self.object, 
@@ -910,7 +910,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func executeBundles(bundlesCount: UInt32, bundles: [RenderBundle]) {
+    public func executeBundles(bundles: [RenderBundle]) {
         bundles.map { $0.object }.withUnsafeBufferPointer { buffer_bundles in 
         wgpuRenderPassEncoderExecuteBundles(
             self.object, 

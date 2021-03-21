@@ -138,6 +138,9 @@ class Member:
         if self.length_of:
             return typeconversion.length_conversion
 
+        if self.name == 'userdata':
+            return typeconversion.userdata_conversion
+
         if self.type.name == 'char' and self.annotation == 'const*':
             return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
 
@@ -153,7 +156,7 @@ class Member:
 
             if self.optional:
                 return typeconversion.optional_implicit_array_conversion
-            
+
             return typeconversion.implicit_array_conversion
 
         if self.type.category == 'enum':
@@ -171,6 +174,9 @@ class Member:
 
         if self.type.category == 'object':
             return typeconversion.optional_object_conversion if self.optional else typeconversion.object_conversion
+
+        if isinstance(self.type, CallbackType):
+            return typeconversion.Conversion(self.type.function_name)
 
         return typeconversion.implicit_conversion
 
@@ -221,7 +227,7 @@ class Method:
 
     @property
     def swift_args(self) -> List[Member]:
-        return [arg for arg in self.args if not arg.length_of]
+        return [arg for arg in self.args if not arg.length_of and arg.name != 'userdata']
 
     @property
     def return_conversion(self) -> Optional[typeconversion.Conversion]:
@@ -257,9 +263,26 @@ class ObjectType(Type):
 
 
 class CallbackType(Type):
+    def __init__(self, name: str, data: Dict):
+        super().__init__(name, data)
+        self.args: List[Member] = []
+
     @property
-    def swift_name(self) -> str:
-        return self.c_name
+    def function_name(self) -> str:
+        return camel_case(self.name.lower())
+
+    @property
+    def swift_args(self) -> List[Member]:
+        return [arg for arg in self.args if not arg.length_of and arg.name != 'userdata']
+
+    def link(self, types: Dict[str, Type]):
+        self.args = [
+            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'), m.get('optional', False))
+            for m in self.data['args']
+        ]
+        args_by_length = {arg.length: arg for arg in self.args if arg.length}
+        for arg in self.args:
+            arg.length_of = args_by_length.get(arg.name)
 
 
 class Model:
