@@ -82,6 +82,7 @@ class Member:
         self.annotation = annotation
         self.length = length
         self.optional = optional
+        self.length_of: Optional[Member] = None
 
     @property
     def c_name(self) -> str:
@@ -134,6 +135,9 @@ class Member:
 
     @property
     def conversion(self) -> typeconversion.Conversion:
+        if self.length_of:
+            return typeconversion.length_conversion
+
         if self.type.name == 'char' and self.annotation == 'const*':
             return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
 
@@ -163,6 +167,10 @@ class Member:
 
         return typeconversion.implicit_conversion
 
+    @property
+    def target_swift_name(self) -> str:
+        return self.length_of.swift_name if self.length_of else self.swift_name
+
 
 class StructureType(Type):
     def __init__(self, name: str, data: Dict):
@@ -171,11 +179,18 @@ class StructureType(Type):
         self.chained = data.get('chained', False)
         self.members: List[Member] = []
 
+    @property
+    def swift_members(self) -> List[Member]:
+        return [member for member in self.members if not member.length_of]
+
     def link(self, types: Dict[str, Type]):
         self.members = [
             Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'), m.get('optional', False))
             for m in self.data['members']
         ]
+        members_by_length = {member.length: member for member in self.members if member.length}
+        for member in self.members:
+            member.length_of = members_by_length.get(member.name)
 
 
 class ObjectType(Type):

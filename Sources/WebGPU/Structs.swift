@@ -56,7 +56,6 @@ public struct BindGroupDescriptor: CStructConvertible {
 
     public var label: String?
     public var layout: BindGroupLayout
-    public var entryCount: UInt32
     public var entries: [BindGroupEntry]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupDescriptor>) throws -> R) rethrows -> R {
@@ -66,7 +65,7 @@ public struct BindGroupDescriptor: CStructConvertible {
             nextInChain: nil, 
             label: cString_label, 
             layout: self.layout.object, 
-            entryCount: self.entryCount, 
+            entryCount: .init(buffer_entries.count), 
             entries: buffer_entries.baseAddress
         )
         return try body(&cStruct)
@@ -191,7 +190,6 @@ public struct BindGroupLayoutDescriptor: CStructConvertible {
     typealias CStruct = WGPUBindGroupLayoutDescriptor
 
     public var label: String?
-    public var entryCount: UInt32
     public var entries: [BindGroupLayoutEntry]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupLayoutDescriptor>) throws -> R) rethrows -> R {
@@ -200,7 +198,7 @@ public struct BindGroupLayoutDescriptor: CStructConvertible {
         var cStruct = WGPUBindGroupLayoutDescriptor(
             nextInChain: nil, 
             label: cString_label, 
-            entryCount: self.entryCount, 
+            entryCount: .init(buffer_entries.count), 
             entries: buffer_entries.baseAddress
         )
         return try body(&cStruct)
@@ -513,7 +511,6 @@ public struct VertexBufferLayout: CStructConvertible {
 
     public var arrayStride: UInt64
     public var stepMode: InputStepMode
-    public var attributeCount: UInt32
     public var attributes: [VertexAttribute]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexBufferLayout>) throws -> R) rethrows -> R {
@@ -521,7 +518,7 @@ public struct VertexBufferLayout: CStructConvertible {
         var cStruct = WGPUVertexBufferLayout(
             arrayStride: self.arrayStride, 
             stepMode: self.stepMode.cValue, 
-            attributeCount: self.attributeCount, 
+            attributeCount: .init(buffer_attributes.count), 
             attributes: buffer_attributes.baseAddress
         )
         return try body(&cStruct)
@@ -533,7 +530,6 @@ public struct VertexStateDescriptor: CStructConvertible {
     typealias CStruct = WGPUVertexStateDescriptor
 
     public var indexFormat: IndexFormat
-    public var vertexBufferCount: UInt32
     public var vertexBuffers: [VertexBufferLayout]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexStateDescriptor>) throws -> R) rethrows -> R {
@@ -541,7 +537,7 @@ public struct VertexStateDescriptor: CStructConvertible {
         var cStruct = WGPUVertexStateDescriptor(
             nextInChain: nil, 
             indexFormat: self.indexFormat.cValue, 
-            vertexBufferCount: self.vertexBufferCount, 
+            vertexBufferCount: .init(buffer_vertexBuffers.count), 
             vertexBuffers: buffer_vertexBuffers.baseAddress
         )
         return try body(&cStruct)
@@ -570,7 +566,6 @@ public struct PipelineLayoutDescriptor: CStructConvertible {
     typealias CStruct = WGPUPipelineLayoutDescriptor
 
     public var label: String?
-    public var bindGroupLayoutCount: UInt32
     public var bindGroupLayouts: [BindGroupLayout]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUPipelineLayoutDescriptor>) throws -> R) rethrows -> R {
@@ -579,7 +574,7 @@ public struct PipelineLayoutDescriptor: CStructConvertible {
         var cStruct = WGPUPipelineLayoutDescriptor(
             nextInChain: nil, 
             label: cString_label, 
-            bindGroupLayoutCount: self.bindGroupLayoutCount, 
+            bindGroupLayoutCount: .init(buffer_bindGroupLayouts.count), 
             bindGroupLayouts: buffer_bindGroupLayouts.baseAddress
         )
         return try body(&cStruct)
@@ -613,7 +608,6 @@ public struct QuerySetDescriptor: CStructConvertible {
     public var type: QueryType
     public var count: UInt32
     public var pipelineStatistics: [PipelineStatisticName]
-    public var pipelineStatisticsCount: UInt32
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUQuerySetDescriptor>) throws -> R) rethrows -> R {
         return try self.label.withOptionalCString { cString_label in
@@ -624,7 +618,7 @@ public struct QuerySetDescriptor: CStructConvertible {
             type: self.type.cValue, 
             count: self.count, 
             pipelineStatistics: buffer_pipelineStatistics.baseAddress, 
-            pipelineStatisticsCount: self.pipelineStatisticsCount
+            pipelineStatisticsCount: .init(buffer_pipelineStatistics.count)
         )
         return try body(&cStruct)
         }
@@ -674,7 +668,6 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderBundleEncoderDescriptor
 
     public var label: String?
-    public var colorFormatsCount: UInt32
     public var colorFormats: [TextureFormat]
     public var depthStencilFormat: TextureFormat
     public var sampleCount: UInt32
@@ -685,7 +678,7 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible {
         var cStruct = WGPURenderBundleEncoderDescriptor(
             nextInChain: nil, 
             label: cString_label, 
-            colorFormatsCount: self.colorFormatsCount, 
+            colorFormatsCount: .init(buffer_colorFormats.count), 
             colorFormats: buffer_colorFormats.baseAddress, 
             depthStencilFormat: self.depthStencilFormat.cValue, 
             sampleCount: self.sampleCount
@@ -752,7 +745,6 @@ public struct RenderPassDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderPassDescriptor
 
     public var label: String?
-    public var colorAttachmentCount: UInt32
     public var colorAttachments: [RenderPassColorAttachmentDescriptor]
     public var depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor?
     public var occlusionQuerySet: QuerySet?
@@ -764,7 +756,7 @@ public struct RenderPassDescriptor: CStructConvertible {
         var cStruct = WGPURenderPassDescriptor(
             nextInChain: nil, 
             label: cString_label, 
-            colorAttachmentCount: self.colorAttachmentCount, 
+            colorAttachmentCount: .init(buffer_colorAttachments.count), 
             colorAttachments: buffer_colorAttachments.baseAddress, 
             depthStencilAttachment: cStruct_depthStencilAttachment, 
             occlusionQuerySet: self.occlusionQuerySet?.object
@@ -788,7 +780,6 @@ public struct RenderPipelineDescriptor: CStructConvertible {
     public var rasterizationState: RasterizationStateDescriptor?
     public var sampleCount: UInt32
     public var depthStencilState: DepthStencilStateDescriptor?
-    public var colorStateCount: UInt32
     public var colorStates: [ColorStateDescriptor]
     public var sampleMask: UInt32
     public var alphaToCoverageEnabled: Bool
@@ -812,7 +803,7 @@ public struct RenderPipelineDescriptor: CStructConvertible {
             rasterizationState: cStruct_rasterizationState, 
             sampleCount: self.sampleCount, 
             depthStencilState: cStruct_depthStencilState, 
-            colorStateCount: self.colorStateCount, 
+            colorStateCount: .init(buffer_colorStates.count), 
             colorStates: buffer_colorStates.baseAddress, 
             sampleMask: self.sampleMask, 
             alphaToCoverageEnabled: self.alphaToCoverageEnabled
@@ -913,14 +904,13 @@ public struct ShaderModuleDescriptor: CStructConvertible {
 public struct ShaderModuleSpirvDescriptor: CStructConvertible {
     typealias CStruct = WGPUShaderModuleSPIRVDescriptor
 
-    public var codeSize: UInt32
     public var code: [UInt32]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleSPIRVDescriptor>) throws -> R) rethrows -> R {
         return try self.code.withUnsafeBufferPointer { buffer_code in
         var cStruct = WGPUShaderModuleSPIRVDescriptor(
             chain: WGPUChainedStruct(), 
-            codeSize: self.codeSize, 
+            codeSize: .init(buffer_code.count), 
             code: buffer_code.baseAddress
         )
         return try body(&cStruct)
