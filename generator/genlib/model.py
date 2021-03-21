@@ -149,6 +149,9 @@ class Member:
         if self.type.category == 'structure':
             return typeconversion.optional_struct_conversion if self.optional else typeconversion.struct_conversion
 
+        if self.type.category == 'object':
+            return typeconversion.optional_object_conversion if self.optional else typeconversion.object_conversion
+
         return typeconversion.implicit_conversion
 
 

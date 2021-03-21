@@ -45,3 +45,7 @@ struct_conversion = Conversion('cStruct_{{ name }}.pointee',
 
 optional_struct_conversion = Conversion('cStruct_{{ name }}',
                                         ('{{ value }}.withOptionalCStruct { cStruct_{{ name }} in', '}'))
+
+object_conversion = Conversion('{{ value }}.object')
+
+optional_object_conversion = Conversion('{{ value }}?.object')

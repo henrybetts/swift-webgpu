@@ -3,7 +3,7 @@ import CWebGPU
 {% for struct in model.types_by_category('structure') %}
 public struct {{ struct.swift_name }}: CStructConvertible {
     typealias CStruct = {{ struct.c_name }}
-    
+
     {% for member in struct.members %}
     public var {{ member.swift_name }}: {{ member.swift_type }}
     {% endfor %}

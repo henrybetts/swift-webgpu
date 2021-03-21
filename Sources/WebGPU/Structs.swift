@@ -2,7 +2,7 @@ import CWebGPU
 
 public struct AdapterProperties: CStructConvertible {
     typealias CStruct = WGPUAdapterProperties
-    
+
     public var deviceId: UInt32
     public var vendorId: UInt32
     public var name: String
@@ -30,7 +30,7 @@ public struct AdapterProperties: CStructConvertible {
 
 public struct BindGroupEntry: CStructConvertible {
     typealias CStruct = WGPUBindGroupEntry
-    
+
     public var binding: UInt32
     public var buffer: Buffer?
     public var offset: UInt64
@@ -41,11 +41,11 @@ public struct BindGroupEntry: CStructConvertible {
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupEntry>) throws -> R) rethrows -> R {
         var cStruct = WGPUBindGroupEntry(
             binding: self.binding, 
-            buffer: self.buffer, 
+            buffer: self.buffer?.object, 
             offset: self.offset, 
             size: self.size, 
-            sampler: self.sampler, 
-            textureView: self.textureView
+            sampler: self.sampler?.object, 
+            textureView: self.textureView?.object
         )
         return try body(&cStruct)
     }
@@ -53,7 +53,7 @@ public struct BindGroupEntry: CStructConvertible {
 
 public struct BindGroupDescriptor: CStructConvertible {
     typealias CStruct = WGPUBindGroupDescriptor
-    
+
     public var label: String?
     public var layout: BindGroupLayout
     public var entryCount: UInt32
@@ -64,7 +64,7 @@ public struct BindGroupDescriptor: CStructConvertible {
         var cStruct = WGPUBindGroupDescriptor(
             nextInChain: nil, 
             label: cString_label, 
-            layout: self.layout, 
+            layout: self.layout.object, 
             entryCount: self.entryCount, 
             entries: self.entries
         )
@@ -75,7 +75,7 @@ public struct BindGroupDescriptor: CStructConvertible {
 
 public struct BufferBindingLayout: CStructConvertible {
     typealias CStruct = WGPUBufferBindingLayout
-    
+
     public var type: BufferBindingType
     public var hasDynamicOffset: Bool
     public var minBindingSize: UInt64
@@ -93,7 +93,7 @@ public struct BufferBindingLayout: CStructConvertible {
 
 public struct SamplerBindingLayout: CStructConvertible {
     typealias CStruct = WGPUSamplerBindingLayout
-    
+
     public var type: SamplerBindingType
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSamplerBindingLayout>) throws -> R) rethrows -> R {
@@ -107,7 +107,7 @@ public struct SamplerBindingLayout: CStructConvertible {
 
 public struct TextureBindingLayout: CStructConvertible {
     typealias CStruct = WGPUTextureBindingLayout
-    
+
     public var sampleType: TextureSampleType
     public var viewDimension: TextureViewDimension
     public var multisampled: Bool
@@ -125,7 +125,7 @@ public struct TextureBindingLayout: CStructConvertible {
 
 public struct StorageTextureBindingLayout: CStructConvertible {
     typealias CStruct = WGPUStorageTextureBindingLayout
-    
+
     public var access: StorageTextureAccess
     public var format: TextureFormat
     public var viewDimension: TextureViewDimension
@@ -143,7 +143,7 @@ public struct StorageTextureBindingLayout: CStructConvertible {
 
 public struct BindGroupLayoutEntry: CStructConvertible {
     typealias CStruct = WGPUBindGroupLayoutEntry
-    
+
     public var binding: UInt32
     public var visibility: ShaderStage
     public var type: BindingType
@@ -187,7 +187,7 @@ public struct BindGroupLayoutEntry: CStructConvertible {
 
 public struct BindGroupLayoutDescriptor: CStructConvertible {
     typealias CStruct = WGPUBindGroupLayoutDescriptor
-    
+
     public var label: String?
     public var entryCount: UInt32
     public var entries: [BindGroupLayoutEntry]
@@ -207,7 +207,7 @@ public struct BindGroupLayoutDescriptor: CStructConvertible {
 
 public struct BlendDescriptor: CStructConvertible {
     typealias CStruct = WGPUBlendDescriptor
-    
+
     public var operation: BlendOperation
     public var srcFactor: BlendFactor
     public var dstFactor: BlendFactor
@@ -224,7 +224,7 @@ public struct BlendDescriptor: CStructConvertible {
 
 public struct ColorStateDescriptor: CStructConvertible {
     typealias CStruct = WGPUColorStateDescriptor
-    
+
     public var format: TextureFormat
     public var alphaBlend: BlendDescriptor
     public var colorBlend: BlendDescriptor
@@ -248,7 +248,7 @@ public struct ColorStateDescriptor: CStructConvertible {
 
 public struct BufferCopyView: CStructConvertible {
     typealias CStruct = WGPUBufferCopyView
-    
+
     public var layout: TextureDataLayout
     public var buffer: Buffer
 
@@ -257,7 +257,7 @@ public struct BufferCopyView: CStructConvertible {
         var cStruct = WGPUBufferCopyView(
             nextInChain: nil, 
             layout: cStruct_layout.pointee, 
-            buffer: self.buffer
+            buffer: self.buffer.object
         )
         return try body(&cStruct)
         }
@@ -266,7 +266,7 @@ public struct BufferCopyView: CStructConvertible {
 
 public struct BufferDescriptor: CStructConvertible {
     typealias CStruct = WGPUBufferDescriptor
-    
+
     public var label: String?
     public var usage: BufferUsage
     public var size: UInt64
@@ -288,7 +288,7 @@ public struct BufferDescriptor: CStructConvertible {
 
 public struct Color: CStructConvertible {
     typealias CStruct = WGPUColor
-    
+
     public var r: Double
     public var g: Double
     public var b: Double
@@ -307,7 +307,7 @@ public struct Color: CStructConvertible {
 
 public struct CommandBufferDescriptor: CStructConvertible {
     typealias CStruct = WGPUCommandBufferDescriptor
-    
+
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCommandBufferDescriptor>) throws -> R) rethrows -> R {
@@ -323,7 +323,7 @@ public struct CommandBufferDescriptor: CStructConvertible {
 
 public struct CommandEncoderDescriptor: CStructConvertible {
     typealias CStruct = WGPUCommandEncoderDescriptor
-    
+
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCommandEncoderDescriptor>) throws -> R) rethrows -> R {
@@ -339,7 +339,7 @@ public struct CommandEncoderDescriptor: CStructConvertible {
 
 public struct ComputePassDescriptor: CStructConvertible {
     typealias CStruct = WGPUComputePassDescriptor
-    
+
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUComputePassDescriptor>) throws -> R) rethrows -> R {
@@ -355,7 +355,7 @@ public struct ComputePassDescriptor: CStructConvertible {
 
 public struct ComputePipelineDescriptor: CStructConvertible {
     typealias CStruct = WGPUComputePipelineDescriptor
-    
+
     public var label: String?
     public var layout: PipelineLayout?
     public var computeStage: ProgrammableStageDescriptor
@@ -366,7 +366,7 @@ public struct ComputePipelineDescriptor: CStructConvertible {
         var cStruct = WGPUComputePipelineDescriptor(
             nextInChain: nil, 
             label: cString_label, 
-            layout: self.layout, 
+            layout: self.layout?.object, 
             computeStage: cStruct_computeStage.pointee
         )
         return try body(&cStruct)
@@ -377,7 +377,7 @@ public struct ComputePipelineDescriptor: CStructConvertible {
 
 public struct CopyTextureForBrowserOptions: CStructConvertible {
     typealias CStruct = WGPUCopyTextureForBrowserOptions
-    
+
     public var flipy: Bool
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCopyTextureForBrowserOptions>) throws -> R) rethrows -> R {
@@ -391,7 +391,7 @@ public struct CopyTextureForBrowserOptions: CStructConvertible {
 
 public struct DeviceProperties: CStructConvertible {
     typealias CStruct = WGPUDeviceProperties
-    
+
     public var textureCompressionBc: Bool
     public var shaderFloat16: Bool
     public var pipelineStatisticsQuery: Bool
@@ -412,7 +412,7 @@ public struct DeviceProperties: CStructConvertible {
 
 public struct DepthStencilStateDescriptor: CStructConvertible {
     typealias CStruct = WGPUDepthStencilStateDescriptor
-    
+
     public var format: TextureFormat
     public var depthWriteEnabled: Bool
     public var depthCompare: CompareFunction
@@ -442,7 +442,7 @@ public struct DepthStencilStateDescriptor: CStructConvertible {
 
 public struct Extent3d: CStructConvertible {
     typealias CStruct = WGPUExtent3D
-    
+
     public var width: UInt32
     public var height: UInt32
     public var depth: UInt32
@@ -459,7 +459,7 @@ public struct Extent3d: CStructConvertible {
 
 public struct FenceDescriptor: CStructConvertible {
     typealias CStruct = WGPUFenceDescriptor
-    
+
     public var label: String?
     public var initialValue: UInt64
 
@@ -477,7 +477,7 @@ public struct FenceDescriptor: CStructConvertible {
 
 public struct InstanceDescriptor: CStructConvertible {
     typealias CStruct = WGPUInstanceDescriptor
-    
+
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUInstanceDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPUInstanceDescriptor(
@@ -489,7 +489,7 @@ public struct InstanceDescriptor: CStructConvertible {
 
 public struct VertexAttribute: CStructConvertible {
     typealias CStruct = WGPUVertexAttribute
-    
+
     public var format: VertexFormat
     public var offset: UInt64
     public var shaderLocation: UInt32
@@ -506,7 +506,7 @@ public struct VertexAttribute: CStructConvertible {
 
 public struct VertexBufferLayout: CStructConvertible {
     typealias CStruct = WGPUVertexBufferLayout
-    
+
     public var arrayStride: UInt64
     public var stepMode: InputStepMode
     public var attributeCount: UInt32
@@ -525,7 +525,7 @@ public struct VertexBufferLayout: CStructConvertible {
 
 public struct VertexStateDescriptor: CStructConvertible {
     typealias CStruct = WGPUVertexStateDescriptor
-    
+
     public var indexFormat: IndexFormat
     public var vertexBufferCount: UInt32
     public var vertexBuffers: [VertexBufferLayout]
@@ -543,7 +543,7 @@ public struct VertexStateDescriptor: CStructConvertible {
 
 public struct Origin3d: CStructConvertible {
     typealias CStruct = WGPUOrigin3D
-    
+
     public var x: UInt32
     public var y: UInt32
     public var z: UInt32
@@ -560,7 +560,7 @@ public struct Origin3d: CStructConvertible {
 
 public struct PipelineLayoutDescriptor: CStructConvertible {
     typealias CStruct = WGPUPipelineLayoutDescriptor
-    
+
     public var label: String?
     public var bindGroupLayoutCount: UInt32
     public var bindGroupLayouts: [BindGroupLayout]
@@ -580,7 +580,7 @@ public struct PipelineLayoutDescriptor: CStructConvertible {
 
 public struct ProgrammableStageDescriptor: CStructConvertible {
     typealias CStruct = WGPUProgrammableStageDescriptor
-    
+
     public var module: ShaderModule
     public var entryPoint: String
 
@@ -588,7 +588,7 @@ public struct ProgrammableStageDescriptor: CStructConvertible {
         return try self.entryPoint.withCString { cString_entryPoint in
         var cStruct = WGPUProgrammableStageDescriptor(
             nextInChain: nil, 
-            module: self.module, 
+            module: self.module.object, 
             entryPoint: cString_entryPoint
         )
         return try body(&cStruct)
@@ -598,7 +598,7 @@ public struct ProgrammableStageDescriptor: CStructConvertible {
 
 public struct QuerySetDescriptor: CStructConvertible {
     typealias CStruct = WGPUQuerySetDescriptor
-    
+
     public var label: String?
     public var type: QueryType
     public var count: UInt32
@@ -622,7 +622,7 @@ public struct QuerySetDescriptor: CStructConvertible {
 
 public struct RasterizationStateDescriptor: CStructConvertible {
     typealias CStruct = WGPURasterizationStateDescriptor
-    
+
     public var frontFace: FrontFace
     public var cullMode: CullMode
     public var depthBias: Int32
@@ -644,7 +644,7 @@ public struct RasterizationStateDescriptor: CStructConvertible {
 
 public struct RenderBundleDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderBundleDescriptor
-    
+
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderBundleDescriptor>) throws -> R) rethrows -> R {
@@ -660,7 +660,7 @@ public struct RenderBundleDescriptor: CStructConvertible {
 
 public struct RenderBundleEncoderDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderBundleEncoderDescriptor
-    
+
     public var label: String?
     public var colorFormatsCount: UInt32
     public var colorFormats: [TextureFormat]
@@ -684,7 +684,7 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible {
 
 public struct RenderPassColorAttachmentDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderPassColorAttachmentDescriptor
-    
+
     public var attachment: TextureView
     public var resolveTarget: TextureView?
     public var loadOp: LoadOp
@@ -694,8 +694,8 @@ public struct RenderPassColorAttachmentDescriptor: CStructConvertible {
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassColorAttachmentDescriptor>) throws -> R) rethrows -> R {
         return try self.clearColor.withCStruct { cStruct_clearColor in
         var cStruct = WGPURenderPassColorAttachmentDescriptor(
-            attachment: self.attachment, 
-            resolveTarget: self.resolveTarget, 
+            attachment: self.attachment.object, 
+            resolveTarget: self.resolveTarget?.object, 
             loadOp: self.loadOp.cValue, 
             storeOp: self.storeOp.cValue, 
             clearColor: cStruct_clearColor.pointee
@@ -707,7 +707,7 @@ public struct RenderPassColorAttachmentDescriptor: CStructConvertible {
 
 public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderPassDepthStencilAttachmentDescriptor
-    
+
     public var attachment: TextureView
     public var depthLoadOp: LoadOp
     public var depthStoreOp: StoreOp
@@ -720,7 +720,7 @@ public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDepthStencilAttachmentDescriptor>) throws -> R) rethrows -> R {
         var cStruct = WGPURenderPassDepthStencilAttachmentDescriptor(
-            attachment: self.attachment, 
+            attachment: self.attachment.object, 
             depthLoadOp: self.depthLoadOp.cValue, 
             depthStoreOp: self.depthStoreOp.cValue, 
             clearDepth: self.clearDepth, 
@@ -736,7 +736,7 @@ public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
 
 public struct RenderPassDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderPassDescriptor
-    
+
     public var label: String?
     public var colorAttachmentCount: UInt32
     public var colorAttachments: [RenderPassColorAttachmentDescriptor]
@@ -752,7 +752,7 @@ public struct RenderPassDescriptor: CStructConvertible {
             colorAttachmentCount: self.colorAttachmentCount, 
             colorAttachments: self.colorAttachments, 
             depthStencilAttachment: cStruct_depthStencilAttachment, 
-            occlusionQuerySet: self.occlusionQuerySet
+            occlusionQuerySet: self.occlusionQuerySet?.object
         )
         return try body(&cStruct)
         }
@@ -762,7 +762,7 @@ public struct RenderPassDescriptor: CStructConvertible {
 
 public struct RenderPipelineDescriptor: CStructConvertible {
     typealias CStruct = WGPURenderPipelineDescriptor
-    
+
     public var label: String?
     public var layout: PipelineLayout?
     public var vertexStage: ProgrammableStageDescriptor
@@ -787,7 +787,7 @@ public struct RenderPipelineDescriptor: CStructConvertible {
         var cStruct = WGPURenderPipelineDescriptor(
             nextInChain: nil, 
             label: cString_label, 
-            layout: self.layout, 
+            layout: self.layout?.object, 
             vertexStage: cStruct_vertexStage.pointee, 
             fragmentStage: cStruct_fragmentStage, 
             vertexState: cStruct_vertexState, 
@@ -812,7 +812,7 @@ public struct RenderPipelineDescriptor: CStructConvertible {
 
 public struct RenderPipelineDescriptorDummyExtension: CStructConvertible {
     typealias CStruct = WGPURenderPipelineDescriptorDummyExtension
-    
+
     public var dummyStage: ProgrammableStageDescriptor
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPipelineDescriptorDummyExtension>) throws -> R) rethrows -> R {
@@ -828,7 +828,7 @@ public struct RenderPipelineDescriptorDummyExtension: CStructConvertible {
 
 public struct SamplerDescriptor: CStructConvertible {
     typealias CStruct = WGPUSamplerDescriptor
-    
+
     public var label: String?
     public var addressModeU: AddressMode
     public var addressModeV: AddressMode
@@ -864,7 +864,7 @@ public struct SamplerDescriptor: CStructConvertible {
 
 public struct SamplerDescriptorDummyAnisotropicFiltering: CStructConvertible {
     typealias CStruct = WGPUSamplerDescriptorDummyAnisotropicFiltering
-    
+
     public var maxAnisotropy: Float
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSamplerDescriptorDummyAnisotropicFiltering>) throws -> R) rethrows -> R {
@@ -878,7 +878,7 @@ public struct SamplerDescriptorDummyAnisotropicFiltering: CStructConvertible {
 
 public struct ShaderModuleDescriptor: CStructConvertible {
     typealias CStruct = WGPUShaderModuleDescriptor
-    
+
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleDescriptor>) throws -> R) rethrows -> R {
@@ -894,7 +894,7 @@ public struct ShaderModuleDescriptor: CStructConvertible {
 
 public struct ShaderModuleSpirvDescriptor: CStructConvertible {
     typealias CStruct = WGPUShaderModuleSPIRVDescriptor
-    
+
     public var codeSize: UInt32
     public var code: [UInt32]
 
@@ -910,7 +910,7 @@ public struct ShaderModuleSpirvDescriptor: CStructConvertible {
 
 public struct ShaderModuleWgslDescriptor: CStructConvertible {
     typealias CStruct = WGPUShaderModuleWGSLDescriptor
-    
+
     public var source: String
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleWGSLDescriptor>) throws -> R) rethrows -> R {
@@ -926,7 +926,7 @@ public struct ShaderModuleWgslDescriptor: CStructConvertible {
 
 public struct StencilStateFaceDescriptor: CStructConvertible {
     typealias CStruct = WGPUStencilStateFaceDescriptor
-    
+
     public var compare: CompareFunction
     public var failOp: StencilOperation
     public var depthFailOp: StencilOperation
@@ -945,7 +945,7 @@ public struct StencilStateFaceDescriptor: CStructConvertible {
 
 public struct SurfaceDescriptor: CStructConvertible {
     typealias CStruct = WGPUSurfaceDescriptor
-    
+
     public var label: String?
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptor>) throws -> R) rethrows -> R {
@@ -961,7 +961,7 @@ public struct SurfaceDescriptor: CStructConvertible {
 
 public struct SurfaceDescriptorFromCanvasHtmlSelector: CStructConvertible {
     typealias CStruct = WGPUSurfaceDescriptorFromCanvasHTMLSelector
-    
+
     public var selector: String
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromCanvasHTMLSelector>) throws -> R) rethrows -> R {
@@ -977,7 +977,7 @@ public struct SurfaceDescriptorFromCanvasHtmlSelector: CStructConvertible {
 
 public struct SurfaceDescriptorFromMetalLayer: CStructConvertible {
     typealias CStruct = WGPUSurfaceDescriptorFromMetalLayer
-    
+
     public var layer: UnsafeMutableRawPointer!
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromMetalLayer>) throws -> R) rethrows -> R {
@@ -991,7 +991,7 @@ public struct SurfaceDescriptorFromMetalLayer: CStructConvertible {
 
 public struct SurfaceDescriptorFromWindowsHwnd: CStructConvertible {
     typealias CStruct = WGPUSurfaceDescriptorFromWindowsHWND
-    
+
     public var hinstance: UnsafeMutableRawPointer!
     public var hwnd: UnsafeMutableRawPointer!
 
@@ -1007,7 +1007,7 @@ public struct SurfaceDescriptorFromWindowsHwnd: CStructConvertible {
 
 public struct SurfaceDescriptorFromXlib: CStructConvertible {
     typealias CStruct = WGPUSurfaceDescriptorFromXlib
-    
+
     public var display: UnsafeMutableRawPointer!
     public var window: UInt32
 
@@ -1023,7 +1023,7 @@ public struct SurfaceDescriptorFromXlib: CStructConvertible {
 
 public struct SwapChainDescriptor: CStructConvertible {
     typealias CStruct = WGPUSwapChainDescriptor
-    
+
     public var label: String?
     public var usage: TextureUsage
     public var format: TextureFormat
@@ -1051,7 +1051,7 @@ public struct SwapChainDescriptor: CStructConvertible {
 
 public struct TextureCopyView: CStructConvertible {
     typealias CStruct = WGPUTextureCopyView
-    
+
     public var texture: Texture
     public var mipLevel: UInt32
     public var origin: Origin3d
@@ -1061,7 +1061,7 @@ public struct TextureCopyView: CStructConvertible {
         return try self.origin.withCStruct { cStruct_origin in
         var cStruct = WGPUTextureCopyView(
             nextInChain: nil, 
-            texture: self.texture, 
+            texture: self.texture.object, 
             mipLevel: self.mipLevel, 
             origin: cStruct_origin.pointee, 
             aspect: self.aspect.cValue
@@ -1073,7 +1073,7 @@ public struct TextureCopyView: CStructConvertible {
 
 public struct TextureDataLayout: CStructConvertible {
     typealias CStruct = WGPUTextureDataLayout
-    
+
     public var offset: UInt64
     public var bytesPerRow: UInt32
     public var rowsPerImage: UInt32
@@ -1091,7 +1091,7 @@ public struct TextureDataLayout: CStructConvertible {
 
 public struct TextureDescriptor: CStructConvertible {
     typealias CStruct = WGPUTextureDescriptor
-    
+
     public var label: String?
     public var usage: TextureUsage
     public var dimension: TextureDimension
@@ -1121,7 +1121,7 @@ public struct TextureDescriptor: CStructConvertible {
 
 public struct TextureViewDescriptor: CStructConvertible {
     typealias CStruct = WGPUTextureViewDescriptor
-    
+
     public var label: String?
     public var format: TextureFormat
     public var dimension: TextureViewDimension

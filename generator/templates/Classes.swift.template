@@ -2,7 +2,11 @@ import CWebGPU
 
 {% for object in model.types_by_category('object') %}
 public class {{ object.swift_name }} {
+    let object: {{ object.c_name }}!
 
+    init(object: {{ object.c_name }}!) {
+        self.object = object
+    }
 }
 
 {% endfor %}
