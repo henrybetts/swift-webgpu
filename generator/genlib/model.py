@@ -147,7 +147,7 @@ class Member:
             if self.type.category == 'object':
                 return typeconversion.object_array_conversion
 
-            return typeconversion.implicit_conversion
+            return typeconversion.implicit_array_conversion
 
         if self.type.category == 'enum':
             return typeconversion.enum_conversion

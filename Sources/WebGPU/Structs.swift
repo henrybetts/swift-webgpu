@@ -917,12 +917,14 @@ public struct ShaderModuleSpirvDescriptor: CStructConvertible {
     public var code: [UInt32]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleSPIRVDescriptor>) throws -> R) rethrows -> R {
+        return try self.code.withUnsafeBufferPointer { buffer_code in
         var cStruct = WGPUShaderModuleSPIRVDescriptor(
             chain: WGPUChainedStruct(), 
             codeSize: self.codeSize, 
-            code: self.code
+            code: buffer_code.baseAddress
         )
         return try body(&cStruct)
+        }
     }
 }
 
