@@ -138,6 +138,15 @@ class Member:
             return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
 
         if self.annotation == 'const*' and self.length:
+            if self.type.category == 'enum':
+                return typeconversion.enum_array_conversion
+
+            if self.type.category == 'structure':
+                return typeconversion.struct_array_conversion
+
+            if self.type.category == 'object':
+                return typeconversion.object_array_conversion
+
             return typeconversion.implicit_conversion
 
         if self.type.category == 'enum':

@@ -61,14 +61,16 @@ public struct BindGroupDescriptor: CStructConvertible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupDescriptor>) throws -> R) rethrows -> R {
         return try self.label.withOptionalCString { cString_label in
+        return try self.entries.withCStructBufferPointer { buffer_entries in
         var cStruct = WGPUBindGroupDescriptor(
             nextInChain: nil, 
             label: cString_label, 
             layout: self.layout.object, 
             entryCount: self.entryCount, 
-            entries: self.entries
+            entries: buffer_entries.baseAddress
         )
         return try body(&cStruct)
+        }
         }
     }
 }
@@ -194,13 +196,15 @@ public struct BindGroupLayoutDescriptor: CStructConvertible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupLayoutDescriptor>) throws -> R) rethrows -> R {
         return try self.label.withOptionalCString { cString_label in
+        return try self.entries.withCStructBufferPointer { buffer_entries in
         var cStruct = WGPUBindGroupLayoutDescriptor(
             nextInChain: nil, 
             label: cString_label, 
             entryCount: self.entryCount, 
-            entries: self.entries
+            entries: buffer_entries.baseAddress
         )
         return try body(&cStruct)
+        }
         }
     }
 }
@@ -513,13 +517,15 @@ public struct VertexBufferLayout: CStructConvertible {
     public var attributes: [VertexAttribute]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexBufferLayout>) throws -> R) rethrows -> R {
+        return try self.attributes.withCStructBufferPointer { buffer_attributes in
         var cStruct = WGPUVertexBufferLayout(
             arrayStride: self.arrayStride, 
             stepMode: self.stepMode.cValue, 
             attributeCount: self.attributeCount, 
-            attributes: self.attributes
+            attributes: buffer_attributes.baseAddress
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -531,13 +537,15 @@ public struct VertexStateDescriptor: CStructConvertible {
     public var vertexBuffers: [VertexBufferLayout]
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexStateDescriptor>) throws -> R) rethrows -> R {
+        return try self.vertexBuffers.withCStructBufferPointer { buffer_vertexBuffers in
         var cStruct = WGPUVertexStateDescriptor(
             nextInChain: nil, 
             indexFormat: self.indexFormat.cValue, 
             vertexBufferCount: self.vertexBufferCount, 
-            vertexBuffers: self.vertexBuffers
+            vertexBuffers: buffer_vertexBuffers.baseAddress
         )
         return try body(&cStruct)
+        }
     }
 }
 
@@ -567,13 +575,15 @@ public struct PipelineLayoutDescriptor: CStructConvertible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUPipelineLayoutDescriptor>) throws -> R) rethrows -> R {
         return try self.label.withOptionalCString { cString_label in
+        return try self.bindGroupLayouts.map { $0.object }.withUnsafeBufferPointer { buffer_bindGroupLayouts in 
         var cStruct = WGPUPipelineLayoutDescriptor(
             nextInChain: nil, 
             label: cString_label, 
             bindGroupLayoutCount: self.bindGroupLayoutCount, 
-            bindGroupLayouts: self.bindGroupLayouts
+            bindGroupLayouts: buffer_bindGroupLayouts.baseAddress
         )
         return try body(&cStruct)
+        }
         }
     }
 }
@@ -607,15 +617,17 @@ public struct QuerySetDescriptor: CStructConvertible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUQuerySetDescriptor>) throws -> R) rethrows -> R {
         return try self.label.withOptionalCString { cString_label in
+        return try self.pipelineStatistics.map { $0.cValue }.withUnsafeBufferPointer { buffer_pipelineStatistics in
         var cStruct = WGPUQuerySetDescriptor(
             nextInChain: nil, 
             label: cString_label, 
             type: self.type.cValue, 
             count: self.count, 
-            pipelineStatistics: self.pipelineStatistics, 
+            pipelineStatistics: buffer_pipelineStatistics.baseAddress, 
             pipelineStatisticsCount: self.pipelineStatisticsCount
         )
         return try body(&cStruct)
+        }
         }
     }
 }
@@ -669,15 +681,17 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderBundleEncoderDescriptor>) throws -> R) rethrows -> R {
         return try self.label.withOptionalCString { cString_label in
+        return try self.colorFormats.map { $0.cValue }.withUnsafeBufferPointer { buffer_colorFormats in
         var cStruct = WGPURenderBundleEncoderDescriptor(
             nextInChain: nil, 
             label: cString_label, 
             colorFormatsCount: self.colorFormatsCount, 
-            colorFormats: self.colorFormats, 
+            colorFormats: buffer_colorFormats.baseAddress, 
             depthStencilFormat: self.depthStencilFormat.cValue, 
             sampleCount: self.sampleCount
         )
         return try body(&cStruct)
+        }
         }
     }
 }
@@ -745,16 +759,18 @@ public struct RenderPassDescriptor: CStructConvertible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDescriptor>) throws -> R) rethrows -> R {
         return try self.label.withOptionalCString { cString_label in
+        return try self.colorAttachments.withCStructBufferPointer { buffer_colorAttachments in
         return try self.depthStencilAttachment.withOptionalCStruct { cStruct_depthStencilAttachment in
         var cStruct = WGPURenderPassDescriptor(
             nextInChain: nil, 
             label: cString_label, 
             colorAttachmentCount: self.colorAttachmentCount, 
-            colorAttachments: self.colorAttachments, 
+            colorAttachments: buffer_colorAttachments.baseAddress, 
             depthStencilAttachment: cStruct_depthStencilAttachment, 
             occlusionQuerySet: self.occlusionQuerySet?.object
         )
         return try body(&cStruct)
+        }
         }
         }
     }
@@ -784,6 +800,7 @@ public struct RenderPipelineDescriptor: CStructConvertible {
         return try self.vertexState.withOptionalCStruct { cStruct_vertexState in
         return try self.rasterizationState.withOptionalCStruct { cStruct_rasterizationState in
         return try self.depthStencilState.withOptionalCStruct { cStruct_depthStencilState in
+        return try self.colorStates.withCStructBufferPointer { buffer_colorStates in
         var cStruct = WGPURenderPipelineDescriptor(
             nextInChain: nil, 
             label: cString_label, 
@@ -796,11 +813,12 @@ public struct RenderPipelineDescriptor: CStructConvertible {
             sampleCount: self.sampleCount, 
             depthStencilState: cStruct_depthStencilState, 
             colorStateCount: self.colorStateCount, 
-            colorStates: self.colorStates, 
+            colorStates: buffer_colorStates.baseAddress, 
             sampleMask: self.sampleMask, 
             alphaToCoverageEnabled: self.alphaToCoverageEnabled
         )
         return try body(&cStruct)
+        }
         }
         }
         }

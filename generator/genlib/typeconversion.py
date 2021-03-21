@@ -32,6 +32,10 @@ implicit_conversion = Conversion('{{ value }}')
 
 enum_conversion = Conversion('{{ value }}.cValue')
 
+enum_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
+                                   ('{{ value }}.map { $0.cValue }.withUnsafeBufferPointer { buffer_{{ name }} in',
+                                    '}'))
+
 bitmask_conversion = Conversion('{{ value }}.rawValue')
 
 string_conversion = Conversion('cString_{{ name }}',
@@ -46,6 +50,13 @@ struct_conversion = Conversion('cStruct_{{ name }}.pointee',
 optional_struct_conversion = Conversion('cStruct_{{ name }}',
                                         ('{{ value }}.withOptionalCStruct { cStruct_{{ name }} in', '}'))
 
+struct_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
+                                     ('{{ value }}.withCStructBufferPointer { buffer_{{ name }} in', '}'))
+
 object_conversion = Conversion('{{ value }}.object')
 
 optional_object_conversion = Conversion('{{ value }}?.object')
+
+object_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
+                                     ('{{ value }}.map { $0.object }.withUnsafeBufferPointer { buffer_{{ name }} in ',
+                                      '}'))
