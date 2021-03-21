@@ -10,10 +10,31 @@ public class {{ object.swift_name }} {
     {% for method in object.methods %}
 
     public func {{ method.swift_name }}(
-    {%- for arg in method.swift_args -%}
+    {%- for arg in method.args -%}
     {{ arg.swift_name }}: {{ arg.swift_type }}{% if not loop.last %}, {% endif %}
     {%- endfor -%}
     ){% if method.return_type %} -> {{ method.return_type.swift_name }}{% endif %} {
+        {% for arg in method.args %}
+        {% if arg.conversion.requires_closure %}
+        {{ arg.conversion.get_closure_head(arg.target_swift_name) }}
+        {% endif %}
+        {% endfor %}
+        {%+ if method.return_type %}let result = {% endif %}{{ method.c_name }}(
+            self.object{% if method.args %}, {% endif %}
+
+            {% for arg in method.args %}
+            {{ arg.conversion.get_c_value(arg.target_swift_name) }}{% if not loop.last %}, {% endif %}
+
+            {% endfor %}
+        )
+        {% if method.return_type %}
+        return {{ method.return_conversion.get_swift_value('result') }}
+        {% endif %}
+        {% for arg in method.args %}
+        {% if arg.conversion.requires_closure %}
+        {{ arg.conversion.get_closure_tail(arg.target_swift_name) }}
+        {% endif %}
+        {% endfor %}
     }
     {% endfor %}
 }

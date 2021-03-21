@@ -216,6 +216,16 @@ class Method:
     def swift_args(self) -> List[Member]:
         return [arg for arg in self.args if not arg.length_of]
 
+    @property
+    def return_conversion(self) -> Optional[typeconversion.Conversion]:
+        if not self.return_type:
+            return None
+
+        if self.return_type.category == 'object':
+            return typeconversion.object_conversion
+
+        return typeconversion.implicit_conversion
+
 
 class ObjectType(Type):
     def __init__(self, name: str, data: Dict):

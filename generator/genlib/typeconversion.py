@@ -3,10 +3,12 @@ from typing import Tuple
 
 
 class Conversion:
-    def __init__(self, c_value_template: str, closure_template: Tuple[str, str] = None):
+    def __init__(self, c_value_template: str, closure_template: Tuple[str, str] = None,
+                 swift_value_template: str = None):
         self.c_value_template = Template(c_value_template)
         self.closure_template = (Template(closure_template[0]),
                                  Template(closure_template[1])) if closure_template else None
+        self.swift_value_template = Template(swift_value_template) if swift_value_template else None
 
     @staticmethod
     def _render(template: Template, name: str, value: str = None, prefix: str = None):
@@ -27,8 +29,11 @@ class Conversion:
     def requires_closure(self) -> bool:
         return self.closure_template is not None
 
+    def get_swift_value(self, value: str) -> str:
+        return self.swift_value_template.render(value=value)
 
-implicit_conversion = Conversion('{{ value }}')
+
+implicit_conversion = Conversion('{{ value }}', None, '{{ value }}')
 
 implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                        ('{{ value }}.withUnsafeBufferPointer { buffer_{{ name }} in', '}'))
@@ -56,7 +61,7 @@ optional_struct_conversion = Conversion('cStruct_{{ name }}',
 struct_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                      ('{{ value }}.withCStructBufferPointer { buffer_{{ name }} in', '}'))
 
-object_conversion = Conversion('{{ value }}.object')
+object_conversion = Conversion('{{ value }}.object', None, '.init(object: {{ value }})')
 
 optional_object_conversion = Conversion('{{ value }}?.object')
 
