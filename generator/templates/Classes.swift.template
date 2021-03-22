@@ -11,7 +11,9 @@ public class {{ object.swift_name }} {
 
     public func {{ method.swift_name }}(
     {%- for arg in method.swift_args -%}
-    {{ arg.swift_name }}: {{ arg.swift_type }}{% if not loop.last %}, {% endif %}
+    {{ arg.swift_name }}: {{ arg.swift_type }}
+    {%- if arg.default_swift_value %} = {{ arg.default_swift_value }}{% endif %}
+    {% if not loop.last %}, {% endif %}
     {%- endfor -%}
     ){% if method.return_type %} -> {{ method.return_type.swift_name }}{% endif %} {
         {% for arg in method.args %}

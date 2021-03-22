@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, Optional, List
+from typing import Dict, Iterable, Optional, List, Any
 from .nameutils import camel_case, pascal_case, swift_safe
 from . import typeconversion
 
@@ -16,6 +16,9 @@ class Type:
     @property
     def swift_name(self) -> str:
         return pascal_case(self.name.lower())
+
+    def get_swift_value(self, value: Any) -> str:
+        return str(value)
 
     def link(self, types: Dict[str, 'Type']):
         pass
@@ -49,6 +52,15 @@ class NativeType(Type):
     def swift_name(self) -> str:
         return self.c_name
 
+    def get_swift_value(self, value: Any) -> str:
+        if isinstance(value, str) and value.startswith('WGPU_'):
+            return f'{self.swift_name}({value})'
+        
+        if self.name == 'float' and isinstance(value, str):
+            return value.rstrip('f')
+
+        return super().get_swift_value(value)
+
 
 class EnumValue:
     def __init__(self, name: str, value: int, requires_prefix: bool):
@@ -68,6 +80,10 @@ class EnumType(Type):
         self.requires_prefix = any((value['name'][0].isdigit() for value in data['values']))
         self.values = [EnumValue(value['name'], value['value'], self.requires_prefix) for value in data['values']]
 
+    def get_swift_value(self, value: Any) -> str:
+        name = 'type ' + value if self.requires_prefix else value
+        return '.' + camel_case(name.lower())
+
 
 class BitmaskType(EnumType):
     @property
@@ -76,11 +92,13 @@ class BitmaskType(EnumType):
 
 
 class Member:
-    def __init__(self, name: str, type_: Type, annotation: Optional[str], length: Optional[str], optional: bool):
+    def __init__(self, name: str, type_: Type, annotation: Optional[str], length: Optional[str],
+                 default: Optional[Any], optional: bool):
         self.name = name
         self.type = type_
         self.annotation = annotation
         self.length = length
+        self.default = default
         self.optional = optional
         self.length_of: Optional[Member] = None
 
@@ -184,6 +202,14 @@ class Member:
     def target_swift_name(self) -> str:
         return self.length_of.swift_name if self.length_of else self.swift_name
 
+    @property
+    def default_swift_value(self) -> Optional[str]:
+        if self.optional:
+            return 'nil'
+
+        if self.default:
+            return self.type.get_swift_value(self.default)
+
 
 class StructureType(Type):
     def __init__(self, name: str, data: Dict):
@@ -202,7 +228,8 @@ class StructureType(Type):
 
     def link(self, types: Dict[str, Type]):
         self.members = [
-            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'), m.get('optional', False))
+            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'),
+                   m.get('default'), m.get('optional', False))
             for m in self.data['members']
         ]
         members_by_length = {member.length: member for member in self.members if member.length}
@@ -249,7 +276,7 @@ class ObjectType(Type):
         for method in self.data.get('methods', []):
             args = [
                 Member(arg['name'], types[arg['type']], arg.get('annotation'), arg.get('length'),
-                       arg.get('optional', False))
+                       arg.get('default'), arg.get('optional', False))
                 for arg in method.get('args', [])
             ]
             args_by_length = {arg.length: arg for arg in args if arg.length}
@@ -277,7 +304,8 @@ class CallbackType(Type):
 
     def link(self, types: Dict[str, Type]):
         self.args = [
-            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'), m.get('optional', False))
+            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'),
+                   m.get('default'), m.get('optional', False))
             for m in self.data['args']
         ]
         args_by_length = {arg.length: arg for arg in self.args if arg.length}

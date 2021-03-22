@@ -80,7 +80,7 @@ public class CommandEncoder {
         self.object = object
     }
 
-    public func finish(descriptor: CommandBufferDescriptor?) -> CommandBuffer {
+    public func finish(descriptor: CommandBufferDescriptor? = nil) -> CommandBuffer {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuCommandEncoderFinish(
             self.object, 
@@ -90,7 +90,7 @@ public class CommandEncoder {
         }
     }
 
-    public func beginComputePass(descriptor: ComputePassDescriptor?) -> ComputePassEncoder {
+    public func beginComputePass(descriptor: ComputePassDescriptor? = nil) -> ComputePassEncoder {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuCommandEncoderBeginComputePass(
             self.object, 
@@ -257,7 +257,7 @@ public class ComputePassEncoder {
         )
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]?) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]? = nil) {
         dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
         wgpuComputePassEncoderSetBindGroup(
             self.object, 
@@ -277,7 +277,7 @@ public class ComputePassEncoder {
         )
     }
 
-    public func dispatch(x: UInt32, y: UInt32, z: UInt32) {
+    public func dispatch(x: UInt32, y: UInt32 = 1, z: UInt32 = 1) {
         wgpuComputePassEncoderDispatch(
             self.object, 
             x, 
@@ -361,7 +361,7 @@ public class Device {
         return .init(object: result)
     }
 
-    public func createCommandEncoder(descriptor: CommandEncoderDescriptor?) -> CommandEncoder {
+    public func createCommandEncoder(descriptor: CommandEncoderDescriptor? = nil) -> CommandEncoder {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateCommandEncoder(
             self.object, 
@@ -443,7 +443,7 @@ public class Device {
         }
     }
 
-    public func createSampler(descriptor: SamplerDescriptor?) -> Sampler {
+    public func createSampler(descriptor: SamplerDescriptor? = nil) -> Sampler {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateSampler(
             self.object, 
@@ -463,7 +463,7 @@ public class Device {
         }
     }
 
-    public func createSwapChain(surface: Surface?, descriptor: SwapChainDescriptor) -> SwapChain {
+    public func createSwapChain(surface: Surface? = nil, descriptor: SwapChainDescriptor) -> SwapChain {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateSwapChain(
             self.object, 
@@ -642,7 +642,7 @@ public class Queue {
         )
     }
 
-    public func createFence(descriptor: FenceDescriptor?) -> Fence {
+    public func createFence(descriptor: FenceDescriptor? = nil) -> Fence {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuQueueCreateFence(
             self.object, 
@@ -733,7 +733,7 @@ public class RenderBundleEncoder {
         )
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]?) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]? = nil) {
         dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
         wgpuRenderBundleEncoderSetBindGroup(
             self.object, 
@@ -745,7 +745,7 @@ public class RenderBundleEncoder {
         }
     }
 
-    public func draw(vertexCount: UInt32, instanceCount: UInt32, firstVertex: UInt32, firstInstance: UInt32) {
+    public func draw(vertexCount: UInt32, instanceCount: UInt32 = 1, firstVertex: UInt32 = 0, firstInstance: UInt32 = 0) {
         wgpuRenderBundleEncoderDraw(
             self.object, 
             vertexCount, 
@@ -755,7 +755,7 @@ public class RenderBundleEncoder {
         )
     }
 
-    public func drawIndexed(indexCount: UInt32, instanceCount: UInt32, firstIndex: UInt32, baseVertex: Int32, firstInstance: UInt32) {
+    public func drawIndexed(indexCount: UInt32, instanceCount: UInt32 = 1, firstIndex: UInt32 = 0, baseVertex: Int32 = 0, firstInstance: UInt32 = 0) {
         wgpuRenderBundleEncoderDrawIndexed(
             self.object, 
             indexCount, 
@@ -806,7 +806,7 @@ public class RenderBundleEncoder {
         }
     }
 
-    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64, size: UInt64) {
+    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderBundleEncoderSetVertexBuffer(
             self.object, 
             slot, 
@@ -816,7 +816,7 @@ public class RenderBundleEncoder {
         )
     }
 
-    public func setIndexBuffer(buffer: Buffer, format: IndexFormat, offset: UInt64, size: UInt64) {
+    public func setIndexBuffer(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderBundleEncoderSetIndexBuffer(
             self.object, 
             buffer.object, 
@@ -826,7 +826,7 @@ public class RenderBundleEncoder {
         )
     }
 
-    public func setIndexBufferWithFormat(buffer: Buffer, format: IndexFormat, offset: UInt64, size: UInt64) {
+    public func setIndexBufferWithFormat(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderBundleEncoderSetIndexBufferWithFormat(
             self.object, 
             buffer.object, 
@@ -836,7 +836,7 @@ public class RenderBundleEncoder {
         )
     }
 
-    public func finish(descriptor: RenderBundleDescriptor?) -> RenderBundle {
+    public func finish(descriptor: RenderBundleDescriptor? = nil) -> RenderBundle {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuRenderBundleEncoderFinish(
             self.object, 
@@ -861,7 +861,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]?) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]? = nil) {
         dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
         wgpuRenderPassEncoderSetBindGroup(
             self.object, 
@@ -873,7 +873,7 @@ public class RenderPassEncoder {
         }
     }
 
-    public func draw(vertexCount: UInt32, instanceCount: UInt32, firstVertex: UInt32, firstInstance: UInt32) {
+    public func draw(vertexCount: UInt32, instanceCount: UInt32 = 1, firstVertex: UInt32 = 0, firstInstance: UInt32 = 0) {
         wgpuRenderPassEncoderDraw(
             self.object, 
             vertexCount, 
@@ -883,7 +883,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func drawIndexed(indexCount: UInt32, instanceCount: UInt32, firstIndex: UInt32, baseVertex: Int32, firstInstance: UInt32) {
+    public func drawIndexed(indexCount: UInt32, instanceCount: UInt32 = 1, firstIndex: UInt32 = 0, baseVertex: Int32 = 0, firstInstance: UInt32 = 0) {
         wgpuRenderPassEncoderDrawIndexed(
             self.object, 
             indexCount, 
@@ -982,7 +982,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64, size: UInt64) {
+    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderPassEncoderSetVertexBuffer(
             self.object, 
             slot, 
@@ -992,7 +992,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func setIndexBuffer(buffer: Buffer, format: IndexFormat, offset: UInt64, size: UInt64) {
+    public func setIndexBuffer(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderPassEncoderSetIndexBuffer(
             self.object, 
             buffer.object, 
@@ -1002,7 +1002,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func setIndexBufferWithFormat(buffer: Buffer, format: IndexFormat, offset: UInt64, size: UInt64) {
+    public func setIndexBufferWithFormat(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderPassEncoderSetIndexBufferWithFormat(
             self.object, 
             buffer.object, 
@@ -1118,7 +1118,7 @@ public class Texture {
         self.object = object
     }
 
-    public func createView(descriptor: TextureViewDescriptor?) -> TextureView {
+    public func createView(descriptor: TextureViewDescriptor? = nil) -> TextureView {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuTextureCreateView(
             self.object, 

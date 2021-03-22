@@ -16,7 +16,9 @@ public struct {{ struct.swift_name }}: CStructConvertible
 
     public init(
     {%- for member in struct.swift_members -%}
-    {{ member.swift_name }}: {{ member.swift_type }}{% if not loop.last or struct.extensible or struct.chained %}, {% endif %}
+    {{ member.swift_name }}: {{ member.swift_type }}
+    {%- if member.default_swift_value %} = {{ member.default_swift_value }}{% endif %}
+    {% if not loop.last or struct.extensible or struct.chained %}, {% endif %}
     {%- endfor -%}
     {%- if struct.extensible or struct.chained -%}
     nextInChain: Chained? = nil
