@@ -18,19 +18,24 @@ public struct {{ struct.swift_name }}: CStructConvertible
     {%- for member in struct.swift_members -%}
     {{ member.swift_name }}: {{ member.swift_type }}
     {%- if member.default_swift_value %} = {{ member.default_swift_value }}{% endif %}
-    {% if not loop.last or struct.extensible or struct.chained %}, {% endif %}
+    {% if not loop.last %}, {% endif %}
     {%- endfor -%}
-    {%- if struct.extensible or struct.chained -%}
-    nextInChain: Chained? = nil
-    {%- endif -%}
     ) {
         {% for member in struct.swift_members %}
         self.{{ member.swift_name }} = {{ member.swift_name }}
         {% endfor %}
-        {% if struct.extensible or struct.chained %}
-        self.nextInChain = nextInChain
-        {% endif %}
     }
+    {% if struct.extensible or struct.chained %}
+
+    public init(
+    {%- for member in struct.swift_members %}{{ member.swift_name }}: {{ member.swift_type }}, {% endfor -%}
+    nextInChain: Chained?) {
+        {% for member in struct.swift_members %}
+        self.{{ member.swift_name }} = {{ member.swift_name }}
+        {% endfor %}
+        self.nextInChain = nextInChain
+    }
+    {% endif %}
 
     func withCStruct<R>(_ body: (UnsafePointer<{{ struct.c_name }}>) throws -> R) rethrows -> R {
         {% if struct.extensible or struct.chained %}

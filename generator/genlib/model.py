@@ -55,7 +55,7 @@ class NativeType(Type):
     def get_swift_value(self, value: Any) -> str:
         if isinstance(value, str) and value.startswith('WGPU_'):
             return f'{self.swift_name}({value})'
-        
+
         if self.name == 'float' and isinstance(value, str):
             return value.rstrip('f')
 

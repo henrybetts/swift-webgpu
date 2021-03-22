@@ -12,7 +12,16 @@ public struct AdapterProperties: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(deviceId: UInt32, vendorId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType, nextInChain: Chained? = nil) {
+    public init(deviceId: UInt32, vendorId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType) {
+        self.deviceId = deviceId
+        self.vendorId = vendorId
+        self.name = name
+        self.driverDescription = driverDescription
+        self.adapterType = adapterType
+        self.backendType = backendType
+    }
+
+    public init(deviceId: UInt32, vendorId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType, nextInChain: Chained?) {
         self.deviceId = deviceId
         self.vendorId = vendorId
         self.name = name
@@ -83,7 +92,13 @@ public struct BindGroupDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, layout: BindGroupLayout, entries: [BindGroupEntry], nextInChain: Chained? = nil) {
+    public init(label: String? = nil, layout: BindGroupLayout, entries: [BindGroupEntry]) {
+        self.label = label
+        self.layout = layout
+        self.entries = entries
+    }
+
+    public init(label: String?, layout: BindGroupLayout, entries: [BindGroupEntry], nextInChain: Chained?) {
         self.label = label
         self.layout = layout
         self.entries = entries
@@ -117,7 +132,13 @@ public struct BufferBindingLayout: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(type: BufferBindingType = .undefined, hasDynamicOffset: Bool = false, minBindingSize: UInt64 = 0, nextInChain: Chained? = nil) {
+    public init(type: BufferBindingType = .undefined, hasDynamicOffset: Bool = false, minBindingSize: UInt64 = 0) {
+        self.type = type
+        self.hasDynamicOffset = hasDynamicOffset
+        self.minBindingSize = minBindingSize
+    }
+
+    public init(type: BufferBindingType, hasDynamicOffset: Bool, minBindingSize: UInt64, nextInChain: Chained?) {
         self.type = type
         self.hasDynamicOffset = hasDynamicOffset
         self.minBindingSize = minBindingSize
@@ -144,7 +165,11 @@ public struct SamplerBindingLayout: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(type: SamplerBindingType = .undefined, nextInChain: Chained? = nil) {
+    public init(type: SamplerBindingType = .undefined) {
+        self.type = type
+    }
+
+    public init(type: SamplerBindingType, nextInChain: Chained?) {
         self.type = type
         self.nextInChain = nextInChain
     }
@@ -169,7 +194,13 @@ public struct TextureBindingLayout: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(sampleType: TextureSampleType = .undefined, viewDimension: TextureViewDimension = .typeUndefined, multisampled: Bool = false, nextInChain: Chained? = nil) {
+    public init(sampleType: TextureSampleType = .undefined, viewDimension: TextureViewDimension = .typeUndefined, multisampled: Bool = false) {
+        self.sampleType = sampleType
+        self.viewDimension = viewDimension
+        self.multisampled = multisampled
+    }
+
+    public init(sampleType: TextureSampleType, viewDimension: TextureViewDimension, multisampled: Bool, nextInChain: Chained?) {
         self.sampleType = sampleType
         self.viewDimension = viewDimension
         self.multisampled = multisampled
@@ -198,7 +229,13 @@ public struct StorageTextureBindingLayout: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(access: StorageTextureAccess = .undefined, format: TextureFormat = .undefined, viewDimension: TextureViewDimension = .typeUndefined, nextInChain: Chained? = nil) {
+    public init(access: StorageTextureAccess = .undefined, format: TextureFormat = .undefined, viewDimension: TextureViewDimension = .typeUndefined) {
+        self.access = access
+        self.format = format
+        self.viewDimension = viewDimension
+    }
+
+    public init(access: StorageTextureAccess, format: TextureFormat, viewDimension: TextureViewDimension, nextInChain: Chained?) {
         self.access = access
         self.format = format
         self.viewDimension = viewDimension
@@ -236,7 +273,22 @@ public struct BindGroupLayoutEntry: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(binding: UInt32, visibility: ShaderStage, type: BindingType = .undefined, hasDynamicOffset: Bool = false, minBufferBindingSize: UInt64 = 0, viewDimension: TextureViewDimension = .typeUndefined, textureComponentType: TextureComponentType = .float, storageTextureFormat: TextureFormat = .undefined, buffer: BufferBindingLayout, sampler: SamplerBindingLayout, texture: TextureBindingLayout, storageTexture: StorageTextureBindingLayout, nextInChain: Chained? = nil) {
+    public init(binding: UInt32, visibility: ShaderStage, type: BindingType = .undefined, hasDynamicOffset: Bool = false, minBufferBindingSize: UInt64 = 0, viewDimension: TextureViewDimension = .typeUndefined, textureComponentType: TextureComponentType = .float, storageTextureFormat: TextureFormat = .undefined, buffer: BufferBindingLayout, sampler: SamplerBindingLayout, texture: TextureBindingLayout, storageTexture: StorageTextureBindingLayout) {
+        self.binding = binding
+        self.visibility = visibility
+        self.type = type
+        self.hasDynamicOffset = hasDynamicOffset
+        self.minBufferBindingSize = minBufferBindingSize
+        self.viewDimension = viewDimension
+        self.textureComponentType = textureComponentType
+        self.storageTextureFormat = storageTextureFormat
+        self.buffer = buffer
+        self.sampler = sampler
+        self.texture = texture
+        self.storageTexture = storageTexture
+    }
+
+    public init(binding: UInt32, visibility: ShaderStage, type: BindingType, hasDynamicOffset: Bool, minBufferBindingSize: UInt64, viewDimension: TextureViewDimension, textureComponentType: TextureComponentType, storageTextureFormat: TextureFormat, buffer: BufferBindingLayout, sampler: SamplerBindingLayout, texture: TextureBindingLayout, storageTexture: StorageTextureBindingLayout, nextInChain: Chained?) {
         self.binding = binding
         self.visibility = visibility
         self.type = type
@@ -290,7 +342,12 @@ public struct BindGroupLayoutDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, entries: [BindGroupLayoutEntry], nextInChain: Chained? = nil) {
+    public init(label: String? = nil, entries: [BindGroupLayoutEntry]) {
+        self.label = label
+        self.entries = entries
+    }
+
+    public init(label: String?, entries: [BindGroupLayoutEntry], nextInChain: Chained?) {
         self.label = label
         self.entries = entries
         self.nextInChain = nextInChain
@@ -346,7 +403,14 @@ public struct ColorStateDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(format: TextureFormat, alphaBlend: BlendDescriptor, colorBlend: BlendDescriptor, writeMask: ColorWriteMask = .all, nextInChain: Chained? = nil) {
+    public init(format: TextureFormat, alphaBlend: BlendDescriptor, colorBlend: BlendDescriptor, writeMask: ColorWriteMask = .all) {
+        self.format = format
+        self.alphaBlend = alphaBlend
+        self.colorBlend = colorBlend
+        self.writeMask = writeMask
+    }
+
+    public init(format: TextureFormat, alphaBlend: BlendDescriptor, colorBlend: BlendDescriptor, writeMask: ColorWriteMask, nextInChain: Chained?) {
         self.format = format
         self.alphaBlend = alphaBlend
         self.colorBlend = colorBlend
@@ -380,7 +444,12 @@ public struct BufferCopyView: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(layout: TextureDataLayout, buffer: Buffer, nextInChain: Chained? = nil) {
+    public init(layout: TextureDataLayout, buffer: Buffer) {
+        self.layout = layout
+        self.buffer = buffer
+    }
+
+    public init(layout: TextureDataLayout, buffer: Buffer, nextInChain: Chained?) {
         self.layout = layout
         self.buffer = buffer
         self.nextInChain = nextInChain
@@ -410,7 +479,14 @@ public struct BufferDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, usage: BufferUsage, size: UInt64, mappedAtCreation: Bool = false, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, usage: BufferUsage, size: UInt64, mappedAtCreation: Bool = false) {
+        self.label = label
+        self.usage = usage
+        self.size = size
+        self.mappedAtCreation = mappedAtCreation
+    }
+
+    public init(label: String?, usage: BufferUsage, size: UInt64, mappedAtCreation: Bool, nextInChain: Chained?) {
         self.label = label
         self.usage = usage
         self.size = size
@@ -467,7 +543,11 @@ public struct CommandBufferDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, nextInChain: Chained? = nil) {
+    public init(label: String? = nil) {
+        self.label = label
+    }
+
+    public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
     }
@@ -492,7 +572,11 @@ public struct CommandEncoderDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, nextInChain: Chained? = nil) {
+    public init(label: String? = nil) {
+        self.label = label
+    }
+
+    public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
     }
@@ -517,7 +601,11 @@ public struct ComputePassDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, nextInChain: Chained? = nil) {
+    public init(label: String? = nil) {
+        self.label = label
+    }
+
+    public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
     }
@@ -544,7 +632,13 @@ public struct ComputePipelineDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, layout: PipelineLayout? = nil, computeStage: ProgrammableStageDescriptor, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, layout: PipelineLayout? = nil, computeStage: ProgrammableStageDescriptor) {
+        self.label = label
+        self.layout = layout
+        self.computeStage = computeStage
+    }
+
+    public init(label: String?, layout: PipelineLayout?, computeStage: ProgrammableStageDescriptor, nextInChain: Chained?) {
         self.label = label
         self.layout = layout
         self.computeStage = computeStage
@@ -575,7 +669,11 @@ public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(flipy: Bool = false, nextInChain: Chained? = nil) {
+    public init(flipy: Bool = false) {
+        self.flipy = flipy
+    }
+
+    public init(flipy: Bool, nextInChain: Chained?) {
         self.flipy = flipy
         self.nextInChain = nextInChain
     }
@@ -633,7 +731,17 @@ public struct DepthStencilStateDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(format: TextureFormat, depthWriteEnabled: Bool = false, depthCompare: CompareFunction = .always, stencilFront: StencilStateFaceDescriptor, stencilBack: StencilStateFaceDescriptor, stencilReadMask: UInt32 = 0xFFFFFFFF, stencilWriteMask: UInt32 = 0xFFFFFFFF, nextInChain: Chained? = nil) {
+    public init(format: TextureFormat, depthWriteEnabled: Bool = false, depthCompare: CompareFunction = .always, stencilFront: StencilStateFaceDescriptor, stencilBack: StencilStateFaceDescriptor, stencilReadMask: UInt32 = 0xFFFFFFFF, stencilWriteMask: UInt32 = 0xFFFFFFFF) {
+        self.format = format
+        self.depthWriteEnabled = depthWriteEnabled
+        self.depthCompare = depthCompare
+        self.stencilFront = stencilFront
+        self.stencilBack = stencilBack
+        self.stencilReadMask = stencilReadMask
+        self.stencilWriteMask = stencilWriteMask
+    }
+
+    public init(format: TextureFormat, depthWriteEnabled: Bool, depthCompare: CompareFunction, stencilFront: StencilStateFaceDescriptor, stencilBack: StencilStateFaceDescriptor, stencilReadMask: UInt32, stencilWriteMask: UInt32, nextInChain: Chained?) {
         self.format = format
         self.depthWriteEnabled = depthWriteEnabled
         self.depthCompare = depthCompare
@@ -696,7 +804,12 @@ public struct FenceDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, initialValue: UInt64 = 0, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, initialValue: UInt64 = 0) {
+        self.label = label
+        self.initialValue = initialValue
+    }
+
+    public init(label: String?, initialValue: UInt64, nextInChain: Chained?) {
         self.label = label
         self.initialValue = initialValue
         self.nextInChain = nextInChain
@@ -722,7 +835,10 @@ public struct InstanceDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(nextInChain: Chained? = nil) {
+    public init() {
+    }
+
+    public init(nextInChain: Chained?) {
         self.nextInChain = nextInChain
     }
 
@@ -793,7 +909,12 @@ public struct VertexStateDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(indexFormat: IndexFormat = .undefined, vertexBuffers: [VertexBufferLayout], nextInChain: Chained? = nil) {
+    public init(indexFormat: IndexFormat = .undefined, vertexBuffers: [VertexBufferLayout]) {
+        self.indexFormat = indexFormat
+        self.vertexBuffers = vertexBuffers
+    }
+
+    public init(indexFormat: IndexFormat, vertexBuffers: [VertexBufferLayout], nextInChain: Chained?) {
         self.indexFormat = indexFormat
         self.vertexBuffers = vertexBuffers
         self.nextInChain = nextInChain
@@ -845,7 +966,12 @@ public struct PipelineLayoutDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, bindGroupLayouts: [BindGroupLayout], nextInChain: Chained? = nil) {
+    public init(label: String? = nil, bindGroupLayouts: [BindGroupLayout]) {
+        self.label = label
+        self.bindGroupLayouts = bindGroupLayouts
+    }
+
+    public init(label: String?, bindGroupLayouts: [BindGroupLayout], nextInChain: Chained?) {
         self.label = label
         self.bindGroupLayouts = bindGroupLayouts
         self.nextInChain = nextInChain
@@ -876,7 +1002,12 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, nextInChain: Chained? = nil) {
+    public init(module: ShaderModule, entryPoint: String) {
+        self.module = module
+        self.entryPoint = entryPoint
+    }
+
+    public init(module: ShaderModule, entryPoint: String, nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
         self.nextInChain = nextInChain
@@ -906,7 +1037,14 @@ public struct QuerySetDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, type: QueryType, count: UInt32, pipelineStatistics: [PipelineStatisticName], nextInChain: Chained? = nil) {
+    public init(label: String? = nil, type: QueryType, count: UInt32, pipelineStatistics: [PipelineStatisticName]) {
+        self.label = label
+        self.type = type
+        self.count = count
+        self.pipelineStatistics = pipelineStatistics
+    }
+
+    public init(label: String?, type: QueryType, count: UInt32, pipelineStatistics: [PipelineStatisticName], nextInChain: Chained?) {
         self.label = label
         self.type = type
         self.count = count
@@ -944,7 +1082,15 @@ public struct RasterizationStateDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(frontFace: FrontFace = .ccw, cullMode: CullMode = .none, depthBias: Int32 = 0, depthBiasSlopeScale: Float = 0.0, depthBiasClamp: Float = 0.0, nextInChain: Chained? = nil) {
+    public init(frontFace: FrontFace = .ccw, cullMode: CullMode = .none, depthBias: Int32 = 0, depthBiasSlopeScale: Float = 0.0, depthBiasClamp: Float = 0.0) {
+        self.frontFace = frontFace
+        self.cullMode = cullMode
+        self.depthBias = depthBias
+        self.depthBiasSlopeScale = depthBiasSlopeScale
+        self.depthBiasClamp = depthBiasClamp
+    }
+
+    public init(frontFace: FrontFace, cullMode: CullMode, depthBias: Int32, depthBiasSlopeScale: Float, depthBiasClamp: Float, nextInChain: Chained?) {
         self.frontFace = frontFace
         self.cullMode = cullMode
         self.depthBias = depthBias
@@ -975,7 +1121,11 @@ public struct RenderBundleDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, nextInChain: Chained? = nil) {
+    public init(label: String? = nil) {
+        self.label = label
+    }
+
+    public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
     }
@@ -1003,7 +1153,14 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, colorFormats: [TextureFormat], depthStencilFormat: TextureFormat = .undefined, sampleCount: UInt32 = 1, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, colorFormats: [TextureFormat], depthStencilFormat: TextureFormat = .undefined, sampleCount: UInt32 = 1) {
+        self.label = label
+        self.colorFormats = colorFormats
+        self.depthStencilFormat = depthStencilFormat
+        self.sampleCount = sampleCount
+    }
+
+    public init(label: String?, colorFormats: [TextureFormat], depthStencilFormat: TextureFormat, sampleCount: UInt32, nextInChain: Chained?) {
         self.label = label
         self.colorFormats = colorFormats
         self.depthStencilFormat = depthStencilFormat
@@ -1112,7 +1269,14 @@ public struct RenderPassDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, colorAttachments: [RenderPassColorAttachmentDescriptor], depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor? = nil, occlusionQuerySet: QuerySet? = nil, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, colorAttachments: [RenderPassColorAttachmentDescriptor], depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor? = nil, occlusionQuerySet: QuerySet? = nil) {
+        self.label = label
+        self.colorAttachments = colorAttachments
+        self.depthStencilAttachment = depthStencilAttachment
+        self.occlusionQuerySet = occlusionQuerySet
+    }
+
+    public init(label: String?, colorAttachments: [RenderPassColorAttachmentDescriptor], depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor?, occlusionQuerySet: QuerySet?, nextInChain: Chained?) {
         self.label = label
         self.colorAttachments = colorAttachments
         self.depthStencilAttachment = depthStencilAttachment
@@ -1159,7 +1323,22 @@ public struct RenderPipelineDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, layout: PipelineLayout? = nil, vertexStage: ProgrammableStageDescriptor, fragmentStage: ProgrammableStageDescriptor? = nil, vertexState: VertexStateDescriptor? = nil, primitiveTopology: PrimitiveTopology, rasterizationState: RasterizationStateDescriptor? = nil, sampleCount: UInt32 = 1, depthStencilState: DepthStencilStateDescriptor? = nil, colorStates: [ColorStateDescriptor], sampleMask: UInt32 = 0xFFFFFFFF, alphaToCoverageEnabled: Bool = false, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, layout: PipelineLayout? = nil, vertexStage: ProgrammableStageDescriptor, fragmentStage: ProgrammableStageDescriptor? = nil, vertexState: VertexStateDescriptor? = nil, primitiveTopology: PrimitiveTopology, rasterizationState: RasterizationStateDescriptor? = nil, sampleCount: UInt32 = 1, depthStencilState: DepthStencilStateDescriptor? = nil, colorStates: [ColorStateDescriptor], sampleMask: UInt32 = 0xFFFFFFFF, alphaToCoverageEnabled: Bool = false) {
+        self.label = label
+        self.layout = layout
+        self.vertexStage = vertexStage
+        self.fragmentStage = fragmentStage
+        self.vertexState = vertexState
+        self.primitiveTopology = primitiveTopology
+        self.rasterizationState = rasterizationState
+        self.sampleCount = sampleCount
+        self.depthStencilState = depthStencilState
+        self.colorStates = colorStates
+        self.sampleMask = sampleMask
+        self.alphaToCoverageEnabled = alphaToCoverageEnabled
+    }
+
+    public init(label: String?, layout: PipelineLayout?, vertexStage: ProgrammableStageDescriptor, fragmentStage: ProgrammableStageDescriptor?, vertexState: VertexStateDescriptor?, primitiveTopology: PrimitiveTopology, rasterizationState: RasterizationStateDescriptor?, sampleCount: UInt32, depthStencilState: DepthStencilStateDescriptor?, colorStates: [ColorStateDescriptor], sampleMask: UInt32, alphaToCoverageEnabled: Bool, nextInChain: Chained?) {
         self.label = label
         self.layout = layout
         self.vertexStage = vertexStage
@@ -1219,7 +1398,11 @@ public struct RenderPipelineDescriptorDummyExtension: CStructConvertible, Chaine
 
     public var nextInChain: Chained?
 
-    public init(dummyStage: ProgrammableStageDescriptor, nextInChain: Chained? = nil) {
+    public init(dummyStage: ProgrammableStageDescriptor) {
+        self.dummyStage = dummyStage
+    }
+
+    public init(dummyStage: ProgrammableStageDescriptor, nextInChain: Chained?) {
         self.dummyStage = dummyStage
         self.nextInChain = nextInChain
     }
@@ -1261,7 +1444,21 @@ public struct SamplerDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, addressModeU: AddressMode = .clampToEdge, addressModeV: AddressMode = .clampToEdge, addressModeW: AddressMode = .clampToEdge, magFilter: FilterMode = .nearest, minFilter: FilterMode = .nearest, mipmapFilter: FilterMode = .nearest, lodMinClamp: Float = 0.0, lodMaxClamp: Float = 1000.0, compare: CompareFunction = .undefined, maxAnisotropy: UInt16 = 1, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, addressModeU: AddressMode = .clampToEdge, addressModeV: AddressMode = .clampToEdge, addressModeW: AddressMode = .clampToEdge, magFilter: FilterMode = .nearest, minFilter: FilterMode = .nearest, mipmapFilter: FilterMode = .nearest, lodMinClamp: Float = 0.0, lodMaxClamp: Float = 1000.0, compare: CompareFunction = .undefined, maxAnisotropy: UInt16 = 1) {
+        self.label = label
+        self.addressModeU = addressModeU
+        self.addressModeV = addressModeV
+        self.addressModeW = addressModeW
+        self.magFilter = magFilter
+        self.minFilter = minFilter
+        self.mipmapFilter = mipmapFilter
+        self.lodMinClamp = lodMinClamp
+        self.lodMaxClamp = lodMaxClamp
+        self.compare = compare
+        self.maxAnisotropy = maxAnisotropy
+    }
+
+    public init(label: String?, addressModeU: AddressMode, addressModeV: AddressMode, addressModeW: AddressMode, magFilter: FilterMode, minFilter: FilterMode, mipmapFilter: FilterMode, lodMinClamp: Float, lodMaxClamp: Float, compare: CompareFunction, maxAnisotropy: UInt16, nextInChain: Chained?) {
         self.label = label
         self.addressModeU = addressModeU
         self.addressModeV = addressModeV
@@ -1306,7 +1503,11 @@ public struct SamplerDescriptorDummyAnisotropicFiltering: CStructConvertible, Ch
 
     public var nextInChain: Chained?
 
-    public init(maxAnisotropy: Float, nextInChain: Chained? = nil) {
+    public init(maxAnisotropy: Float) {
+        self.maxAnisotropy = maxAnisotropy
+    }
+
+    public init(maxAnisotropy: Float, nextInChain: Chained?) {
         self.maxAnisotropy = maxAnisotropy
         self.nextInChain = nextInChain
     }
@@ -1336,7 +1537,11 @@ public struct ShaderModuleDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, nextInChain: Chained? = nil) {
+    public init(label: String? = nil) {
+        self.label = label
+    }
+
+    public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
     }
@@ -1361,7 +1566,11 @@ public struct ShaderModuleSpirvDescriptor: CStructConvertible, Chained {
 
     public var nextInChain: Chained?
 
-    public init(code: [UInt32], nextInChain: Chained? = nil) {
+    public init(code: [UInt32]) {
+        self.code = code
+    }
+
+    public init(code: [UInt32], nextInChain: Chained?) {
         self.code = code
         self.nextInChain = nextInChain
     }
@@ -1394,7 +1603,11 @@ public struct ShaderModuleWgslDescriptor: CStructConvertible, Chained {
 
     public var nextInChain: Chained?
 
-    public init(source: String, nextInChain: Chained? = nil) {
+    public init(source: String) {
+        self.source = source
+    }
+
+    public init(source: String, nextInChain: Chained?) {
         self.source = source
         self.nextInChain = nextInChain
     }
@@ -1452,7 +1665,11 @@ public struct SurfaceDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, nextInChain: Chained? = nil) {
+    public init(label: String? = nil) {
+        self.label = label
+    }
+
+    public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
     }
@@ -1477,7 +1694,11 @@ public struct SurfaceDescriptorFromCanvasHtmlSelector: CStructConvertible, Chain
 
     public var nextInChain: Chained?
 
-    public init(selector: String, nextInChain: Chained? = nil) {
+    public init(selector: String) {
+        self.selector = selector
+    }
+
+    public init(selector: String, nextInChain: Chained?) {
         self.selector = selector
         self.nextInChain = nextInChain
     }
@@ -1509,7 +1730,11 @@ public struct SurfaceDescriptorFromMetalLayer: CStructConvertible, Chained {
 
     public var nextInChain: Chained?
 
-    public init(layer: UnsafeMutableRawPointer!, nextInChain: Chained? = nil) {
+    public init(layer: UnsafeMutableRawPointer!) {
+        self.layer = layer
+    }
+
+    public init(layer: UnsafeMutableRawPointer!, nextInChain: Chained?) {
         self.layer = layer
         self.nextInChain = nextInChain
     }
@@ -1540,7 +1765,12 @@ public struct SurfaceDescriptorFromWindowsHwnd: CStructConvertible, Chained {
 
     public var nextInChain: Chained?
 
-    public init(hinstance: UnsafeMutableRawPointer!, hwnd: UnsafeMutableRawPointer!, nextInChain: Chained? = nil) {
+    public init(hinstance: UnsafeMutableRawPointer!, hwnd: UnsafeMutableRawPointer!) {
+        self.hinstance = hinstance
+        self.hwnd = hwnd
+    }
+
+    public init(hinstance: UnsafeMutableRawPointer!, hwnd: UnsafeMutableRawPointer!, nextInChain: Chained?) {
         self.hinstance = hinstance
         self.hwnd = hwnd
         self.nextInChain = nextInChain
@@ -1573,7 +1803,12 @@ public struct SurfaceDescriptorFromXlib: CStructConvertible, Chained {
 
     public var nextInChain: Chained?
 
-    public init(display: UnsafeMutableRawPointer!, window: UInt32, nextInChain: Chained? = nil) {
+    public init(display: UnsafeMutableRawPointer!, window: UInt32) {
+        self.display = display
+        self.window = window
+    }
+
+    public init(display: UnsafeMutableRawPointer!, window: UInt32, nextInChain: Chained?) {
         self.display = display
         self.window = window
         self.nextInChain = nextInChain
@@ -1611,7 +1846,17 @@ public struct SwapChainDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, usage: TextureUsage, format: TextureFormat, width: UInt32, height: UInt32, presentMode: PresentMode, implementation: UInt64, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, usage: TextureUsage, format: TextureFormat, width: UInt32, height: UInt32, presentMode: PresentMode, implementation: UInt64) {
+        self.label = label
+        self.usage = usage
+        self.format = format
+        self.width = width
+        self.height = height
+        self.presentMode = presentMode
+        self.implementation = implementation
+    }
+
+    public init(label: String?, usage: TextureUsage, format: TextureFormat, width: UInt32, height: UInt32, presentMode: PresentMode, implementation: UInt64, nextInChain: Chained?) {
         self.label = label
         self.usage = usage
         self.format = format
@@ -1651,7 +1896,14 @@ public struct TextureCopyView: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(texture: Texture, mipLevel: UInt32 = 0, origin: Origin3d, aspect: TextureAspect = .all, nextInChain: Chained? = nil) {
+    public init(texture: Texture, mipLevel: UInt32 = 0, origin: Origin3d, aspect: TextureAspect = .all) {
+        self.texture = texture
+        self.mipLevel = mipLevel
+        self.origin = origin
+        self.aspect = aspect
+    }
+
+    public init(texture: Texture, mipLevel: UInt32, origin: Origin3d, aspect: TextureAspect, nextInChain: Chained?) {
         self.texture = texture
         self.mipLevel = mipLevel
         self.origin = origin
@@ -1684,7 +1936,13 @@ public struct TextureDataLayout: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(offset: UInt64, bytesPerRow: UInt32 = UInt32(WGPU_COPY_STRIDE_UNDEFINED), rowsPerImage: UInt32 = UInt32(WGPU_COPY_STRIDE_UNDEFINED), nextInChain: Chained? = nil) {
+    public init(offset: UInt64, bytesPerRow: UInt32 = UInt32(WGPU_COPY_STRIDE_UNDEFINED), rowsPerImage: UInt32 = UInt32(WGPU_COPY_STRIDE_UNDEFINED)) {
+        self.offset = offset
+        self.bytesPerRow = bytesPerRow
+        self.rowsPerImage = rowsPerImage
+    }
+
+    public init(offset: UInt64, bytesPerRow: UInt32, rowsPerImage: UInt32, nextInChain: Chained?) {
         self.offset = offset
         self.bytesPerRow = bytesPerRow
         self.rowsPerImage = rowsPerImage
@@ -1717,7 +1975,17 @@ public struct TextureDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, usage: TextureUsage, dimension: TextureDimension = .type2d, size: Extent3d, format: TextureFormat, mipLevelCount: UInt32 = 1, sampleCount: UInt32 = 1, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, usage: TextureUsage, dimension: TextureDimension = .type2d, size: Extent3d, format: TextureFormat, mipLevelCount: UInt32 = 1, sampleCount: UInt32 = 1) {
+        self.label = label
+        self.usage = usage
+        self.dimension = dimension
+        self.size = size
+        self.format = format
+        self.mipLevelCount = mipLevelCount
+        self.sampleCount = sampleCount
+    }
+
+    public init(label: String?, usage: TextureUsage, dimension: TextureDimension, size: Extent3d, format: TextureFormat, mipLevelCount: UInt32, sampleCount: UInt32, nextInChain: Chained?) {
         self.label = label
         self.usage = usage
         self.dimension = dimension
@@ -1763,7 +2031,18 @@ public struct TextureViewDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, format: TextureFormat = .undefined, dimension: TextureViewDimension = .typeUndefined, baseMipLevel: UInt32 = 0, mipLevelCount: UInt32 = 0, baseArrayLayer: UInt32 = 0, arrayLayerCount: UInt32 = 0, aspect: TextureAspect = .all, nextInChain: Chained? = nil) {
+    public init(label: String? = nil, format: TextureFormat = .undefined, dimension: TextureViewDimension = .typeUndefined, baseMipLevel: UInt32 = 0, mipLevelCount: UInt32 = 0, baseArrayLayer: UInt32 = 0, arrayLayerCount: UInt32 = 0, aspect: TextureAspect = .all) {
+        self.label = label
+        self.format = format
+        self.dimension = dimension
+        self.baseMipLevel = baseMipLevel
+        self.mipLevelCount = mipLevelCount
+        self.baseArrayLayer = baseArrayLayer
+        self.arrayLayerCount = arrayLayerCount
+        self.aspect = aspect
+    }
+
+    public init(label: String?, format: TextureFormat, dimension: TextureViewDimension, baseMipLevel: UInt32, mipLevelCount: UInt32, baseArrayLayer: UInt32, arrayLayerCount: UInt32, aspect: TextureAspect, nextInChain: Chained?) {
         self.label = label
         self.format = format
         self.dimension = dimension
