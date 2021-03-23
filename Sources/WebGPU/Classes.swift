@@ -661,32 +661,28 @@ public class Queue {
         )
     }
 
-    public func writeBuffer(buffer: Buffer, bufferOffset: UInt64, data: [Void]) {
-        data.withUnsafeBufferPointer { buffer_data in
+    public func writeBuffer(buffer: Buffer, bufferOffset: UInt64, data: UnsafeRawBufferPointer) {
         wgpuQueueWriteBuffer(
             self.object, 
             buffer.object, 
             bufferOffset, 
-            buffer_data.baseAddress, 
-            .init(buffer_data.count)
+            data.baseAddress, 
+            .init(data.count)
         )
-        }
     }
 
-    public func writeTexture(destination: TextureCopyView, data: [Void], dataLayout: TextureDataLayout, writeSize: Extent3d) {
+    public func writeTexture(destination: TextureCopyView, data: UnsafeRawBufferPointer, dataLayout: TextureDataLayout, writeSize: Extent3d) {
         destination.withCStruct { cStruct_destination in
-        data.withUnsafeBufferPointer { buffer_data in
         dataLayout.withCStruct { cStruct_dataLayout in
         writeSize.withCStruct { cStruct_writeSize in
         wgpuQueueWriteTexture(
             self.object, 
             cStruct_destination, 
-            buffer_data.baseAddress, 
-            .init(buffer_data.count), 
+            data.baseAddress, 
+            .init(data.count), 
             cStruct_dataLayout, 
             cStruct_writeSize
         )
-        }
         }
         }
         }

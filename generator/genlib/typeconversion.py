@@ -76,6 +76,9 @@ object_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                      ('{{ value }}.map { $0.object }.withUnsafeBufferPointer { buffer_{{ name }} in ',
                                       '}'))
 
-length_conversion = Conversion('.init(buffer_{{ name }}.count)')
+array_length_conversion = Conversion('.init(buffer_{{ name }}.count)')
+
+buffer_conversion = Conversion('{{ name }}.baseAddress')
+buffer_length_conversion = Conversion('.init({{ name }}.count)')
 
 userdata_conversion = Conversion('Unmanaged.passRetained(callback as AnyObject).toOpaque()')

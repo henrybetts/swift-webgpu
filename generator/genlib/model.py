@@ -138,7 +138,10 @@ class Member:
             swift_type = 'String'
 
         elif self.annotation == 'const*' and self.length:
-            swift_type = f'[{self.type.swift_name}]'
+            if self.type.name == 'void':
+                swift_type = 'UnsafeRawBufferPointer'
+            else:
+                swift_type = f'[{self.type.swift_name}]'
 
         elif not self.annotation or (self.annotation == 'const*' and self.type.category == 'structure'):
             swift_type = self.type.swift_name
@@ -154,7 +157,9 @@ class Member:
     @property
     def conversion(self) -> typeconversion.Conversion:
         if self.length_of:
-            return typeconversion.length_conversion
+            if self.length_of.type.name == 'void':
+                return typeconversion.buffer_length_conversion
+            return typeconversion.array_length_conversion
 
         if self.name == 'userdata':
             return typeconversion.userdata_conversion
@@ -163,6 +168,9 @@ class Member:
             return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
 
         if self.annotation == 'const*' and self.length:
+            if self.type.name == 'void':
+                return typeconversion.buffer_conversion
+            
             if self.type.category == 'enum':
                 return typeconversion.enum_array_conversion
 
