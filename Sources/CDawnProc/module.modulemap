@@ -1,0 +1,4 @@
+module CDawnProc [system] {
+    header "shim.h"
+    link "dawn_proc"
+}

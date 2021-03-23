@@ -15,8 +15,12 @@ let package = Package(
     targets: [
         .systemLibrary(
             name: "CWebGPU"),
+        .systemLibrary(
+            name: "CDawnProc"),
+        .target(
+            name: "CDawnNative"),
         .target(
             name: "WebGPU",
-            dependencies: ["CWebGPU"]),
+            dependencies: ["CWebGPU", "CDawnProc", "CDawnNative"]),
     ]
 )

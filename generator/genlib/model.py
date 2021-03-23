@@ -170,7 +170,7 @@ class Member:
         if self.annotation == 'const*' and self.length:
             if self.type.name == 'void':
                 return typeconversion.buffer_conversion
-            
+
             if self.type.category == 'enum':
                 return typeconversion.enum_array_conversion
 
