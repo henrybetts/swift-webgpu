@@ -9,6 +9,9 @@ public class {{ object.swift_name }} {
     }
     {% for method in object.methods %}
 
+    {% if method.is_getter %}
+    public var {{ method.swift_name }}: {{ method.return_type.swift_name }} {
+    {% else %}
     public func {{ method.swift_name }}(
     {%- for arg in method.swift_args -%}
     {{ arg.swift_name }}: {{ arg.swift_type }}
@@ -16,6 +19,7 @@ public class {{ object.swift_name }} {
     {% if not loop.last %}, {% endif %}
     {%- endfor -%}
     ){% if method.return_type %} -> {{ method.return_type.swift_name }}{% endif %} {
+    {% endif %}
         {% for arg in method.args %}
         {% if arg.conversion.requires_closure %}
         {{ arg.conversion.get_closure_head(arg.target_swift_name) }}

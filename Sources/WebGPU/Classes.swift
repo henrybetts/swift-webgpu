@@ -484,14 +484,14 @@ public class Device {
         }
     }
 
-    public func getQueue() -> Queue {
+    public var queue: Queue {
         let result = wgpuDeviceGetQueue(
             self.object
         )
         return .init(object: result)
     }
 
-    public func getDefaultQueue() -> Queue {
+    public var defaultQueue: Queue {
         let result = wgpuDeviceGetDefaultQueue(
             self.object
         )
@@ -560,7 +560,7 @@ public class Fence {
         self.object = object
     }
 
-    public func getCompletedValue() -> UInt64 {
+    public var completedValue: UInt64 {
         let result = wgpuFenceGetCompletedValue(
             self.object
         )
@@ -1093,7 +1093,7 @@ public class SwapChain {
         )
     }
 
-    public func getCurrentTextureView() -> TextureView {
+    public var currentTextureView: TextureView {
         let result = wgpuSwapChainGetCurrentTextureView(
             self.object
         )

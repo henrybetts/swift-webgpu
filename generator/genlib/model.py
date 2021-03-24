@@ -246,11 +246,15 @@ class StructureType(Type):
 
 
 class Method:
-    def __init__(self, object_name: str, name: str, args: List[Member], return_type: Type):
+    def __init__(self, object_name: str, name: str, args: List[Member], return_type: Optional[Type]):
         self.object_name = object_name
         self.name = name
         self.args = args
         self.return_type = return_type
+
+    @property
+    def is_getter(self) -> bool:
+        return self.return_type and not self.args and self.name.startswith('get ')
 
     @property
     def c_name(self) -> str:
@@ -258,7 +262,10 @@ class Method:
 
     @property
     def swift_name(self) -> str:
-        return camel_case(self.name.lower())
+        name = self.name
+        if self.is_getter:
+            name = name[4:]
+        return camel_case(name.lower())
 
     @property
     def swift_args(self) -> List[Member]:
