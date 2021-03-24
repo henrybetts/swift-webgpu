@@ -199,7 +199,7 @@ public class CommandEncoder {
         }
     }
 
-    public func resolveQuerySet(querySet: QuerySet, firstQuery: UInt32, queryCount: UInt32, destination: Buffer, destinationOffset: UInt64) {
+    public func resolveQuerySet(_ querySet: QuerySet, firstQuery: UInt32, queryCount: UInt32, destination: Buffer, destinationOffset: UInt64) {
         wgpuCommandEncoderResolveQuerySet(
             self.object, 
             querySet.object, 
@@ -250,7 +250,7 @@ public class ComputePassEncoder {
         }
     }
 
-    public func setPipeline(pipeline: ComputePipeline) {
+    public func setPipeline(_ pipeline: ComputePipeline) {
         wgpuComputePassEncoderSetPipeline(
             self.object, 
             pipeline.object
@@ -520,7 +520,7 @@ public class Device {
         )
     }
 
-    public func setUncapturedErrorCallback(callback: ErrorCallback) {
+    public func setUncapturedErrorCallback(_ callback: ErrorCallback) {
         wgpuDeviceSetUncapturedErrorCallback(
             self.object, 
             errorCallback, 
@@ -528,7 +528,7 @@ public class Device {
         )
     }
 
-    public func setDeviceLostCallback(callback: DeviceLostCallback) {
+    public func setDeviceLostCallback(_ callback: DeviceLostCallback) {
         wgpuDeviceSetDeviceLostCallback(
             self.object, 
             deviceLostCallback, 
@@ -661,7 +661,7 @@ public class Queue {
         )
     }
 
-    public func writeBuffer(buffer: Buffer, bufferOffset: UInt64, data: UnsafeRawBufferPointer) {
+    public func writeBuffer(_ buffer: Buffer, bufferOffset: UInt64, data: UnsafeRawBufferPointer) {
         wgpuQueueWriteBuffer(
             self.object, 
             buffer.object, 
@@ -722,7 +722,7 @@ public class RenderBundleEncoder {
         self.object = object
     }
 
-    public func setPipeline(pipeline: RenderPipeline) {
+    public func setPipeline(_ pipeline: RenderPipeline) {
         wgpuRenderBundleEncoderSetPipeline(
             self.object, 
             pipeline.object
@@ -812,7 +812,7 @@ public class RenderBundleEncoder {
         )
     }
 
-    public func setIndexBuffer(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
+    public func setIndexBuffer(_ buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderBundleEncoderSetIndexBuffer(
             self.object, 
             buffer.object, 
@@ -850,7 +850,7 @@ public class RenderPassEncoder {
         self.object = object
     }
 
-    public func setPipeline(pipeline: RenderPipeline) {
+    public func setPipeline(_ pipeline: RenderPipeline) {
         wgpuRenderPassEncoderSetPipeline(
             self.object, 
             pipeline.object
@@ -940,14 +940,14 @@ public class RenderPassEncoder {
         }
     }
 
-    public func setStencilReference(reference: UInt32) {
+    public func setStencilReference(_ reference: UInt32) {
         wgpuRenderPassEncoderSetStencilReference(
             self.object, 
             reference
         )
     }
 
-    public func setBlendColor(color: Color) {
+    public func setBlendColor(_ color: Color) {
         color.withCStruct { cStruct_color in
         wgpuRenderPassEncoderSetBlendColor(
             self.object, 
@@ -988,7 +988,7 @@ public class RenderPassEncoder {
         )
     }
 
-    public func setIndexBuffer(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
+    public func setIndexBuffer(_ buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
         wgpuRenderPassEncoderSetIndexBuffer(
             self.object, 
             buffer.object, 

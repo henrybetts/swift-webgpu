@@ -13,6 +13,7 @@ public class {{ object.swift_name }} {
     public var {{ method.swift_name }}: {{ method.return_type.swift_name }} {
     {% else %}
     public func {{ method.swift_name }}(
+    {%- if method.hide_first_arg_label %}_ {% endif -%}
     {%- for arg in method.swift_args -%}
     {{ arg.swift_name }}: {{ arg.swift_type }}
     {%- if arg.default_swift_value %} = {{ arg.default_swift_value }}{% endif %}

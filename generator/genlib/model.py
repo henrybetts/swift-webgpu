@@ -281,6 +281,10 @@ class Method:
 
         return typeconversion.implicit_conversion
 
+    @property
+    def hide_first_arg_label(self) -> bool:
+        return self.args and self.name.endswith(' ' + self.args[0].name)
+
 
 class ObjectType(Type):
     def __init__(self, name: str, data: Dict):
