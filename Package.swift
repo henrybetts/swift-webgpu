@@ -1,5 +1,4 @@
 // swift-tools-version:5.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
@@ -9,6 +8,9 @@ let package = Package(
         .library(
             name: "WebGPU",
             targets: ["WebGPU"]),
+        .executable(
+            name: "DemoInfo",
+            targets: ["DemoInfo"]),
     ],
     dependencies: [
     ],
@@ -22,5 +24,9 @@ let package = Package(
         .target(
             name: "WebGPU",
             dependencies: ["CWebGPU", "CDawnProc", "CDawnNative"]),
+        .target(
+            name: "DemoInfo",
+            dependencies: ["WebGPU"],
+            path: "Demos/DemoInfo"),
     ]
 )
