@@ -20,7 +20,9 @@ let package = Package(
         .systemLibrary(
             name: "CDawnProc"),
         .target(
-            name: "CDawnNative"),
+            name: "CDawnNative",
+            linkerSettings: [
+                .linkedLibrary("dawn_native")]),
         .target(
             name: "WebGPU",
             dependencies: ["CWebGPU", "CDawnProc", "CDawnNative"]),
@@ -28,5 +30,6 @@ let package = Package(
             name: "DemoInfo",
             dependencies: ["WebGPU"],
             path: "Demos/DemoInfo"),
-    ]
+    ],
+    cxxLanguageStandard: .cxx11
 )
