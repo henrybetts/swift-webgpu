@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "swift-webgpu",
+    platforms: [.macOS("10.11")],
     products: [
         .library(
             name: "WebGPU",
@@ -11,6 +12,9 @@ let package = Package(
         .executable(
             name: "DemoInfo",
             targets: ["DemoInfo"]),
+        .executable(
+            name: "DemoClearColor",
+            targets: ["DemoClearColor"]),
     ],
     dependencies: [
     ],
@@ -26,10 +30,25 @@ let package = Package(
         .target(
             name: "WebGPU",
             dependencies: ["CWebGPU", "CDawnProc", "CDawnNative"]),
+        
+        .systemLibrary(
+            name: "CGLFW",
+            path: "Demos/CGLFW",
+            pkgConfig: "glfw3",
+            providers: [
+                .brew(["glfw"])]),
+        .target(
+            name: "WindowUtils",
+            dependencies: ["WebGPU", "CGLFW"],
+            path: "Demos/WindowUtils"),
         .target(
             name: "DemoInfo",
             dependencies: ["WebGPU"],
             path: "Demos/DemoInfo"),
+        .target(
+            name: "DemoClearColor",
+            dependencies: ["WebGPU", "WindowUtils"],
+            path: "Demos/DemoClearColor"),
     ],
     cxxLanguageStandard: .cxx11
 )
