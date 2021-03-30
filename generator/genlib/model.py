@@ -291,6 +291,14 @@ class ObjectType(Type):
         super().__init__(name, data)
         self.methods: List[Method] = []
 
+    @property
+    def reference_method_name(self) -> str:
+        return 'wgpu' + pascal_case(self.name) + 'Reference'
+
+    @property
+    def release_method_name(self) -> str:
+        return 'wgpu' + pascal_case(self.name) + 'Release'
+
     def link(self, types: Dict[str, Type]):
         for method in self.data.get('methods', []):
             args = [

@@ -6,6 +6,10 @@ public class BindGroup {
     init(object: WGPUBindGroup!) {
         self.object = object
     }
+
+    deinit {
+        wgpuBindGroupRelease(self.object)
+    }
 }
 
 public class BindGroupLayout {
@@ -14,6 +18,10 @@ public class BindGroupLayout {
     init(object: WGPUBindGroupLayout!) {
         self.object = object
     }
+
+    deinit {
+        wgpuBindGroupLayoutRelease(self.object)
+    }
 }
 
 public class Buffer {
@@ -21,6 +29,10 @@ public class Buffer {
 
     init(object: WGPUBuffer!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuBufferRelease(self.object)
     }
 
     public func mapAsync(mode: MapMode, offset: Int, size: Int, callback: BufferMapCallback) {
@@ -71,6 +83,10 @@ public class CommandBuffer {
     init(object: WGPUCommandBuffer!) {
         self.object = object
     }
+
+    deinit {
+        wgpuCommandBufferRelease(self.object)
+    }
 }
 
 public class CommandEncoder {
@@ -78,6 +94,10 @@ public class CommandEncoder {
 
     init(object: WGPUCommandEncoder!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuCommandEncoderRelease(self.object)
     }
 
     public func finish(descriptor: CommandBufferDescriptor? = nil) -> CommandBuffer {
@@ -226,6 +246,10 @@ public class ComputePassEncoder {
         self.object = object
     }
 
+    deinit {
+        wgpuComputePassEncoderRelease(self.object)
+    }
+
     public func insertDebugMarker(markerLabel: String) {
         markerLabel.withCString { cString_markerLabel in
         wgpuComputePassEncoderInsertDebugMarker(
@@ -308,6 +332,10 @@ public class ComputePipeline {
         self.object = object
     }
 
+    deinit {
+        wgpuComputePipelineRelease(self.object)
+    }
+
     public func getBindGroupLayout(groupIndex: UInt32) -> BindGroupLayout {
         let result = wgpuComputePipelineGetBindGroupLayout(
             self.object, 
@@ -322,6 +350,10 @@ public class Device {
 
     init(object: WGPUDevice!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuDeviceRelease(self.object)
     }
 
     public func createBindGroup(descriptor: BindGroupDescriptor) -> BindGroup {
@@ -560,6 +592,10 @@ public class Fence {
         self.object = object
     }
 
+    deinit {
+        wgpuFenceRelease(self.object)
+    }
+
     public var completedValue: UInt64 {
         let result = wgpuFenceGetCompletedValue(
             self.object
@@ -584,6 +620,10 @@ public class Instance {
         self.object = object
     }
 
+    deinit {
+        wgpuInstanceRelease(self.object)
+    }
+
     public func createSurface(descriptor: SurfaceDescriptor) -> Surface {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuInstanceCreateSurface(
@@ -601,6 +641,10 @@ public class PipelineLayout {
     init(object: WGPUPipelineLayout!) {
         self.object = object
     }
+
+    deinit {
+        wgpuPipelineLayoutRelease(self.object)
+    }
 }
 
 public class QuerySet {
@@ -608,6 +652,10 @@ public class QuerySet {
 
     init(object: WGPUQuerySet!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuQuerySetRelease(self.object)
     }
 
     public func destroy() {
@@ -622,6 +670,10 @@ public class Queue {
 
     init(object: WGPUQueue!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuQueueRelease(self.object)
     }
 
     public func submit(commands: [CommandBuffer]) {
@@ -652,7 +704,7 @@ public class Queue {
         }
     }
 
-    public func onSubmittedWorkDone(signalValue: UInt64, callback: QueueWorkDoneCallback) {
+    public func onSubmittedWorkDone(signalValue: UInt64, callback: @escaping QueueWorkDoneCallback) {
         wgpuQueueOnSubmittedWorkDone(
             self.object, 
             signalValue, 
@@ -713,6 +765,10 @@ public class RenderBundle {
     init(object: WGPURenderBundle!) {
         self.object = object
     }
+
+    deinit {
+        wgpuRenderBundleRelease(self.object)
+    }
 }
 
 public class RenderBundleEncoder {
@@ -720,6 +776,10 @@ public class RenderBundleEncoder {
 
     init(object: WGPURenderBundleEncoder!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuRenderBundleEncoderRelease(self.object)
     }
 
     public func setPipeline(_ pipeline: RenderPipeline) {
@@ -848,6 +908,10 @@ public class RenderPassEncoder {
 
     init(object: WGPURenderPassEncoder!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuRenderPassEncoderRelease(self.object)
     }
 
     public func setPipeline(_ pipeline: RenderPipeline) {
@@ -1043,6 +1107,10 @@ public class RenderPipeline {
         self.object = object
     }
 
+    deinit {
+        wgpuRenderPipelineRelease(self.object)
+    }
+
     public func getBindGroupLayout(groupIndex: UInt32) -> BindGroupLayout {
         let result = wgpuRenderPipelineGetBindGroupLayout(
             self.object, 
@@ -1058,6 +1126,10 @@ public class Sampler {
     init(object: WGPUSampler!) {
         self.object = object
     }
+
+    deinit {
+        wgpuSamplerRelease(self.object)
+    }
 }
 
 public class ShaderModule {
@@ -1065,6 +1137,10 @@ public class ShaderModule {
 
     init(object: WGPUShaderModule!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuShaderModuleRelease(self.object)
     }
 }
 
@@ -1074,6 +1150,10 @@ public class Surface {
     init(object: WGPUSurface!) {
         self.object = object
     }
+
+    deinit {
+        wgpuSurfaceRelease(self.object)
+    }
 }
 
 public class SwapChain {
@@ -1081,6 +1161,10 @@ public class SwapChain {
 
     init(object: WGPUSwapChain!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuSwapChainRelease(self.object)
     }
 
     public func configure(format: TextureFormat, allowedUsage: TextureUsage, width: UInt32, height: UInt32) {
@@ -1114,6 +1198,10 @@ public class Texture {
         self.object = object
     }
 
+    deinit {
+        wgpuTextureRelease(self.object)
+    }
+
     public func createView(descriptor: TextureViewDescriptor? = nil) -> TextureView {
         descriptor.withOptionalCStruct { cStruct_descriptor in
         let result = wgpuTextureCreateView(
@@ -1136,6 +1224,10 @@ public class TextureView {
 
     init(object: WGPUTextureView!) {
         self.object = object
+    }
+
+    deinit {
+        wgpuTextureViewRelease(self.object)
     }
 }
 

@@ -13,7 +13,14 @@ public class DawnNativeInstance: Instance {
         }
         
         self.instance = dawnNativeCreateInstance()
-        super.init(object: dawnNativeInstanceGetObject(self.instance))
+        
+        let object = dawnNativeInstanceGetObject(self.instance)
+        wgpuInstanceReference(object)
+        super.init(object: object)
+    }
+    
+    deinit {
+        dawnNativeInstanceRelease(self.instance)
     }
     
     public func discoverDefaultAdapters() {
@@ -29,15 +36,21 @@ public class DawnNativeInstance: Instance {
             initializedCount = count
         }
         
-        return adapters.map { DawnNativeAdapter(adapter: $0) }
+        return adapters.map { DawnNativeAdapter(instance: self, adapter: $0) }
     }
 }
 
 public class DawnNativeAdapter {
+    let instance: DawnNativeInstance
     let adapter: CDawnNative.DawnNativeAdapter!
     
-    init(adapter: CDawnNative.DawnNativeAdapter!) {
+    init(instance: DawnNativeInstance, adapter: CDawnNative.DawnNativeAdapter!) {
+        self.instance = instance
         self.adapter = adapter
+    }
+    
+    deinit {
+        dawnNativeAdapterRelease(self.adapter)
     }
     
     public var properties: AdapterProperties {

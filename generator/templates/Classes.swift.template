@@ -7,6 +7,10 @@ public class {{ object.swift_name }} {
     init(object: {{ object.c_name }}!) {
         self.object = object
     }
+
+    deinit {
+        {{ object.release_method_name }}(self.object)
+    }
     {% for method in object.methods %}
 
     {% if method.is_getter %}
