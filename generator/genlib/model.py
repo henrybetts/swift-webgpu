@@ -149,6 +149,9 @@ class Member:
         else:
             return self.c_type
 
+        if self.type.category == 'callback':
+            swift_type = '@escaping ' + swift_type
+
         if self.optional:
             swift_type += '?'
 

@@ -35,7 +35,7 @@ public class Buffer {
         wgpuBufferRelease(self.object)
     }
 
-    public func mapAsync(mode: MapMode, offset: Int, size: Int, callback: BufferMapCallback) {
+    public func mapAsync(mode: MapMode, offset: Int, size: Int, callback: @escaping BufferMapCallback) {
         wgpuBufferMapAsync(
             self.object, 
             mode.rawValue, 
@@ -413,7 +413,7 @@ public class Device {
         }
     }
 
-    public func createComputePipelineAsync(descriptor: ComputePipelineDescriptor, callback: CreateComputePipelineAsyncCallback) {
+    public func createComputePipelineAsync(descriptor: ComputePipelineDescriptor, callback: @escaping CreateComputePipelineAsyncCallback) {
         descriptor.withCStruct { cStruct_descriptor in
         wgpuDeviceCreateComputePipelineAsync(
             self.object, 
@@ -444,7 +444,7 @@ public class Device {
         }
     }
 
-    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor, callback: CreateRenderPipelineAsyncCallback) {
+    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor, callback: @escaping CreateRenderPipelineAsyncCallback) {
         descriptor.withCStruct { cStruct_descriptor in
         wgpuDeviceCreateRenderPipelineAsync(
             self.object, 
@@ -552,7 +552,7 @@ public class Device {
         )
     }
 
-    public func setUncapturedErrorCallback(_ callback: ErrorCallback) {
+    public func setUncapturedErrorCallback(_ callback: @escaping ErrorCallback) {
         wgpuDeviceSetUncapturedErrorCallback(
             self.object, 
             errorCallback, 
@@ -560,7 +560,7 @@ public class Device {
         )
     }
 
-    public func setDeviceLostCallback(_ callback: DeviceLostCallback) {
+    public func setDeviceLostCallback(_ callback: @escaping DeviceLostCallback) {
         wgpuDeviceSetDeviceLostCallback(
             self.object, 
             deviceLostCallback, 
@@ -575,7 +575,7 @@ public class Device {
         )
     }
 
-    public func popErrorScope(callback: ErrorCallback) -> Bool {
+    public func popErrorScope(callback: @escaping ErrorCallback) -> Bool {
         let result = wgpuDevicePopErrorScope(
             self.object, 
             errorCallback, 
@@ -603,7 +603,7 @@ public class Fence {
         return result
     }
 
-    public func onCompletion(value: UInt64, callback: FenceOnCompletionCallback) {
+    public func onCompletion(value: UInt64, callback: @escaping FenceOnCompletionCallback) {
         wgpuFenceOnCompletion(
             self.object, 
             value, 
