@@ -49,6 +49,10 @@ let package = Package(
             name: "DemoClearColor",
             dependencies: ["WebGPU", "WindowUtils"],
             path: "Demos/DemoClearColor"),
+        .target(
+            name: "DemoTriangle",
+            dependencies: ["WebGPU", "WindowUtils"],
+            path: "Demos/DemoTriangle"),
     ],
     cxxLanguageStandard: .cxx11
 )
