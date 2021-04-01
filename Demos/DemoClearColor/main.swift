@@ -17,6 +17,10 @@ withGLFW {
         fatalError("Failed to create device")
     }
     
+    device.setUncapturedErrorCallback { (errorType, errorMessage) in
+        print("Error (\(errorType)): \(errorMessage)")
+    }
+    
     let swapchain = device.createSwapChain(surface: surface, descriptor: SwapChainDescriptor(
         usage: .renderAttachment,
         format: window.preferredTextureFormat,

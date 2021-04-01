@@ -42,7 +42,7 @@ public class Buffer {
             offset, 
             size, 
             bufferMapCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
+            UserData.passRetained(callback)
         )
     }
 
@@ -353,6 +353,8 @@ public class Device {
     }
 
     deinit {
+        setUncapturedErrorCallback(nil)
+        setDeviceLostCallback(nil)
         wgpuDeviceRelease(self.object)
     }
 
@@ -419,7 +421,7 @@ public class Device {
             self.object, 
             cStruct_descriptor, 
             createComputePipelineAsyncCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
+            UserData.passRetained(callback)
         )
         }
     }
@@ -450,7 +452,7 @@ public class Device {
             self.object, 
             cStruct_descriptor, 
             createRenderPipelineAsyncCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
+            UserData.passRetained(callback)
         )
         }
     }
@@ -552,20 +554,28 @@ public class Device {
         )
     }
 
-    public func setUncapturedErrorCallback(_ callback: @escaping ErrorCallback) {
-        wgpuDeviceSetUncapturedErrorCallback(
-            self.object, 
-            errorCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
-        )
+    var _setUncapturedErrorCallback: UserData<ErrorCallback>? = nil
+    public func setUncapturedErrorCallback(_ callback: ErrorCallback?) {
+        if let callback = callback {
+            let userData = UserData(callback)
+            self._setUncapturedErrorCallback = userData
+            wgpuDeviceSetUncapturedErrorCallback(self.object, errorCallback, userData.toOpaque())
+        } else {
+            self._setUncapturedErrorCallback = nil
+            wgpuDeviceSetUncapturedErrorCallback(self.object, nil, nil)
+        }
     }
 
-    public func setDeviceLostCallback(_ callback: @escaping DeviceLostCallback) {
-        wgpuDeviceSetDeviceLostCallback(
-            self.object, 
-            deviceLostCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
-        )
+    var _setDeviceLostCallback: UserData<DeviceLostCallback>? = nil
+    public func setDeviceLostCallback(_ callback: DeviceLostCallback?) {
+        if let callback = callback {
+            let userData = UserData(callback)
+            self._setDeviceLostCallback = userData
+            wgpuDeviceSetDeviceLostCallback(self.object, deviceLostCallback, userData.toOpaque())
+        } else {
+            self._setDeviceLostCallback = nil
+            wgpuDeviceSetDeviceLostCallback(self.object, nil, nil)
+        }
     }
 
     public func pushErrorScope(filter: ErrorFilter) {
@@ -579,7 +589,7 @@ public class Device {
         let result = wgpuDevicePopErrorScope(
             self.object, 
             errorCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
+            UserData.passRetained(callback)
         )
         return result
     }
@@ -608,7 +618,7 @@ public class Fence {
             self.object, 
             value, 
             fenceOnCompletionCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
+            UserData.passRetained(callback)
         )
     }
 }
@@ -709,7 +719,7 @@ public class Queue {
             self.object, 
             signalValue, 
             queueWorkDoneCallback, 
-            Unmanaged.passRetained(callback as AnyObject).toOpaque()
+            UserData.passRetained(callback)
         )
     }
 

@@ -9,10 +9,26 @@ public class {{ object.swift_name }} {
     }
 
     deinit {
+        {% for method in object.methods %}{% if method.is_callback_setter %}
+        {{ method.swift_name }}(nil)
+        {% endif %}{% endfor %}
         {{ object.release_method_name }}(self.object)
     }
     {% for method in object.methods %}
 
+    {% if method.is_callback_setter %}
+    var _{{ method.swift_name }}: UserData<{{ method.args[0].type.swift_name }}>? = nil
+    public func {{ method.swift_name }}(_ callback: {{ method.args[0].type.swift_name }}?) {
+        if let callback = callback {
+            let userData = UserData(callback)
+            self._{{ method.swift_name }} = userData
+            {{ method.c_name }}(self.object, {{ method.args[0].type.function_name }}, userData.toOpaque())
+        } else {
+            self._{{ method.swift_name }} = nil
+            {{ method.c_name }}(self.object, nil, nil)
+        }
+    }
+    {% else %}
     {% if method.is_getter %}
     public var {{ method.swift_name }}: {{ method.return_type.swift_name }} {
     {% else %}
@@ -47,6 +63,7 @@ public class {{ object.swift_name }} {
         {% endif %}
         {% endfor %}
     }
+    {% endif %}
     {% endfor %}
 }
 

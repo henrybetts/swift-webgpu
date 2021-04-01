@@ -288,6 +288,10 @@ class Method:
     def hide_first_arg_label(self) -> bool:
         return self.args and self.name.endswith(' ' + self.args[0].name)
 
+    @property
+    def is_callback_setter(self) -> bool:
+        return self.name.startswith('set ') and self.name.endswith(' callback')
+
 
 class ObjectType(Type):
     def __init__(self, name: str, data: Dict):

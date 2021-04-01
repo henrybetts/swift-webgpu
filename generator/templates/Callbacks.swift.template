@@ -12,7 +12,7 @@ func {{ callback.function_name }}(
 {{ arg.swift_name }}: {{ arg.c_type }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
 ) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! {{ callback.swift_name }}
+    let swiftCallback = UserData<{{ callback.swift_name }}>.takeValue(userdata)
     swiftCallback(
     {% for arg in callback.swift_args %}
         {{ arg.conversion.get_swift_value(arg.swift_name) }}{% if not loop.last %}, {% endif %}

@@ -3,7 +3,7 @@ import CWebGPU
 public typealias BufferMapCallback = (BufferMapAsyncStatus) -> ()
 
 func bufferMapCallback(status: WGPUBufferMapAsyncStatus, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! BufferMapCallback
+    let swiftCallback = UserData<BufferMapCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status)
     )
@@ -12,7 +12,7 @@ func bufferMapCallback(status: WGPUBufferMapAsyncStatus, userdata: UnsafeMutable
 public typealias CreateComputePipelineAsyncCallback = (CreatePipelineAsyncStatus, ComputePipeline, String) -> ()
 
 func createComputePipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pipeline: WGPUComputePipeline!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! CreateComputePipelineAsyncCallback
+    let swiftCallback = UserData<CreateComputePipelineAsyncCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status), 
         .init(object: pipeline), 
@@ -23,7 +23,7 @@ func createComputePipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, p
 public typealias CreateRenderPipelineAsyncCallback = (CreatePipelineAsyncStatus, RenderPipeline, String) -> ()
 
 func createRenderPipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pipeline: WGPURenderPipeline!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! CreateRenderPipelineAsyncCallback
+    let swiftCallback = UserData<CreateRenderPipelineAsyncCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status), 
         .init(object: pipeline), 
@@ -34,7 +34,7 @@ func createRenderPipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pi
 public typealias DeviceLostCallback = (String) -> ()
 
 func deviceLostCallback(message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! DeviceLostCallback
+    let swiftCallback = UserData<DeviceLostCallback>.takeValue(userdata)
     swiftCallback(
         String(cString: message)
     )
@@ -43,7 +43,7 @@ func deviceLostCallback(message: UnsafePointer<CChar>!, userdata: UnsafeMutableR
 public typealias ErrorCallback = (ErrorType, String) -> ()
 
 func errorCallback(type: WGPUErrorType, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! ErrorCallback
+    let swiftCallback = UserData<ErrorCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: type), 
         String(cString: message)
@@ -53,7 +53,7 @@ func errorCallback(type: WGPUErrorType, message: UnsafePointer<CChar>!, userdata
 public typealias FenceOnCompletionCallback = (FenceCompletionStatus) -> ()
 
 func fenceOnCompletionCallback(status: WGPUFenceCompletionStatus, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! FenceOnCompletionCallback
+    let swiftCallback = UserData<FenceOnCompletionCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status)
     )
@@ -62,7 +62,7 @@ func fenceOnCompletionCallback(status: WGPUFenceCompletionStatus, userdata: Unsa
 public typealias QueueWorkDoneCallback = (QueueWorkDoneStatus) -> ()
 
 func queueWorkDoneCallback(status: WGPUQueueWorkDoneStatus, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = Unmanaged<AnyObject>.fromOpaque(userdata).takeRetainedValue() as! QueueWorkDoneCallback
+    let swiftCallback = UserData<QueueWorkDoneCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status)
     )
