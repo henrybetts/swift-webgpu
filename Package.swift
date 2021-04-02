@@ -15,8 +15,15 @@ let package = Package(
         .executable(
             name: "DemoClearColor",
             targets: ["DemoClearColor"]),
+        .executable(
+            name: "DemoTriangle",
+            targets: ["DemoTriangle"]),
+        .executable(
+            name: "DemoCube",
+            targets: ["DemoCube"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/SwiftGL/Math.git", .branch("master")) // for demos only
     ],
     targets: [
         .systemLibrary(
@@ -53,6 +60,10 @@ let package = Package(
             name: "DemoTriangle",
             dependencies: ["WebGPU", "WindowUtils"],
             path: "Demos/DemoTriangle"),
+        .target(
+            name: "DemoCube",
+            dependencies: ["WebGPU", "WindowUtils", "SGLMath"],
+            path: "Demos/DemoCube"),
     ],
     cxxLanguageStandard: .cxx11
 )

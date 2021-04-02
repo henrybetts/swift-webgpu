@@ -4,6 +4,7 @@
 /*.xcodeproj
 xcuserdata/
 .swiftpm/
+Package.resolved
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
