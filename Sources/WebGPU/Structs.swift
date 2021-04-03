@@ -273,7 +273,7 @@ public struct BindGroupLayoutEntry: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(binding: UInt32, visibility: ShaderStage, type: BindingType = .undefined, hasDynamicOffset: Bool = false, minBufferBindingSize: UInt64 = 0, viewDimension: TextureViewDimension = .typeUndefined, textureComponentType: TextureComponentType = .float, storageTextureFormat: TextureFormat = .undefined, buffer: BufferBindingLayout, sampler: SamplerBindingLayout, texture: TextureBindingLayout, storageTexture: StorageTextureBindingLayout) {
+    public init(binding: UInt32, visibility: ShaderStage, type: BindingType = .undefined, hasDynamicOffset: Bool = false, minBufferBindingSize: UInt64 = 0, viewDimension: TextureViewDimension = .typeUndefined, textureComponentType: TextureComponentType = .float, storageTextureFormat: TextureFormat = .undefined, buffer: BufferBindingLayout = BufferBindingLayout(), sampler: SamplerBindingLayout = SamplerBindingLayout(), texture: TextureBindingLayout = TextureBindingLayout(), storageTexture: StorageTextureBindingLayout = StorageTextureBindingLayout()) {
         self.binding = binding
         self.visibility = visibility
         self.type = type
@@ -403,7 +403,7 @@ public struct ColorStateDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(format: TextureFormat, alphaBlend: BlendDescriptor, colorBlend: BlendDescriptor, writeMask: ColorWriteMask = .all) {
+    public init(format: TextureFormat, alphaBlend: BlendDescriptor = BlendDescriptor(), colorBlend: BlendDescriptor = BlendDescriptor(), writeMask: ColorWriteMask = .all) {
         self.format = format
         self.alphaBlend = alphaBlend
         self.colorBlend = colorBlend
@@ -731,7 +731,7 @@ public struct DepthStencilStateDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(format: TextureFormat, depthWriteEnabled: Bool = false, depthCompare: CompareFunction = .always, stencilFront: StencilStateFaceDescriptor, stencilBack: StencilStateFaceDescriptor, stencilReadMask: UInt32 = 0xFFFFFFFF, stencilWriteMask: UInt32 = 0xFFFFFFFF) {
+    public init(format: TextureFormat, depthWriteEnabled: Bool = false, depthCompare: CompareFunction = .always, stencilFront: StencilStateFaceDescriptor = StencilStateFaceDescriptor(), stencilBack: StencilStateFaceDescriptor = StencilStateFaceDescriptor(), stencilReadMask: UInt32 = 0xFFFFFFFF, stencilWriteMask: UInt32 = 0xFFFFFFFF) {
         self.format = format
         self.depthWriteEnabled = depthWriteEnabled
         self.depthCompare = depthCompare
@@ -1896,7 +1896,7 @@ public struct TextureCopyView: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(texture: Texture, mipLevel: UInt32 = 0, origin: Origin3d, aspect: TextureAspect = .all) {
+    public init(texture: Texture, mipLevel: UInt32 = 0, origin: Origin3d = Origin3d(), aspect: TextureAspect = .all) {
         self.texture = texture
         self.mipLevel = mipLevel
         self.origin = origin
@@ -1975,7 +1975,7 @@ public struct TextureDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, usage: TextureUsage, dimension: TextureDimension = .type2d, size: Extent3d, format: TextureFormat, mipLevelCount: UInt32 = 1, sampleCount: UInt32 = 1) {
+    public init(label: String? = nil, usage: TextureUsage, dimension: TextureDimension = .type2d, size: Extent3d = Extent3d(), format: TextureFormat, mipLevelCount: UInt32 = 1, sampleCount: UInt32 = 1) {
         self.label = label
         self.usage = usage
         self.dimension = dimension

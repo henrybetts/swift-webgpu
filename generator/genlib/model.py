@@ -221,6 +221,9 @@ class Member:
         if self.default:
             return self.type.get_swift_value(self.default)
 
+        if isinstance(self.type, StructureType) and not self.annotation and self.type.has_default_swift_initializer:
+            return f'{self.type.swift_name}()'
+
 
 class StructureType(Type):
     def __init__(self, name: str, data: Dict):
@@ -236,6 +239,10 @@ class StructureType(Type):
     @property
     def swift_members(self) -> List[Member]:
         return [member for member in self.members if not member.length_of]
+
+    @property
+    def has_default_swift_initializer(self) -> bool:
+        return all(member.default_swift_value for member in self.swift_members)
 
     def link(self, types: Dict[str, Type]):
         self.members = [

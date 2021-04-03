@@ -84,9 +84,7 @@ withGLFW {
         primitiveTopology: .triangleList,
         colorStates: [
             ColorStateDescriptor(
-                format: window.preferredTextureFormat,
-                alphaBlend: BlendDescriptor(),
-                colorBlend: BlendDescriptor())]))
+                format: window.preferredTextureFormat)]))
     
     let vertexData = [
         Vertex(position: (0, 0.5, 0), color: (1, 0, 0)),

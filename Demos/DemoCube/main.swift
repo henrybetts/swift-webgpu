@@ -83,10 +83,7 @@ withGLFW {
             BindGroupLayoutEntry(
                 binding: 0,
                 visibility: .vertex,
-                buffer: BufferBindingLayout(type: .uniform),
-                sampler: SamplerBindingLayout(),
-                texture: TextureBindingLayout(),
-                storageTexture: StorageTextureBindingLayout())]))
+                buffer: BufferBindingLayout(type: .uniform))]))
     
     let pipelineLayout = device.createPipelineLayout(descriptor: PipelineLayoutDescriptor(
         bindGroupLayouts: [bindGroupLayout]))
@@ -112,14 +109,10 @@ withGLFW {
         depthStencilState: DepthStencilStateDescriptor(
             format: .depth24Plus,
             depthWriteEnabled: true,
-            depthCompare: .less,
-            stencilFront: StencilStateFaceDescriptor(),
-            stencilBack: StencilStateFaceDescriptor()),
+            depthCompare: .less),
         colorStates: [
             ColorStateDescriptor(
-                format: window.preferredTextureFormat,
-                alphaBlend: BlendDescriptor(),
-                colorBlend: BlendDescriptor())]))
+                format: window.preferredTextureFormat)]))
     
     let vertexBuffer = cubeVertices.withUnsafeBytes { vertexBytes -> Buffer in
         let vertexBuffer = device.createBuffer(descriptor: BufferDescriptor(
