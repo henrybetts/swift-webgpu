@@ -141,7 +141,7 @@ public class CommandEncoder {
         )
     }
 
-    public func copyBufferToTexture(source: BufferCopyView, destination: TextureCopyView, copySize: Extent3d) {
+    public func copyBufferToTexture(source: ImageCopyBuffer, destination: ImageCopyTexture, copySize: Extent3d) {
         source.withCStruct { cStruct_source in
         destination.withCStruct { cStruct_destination in
         copySize.withCStruct { cStruct_copySize in
@@ -156,7 +156,7 @@ public class CommandEncoder {
         }
     }
 
-    public func copyTextureToBuffer(source: TextureCopyView, destination: BufferCopyView, copySize: Extent3d) {
+    public func copyTextureToBuffer(source: ImageCopyTexture, destination: ImageCopyBuffer, copySize: Extent3d) {
         source.withCStruct { cStruct_source in
         destination.withCStruct { cStruct_destination in
         copySize.withCStruct { cStruct_copySize in
@@ -171,7 +171,7 @@ public class CommandEncoder {
         }
     }
 
-    public func copyTextureToTexture(source: TextureCopyView, destination: TextureCopyView, copySize: Extent3d) {
+    public func copyTextureToTexture(source: ImageCopyTexture, destination: ImageCopyTexture, copySize: Extent3d) {
         source.withCStruct { cStruct_source in
         destination.withCStruct { cStruct_destination in
         copySize.withCStruct { cStruct_copySize in
@@ -446,7 +446,7 @@ public class Device {
         }
     }
 
-    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor, callback: @escaping CreateRenderPipelineAsyncCallback) {
+    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor2, callback: @escaping CreateRenderPipelineAsyncCallback) {
         descriptor.withCStruct { cStruct_descriptor in
         wgpuDeviceCreateRenderPipelineAsync(
             self.object, 
@@ -470,6 +470,16 @@ public class Device {
     public func createRenderPipeline(descriptor: RenderPipelineDescriptor) -> RenderPipeline {
         descriptor.withCStruct { cStruct_descriptor in
         let result = wgpuDeviceCreateRenderPipeline(
+            self.object, 
+            cStruct_descriptor
+        )
+        return .init(object: result)
+        }
+    }
+
+    public func createRenderPipeline2(descriptor: RenderPipelineDescriptor2) -> RenderPipeline {
+        descriptor.withCStruct { cStruct_descriptor in
+        let result = wgpuDeviceCreateRenderPipeline2(
             self.object, 
             cStruct_descriptor
         )
@@ -532,6 +542,16 @@ public class Device {
         return .init(object: result)
     }
 
+    public func createExternalTexture(externalTextureDescriptor: ExternalTextureDescriptor) -> ExternalTexture {
+        externalTextureDescriptor.withCStruct { cStruct_externalTextureDescriptor in
+        let result = wgpuDeviceCreateExternalTexture(
+            self.object, 
+            cStruct_externalTextureDescriptor
+        )
+        return .init(object: result)
+        }
+    }
+
     public func injectError(type: ErrorType, message: String) {
         message.withCString { cString_message in
         wgpuDeviceInjectError(
@@ -592,6 +612,24 @@ public class Device {
             UserData.passRetained(callback)
         )
         return result
+    }
+}
+
+public class ExternalTexture {
+    let object: WGPUExternalTexture!
+
+    init(object: WGPUExternalTexture!) {
+        self.object = object
+    }
+
+    deinit {
+        wgpuExternalTextureRelease(self.object)
+    }
+
+    public func destroy() {
+        wgpuExternalTextureDestroy(
+            self.object
+        )
     }
 }
 
@@ -733,7 +771,7 @@ public class Queue {
         )
     }
 
-    public func writeTexture(destination: TextureCopyView, data: UnsafeRawBufferPointer, dataLayout: TextureDataLayout, writeSize: Extent3d) {
+    public func writeTexture(destination: ImageCopyTexture, data: UnsafeRawBufferPointer, dataLayout: TextureDataLayout, writeSize: Extent3d) {
         destination.withCStruct { cStruct_destination in
         dataLayout.withCStruct { cStruct_dataLayout in
         writeSize.withCStruct { cStruct_writeSize in
@@ -750,7 +788,7 @@ public class Queue {
         }
     }
 
-    public func copyTextureForBrowser(source: TextureCopyView, destination: TextureCopyView, copySize: Extent3d, options: CopyTextureForBrowserOptions) {
+    public func copyTextureForBrowser(source: ImageCopyTexture, destination: ImageCopyTexture, copySize: Extent3d, options: CopyTextureForBrowserOptions) {
         source.withCStruct { cStruct_source in
         destination.withCStruct { cStruct_destination in
         copySize.withCStruct { cStruct_copySize in
