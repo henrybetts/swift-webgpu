@@ -354,6 +354,15 @@ class CallbackType(Type):
             arg.length_of = args_by_length.get(arg.name)
 
 
+class TypedefType(Type):
+    def __init__(self, name: str, data: Dict):
+        super().__init__(name, data)
+        self.type: Type = None
+
+    def link(self, types: Dict[str, Type]):
+        self.type = types[self.data['type']]
+
+
 class Model:
     def __init__(self, data: Dict):
         self.types: Dict[str, Type] = {}
@@ -365,6 +374,7 @@ class Model:
             'structure': StructureType,
             'object': ObjectType,
             'callback': CallbackType,
+            'typedef': TypedefType,
         }
 
         for name, type_data in data.items():
