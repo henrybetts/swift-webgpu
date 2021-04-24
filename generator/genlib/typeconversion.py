@@ -68,13 +68,15 @@ optional_struct_conversion = Conversion('cStruct_{{ name }}',
 struct_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                      ('{{ value }}.withCStructBufferPointer { buffer_{{ name }} in', '}'))
 
-object_conversion = Conversion('{{ value }}.object', None, '.init(object: {{ value }})')
+object_conversion = Conversion('handle_{{ name }}',
+                               ('{{ value }}.withUnsafeHandle { handle_{{ name }} in', '}'),
+                               '.init(handle: {{ value }})')
 
-optional_object_conversion = Conversion('{{ value }}?.object')
+optional_object_conversion = Conversion('handle_{{ name }}',
+                                        ('{{ value }}.withOptionalHandle { handle_{{ name }} in', '}'))
 
 object_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
-                                     ('{{ value }}.map { $0.object }.withUnsafeBufferPointer { buffer_{{ name }} in ',
-                                      '}'))
+                                     ('{{ value }}.withHandleBufferPointer { buffer_{{ name }} in', '}'))
 
 array_length_conversion = Conversion('.init(buffer_{{ name }}.count)')
 

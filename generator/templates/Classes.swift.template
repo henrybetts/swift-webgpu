@@ -1,31 +1,49 @@
 import CWebGPU
 
 {% for object in model.types_by_category('object') %}
-public class {{ object.swift_name }} {
-    let object: {{ object.c_name }}!
+public class {{ object.swift_name }}: Object {
+    private let handle: {{ object.c_name }}!
 
-    init(object: {{ object.c_name }}!) {
-        self.object = object
+    /// Create a wrapper around an existing handle.
+    ///
+    /// The ownership of the handle is transferred to this class.
+    ///
+    /// - Parameter handle: The handle to wrap.
+    public init(handle: {{ object.c_name }}!) {
+        self.handle = handle
     }
 
     deinit {
         {% for method in object.methods %}{% if method.is_callback_setter %}
         {{ method.swift_name }}(nil)
         {% endif %}{% endfor %}
-        {{ object.release_method_name }}(self.object)
+        {{ object.release_method_name }}(self.handle)
+    }
+
+    /// Calls the given closure with the underlying handle.
+    ///
+    /// The underlying handle is guaranteed not to be released before the closure returns.
+    ///
+    /// - Parameter body: A closure to call with the underlying handle.
+    public func withUnsafeHandle<R>(_ body: ({{ object.c_name }}) throws -> R) rethrows -> R {
+        return try withExtendedLifetime(self) {
+            return try body(self.handle)
+        }
     }
     {% for method in object.methods %}
 
     {% if method.is_callback_setter %}
     var _{{ method.swift_name }}: UserData<{{ method.args[0].type.swift_name }}>? = nil
     public func {{ method.swift_name }}(_ callback: {{ method.args[0].type.swift_name }}?) {
-        if let callback = callback {
-            let userData = UserData(callback)
-            self._{{ method.swift_name }} = userData
-            {{ method.c_name }}(self.object, {{ method.args[0].type.function_name }}, userData.toOpaque())
-        } else {
-            self._{{ method.swift_name }} = nil
-            {{ method.c_name }}(self.object, nil, nil)
+        self.withUnsafeHandle { handle_self in
+            if let callback = callback {
+                let userData = UserData(callback)
+                self._{{ method.swift_name }} = userData
+                {{ method.c_name }}(handle_self, {{ method.args[0].type.function_name }}, userData.toOpaque())
+            } else {
+                self._{{ method.swift_name }} = nil
+                {{ method.c_name }}(handle_self, nil, nil)
+            }
         }
     }
     {% else %}
@@ -41,27 +59,29 @@ public class {{ object.swift_name }} {
     {%- endfor -%}
     ){% if method.return_type %} -> {{ method.return_type.swift_name }}{% endif %} {
     {% endif %}
-        {% for arg in method.args %}
-        {% if arg.conversion.requires_closure %}
-        {{ arg.conversion.get_closure_head(arg.target_swift_name) }}
-        {% endif %}
-        {% endfor %}
-        {%+ if method.return_type %}let result = {% endif %}{{ method.c_name }}(
-            self.object{% if method.args %}, {% endif %}
-
+        self.withUnsafeHandle { handle_self in
             {% for arg in method.args %}
-            {{ arg.conversion.get_c_value(arg.target_swift_name) }}{% if not loop.last %}, {% endif %}
-
+            {% if arg.conversion.requires_closure %}
+            {{ arg.conversion.get_closure_head(arg.target_swift_name) }}
+            {% endif %}
             {% endfor %}
-        )
-        {% if method.return_type %}
-        return {{ method.return_conversion.get_swift_value('result') }}
-        {% endif %}
-        {% for arg in method.args %}
-        {% if arg.conversion.requires_closure %}
-        {{ arg.conversion.get_closure_tail(arg.target_swift_name) }}
-        {% endif %}
-        {% endfor %}
+            {%+ if method.return_type %}let result = {% endif %}{{ method.c_name }}(
+                handle_self{% if method.args %}, {% endif %}
+
+                {% for arg in method.args %}
+                {{ arg.conversion.get_c_value(arg.target_swift_name) }}{% if not loop.last %}, {% endif %}
+
+                {% endfor %}
+            )
+            {% if method.return_type %}
+            return {{ method.return_conversion.get_swift_value('result') }}
+            {% endif %}
+            {% for arg in method.args %}
+            {% if arg.conversion.requires_closure %}
+            {{ arg.conversion.get_closure_tail(arg.target_swift_name) }}
+            {% endif %}
+            {% endfor %}
+        }
     }
     {% endif %}
     {% endfor %}

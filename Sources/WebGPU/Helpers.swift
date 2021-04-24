@@ -54,6 +54,41 @@ extension Array where Element: CStructConvertible {
 }
 
 
+// MARK: Object
+protocol Object {
+    func withUnsafeHandle<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R
+}
+
+extension Optional where Wrapped: Object {
+    func withOptionalHandle<R>(_ body: (OpaquePointer?) throws -> R) rethrows -> R {
+        guard let object = self else { return try body(nil) }
+        return try object.withUnsafeHandle(body)
+    }
+}
+
+func _withHandleBufferPointer<I: IteratorProtocol, R>(to array: inout [OpaquePointer?], appending iterator: inout I, _ body: (UnsafeBufferPointer<OpaquePointer?>) throws -> R) rethrows -> R where I.Element: Object {
+    if let object = iterator.next() {
+        return try object.withUnsafeHandle { handle in
+            array.append(handle)
+            return try _withHandleBufferPointer(to: &array, appending: &iterator, body)
+        }
+    }else{
+        return try array.withUnsafeBufferPointer { ptr in
+            try body(ptr)
+        }
+    }
+}
+
+extension Array where Element: Object {
+    func withHandleBufferPointer<R>(_ body: (UnsafeBufferPointer<OpaquePointer?>) throws -> R) rethrows -> R {
+        var handles: [OpaquePointer?] = []
+        handles.reserveCapacity(self.count)
+        var iterator = makeIterator()
+        return try _withHandleBufferPointer(to: &handles, appending: &iterator, body)
+    }
+}
+
+
 // MARK: Extensible
 public protocol Extensible {
     var nextInChain: Chained? { get }

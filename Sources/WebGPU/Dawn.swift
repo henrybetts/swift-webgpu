@@ -16,7 +16,7 @@ public class DawnNativeInstance: Instance {
         
         let object = dawnNativeInstanceGetObject(self.instance)
         wgpuInstanceReference(object)
-        super.init(object: object)
+        super.init(handle: object)
     }
     
     deinit {
@@ -70,6 +70,6 @@ public class DawnNativeAdapter {
         guard let device = dawnNativeAdapterCreateDevice(self.adapter) else {
             return nil
         }
-        return Device(object: device)
+        return Device(handle: device)
     }
 }

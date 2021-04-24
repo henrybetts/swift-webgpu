@@ -15,7 +15,7 @@ func createComputePipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, p
     let swiftCallback = UserData<CreateComputePipelineAsyncCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status), 
-        .init(object: pipeline), 
+        .init(handle: pipeline), 
         String(cString: message)
     )
 }
@@ -26,7 +26,7 @@ func createRenderPipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pi
     let swiftCallback = UserData<CreateRenderPipelineAsyncCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status), 
-        .init(object: pipeline), 
+        .init(handle: pipeline), 
         String(cString: message)
     )
 }
