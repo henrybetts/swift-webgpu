@@ -1,7 +1,7 @@
 import CWebGPU
 
 {% for object in model.types_by_category('object') %}
-public class {{ object.swift_name }}: Object {
+{{ object.access_level }} class {{ object.swift_name }}: Object {
     private let handle: {{ object.c_name }}!
 
     /// Create a wrapper around an existing handle.

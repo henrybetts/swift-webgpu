@@ -306,6 +306,12 @@ class ObjectType(Type):
         self.methods: List[Method] = []
 
     @property
+    def access_level(self) -> str:
+        if self.name == 'instance':
+            return 'open'
+        return 'public'
+
+    @property
     def reference_method_name(self) -> str:
         return 'wgpu' + pascal_case(self.name) + 'Reference'
 

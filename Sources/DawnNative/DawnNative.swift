@@ -1,10 +1,11 @@
+import WebGPU
 import CDawnProc
 import CDawnNative
 
 var dawnInitialized = false
 
-public class DawnNativeInstance: Instance {
-    let instance: CDawnNative.DawnNativeInstance!
+public class Instance: WebGPU.Instance {
+    let instance: DawnNativeInstance!
     
     public init() {
         if !dawnInitialized {
@@ -27,7 +28,7 @@ public class DawnNativeInstance: Instance {
         dawnNativeInstanceDiscoverDefaultAdapters(self.instance)
     }
     
-    public var adapters: [DawnNativeAdapter] {
+    public var adapters: [Adapter] {
         var count: Int = 0
         dawnNativeInstanceEnumerateAdapters(self.instance, &count, nil)
         
@@ -36,15 +37,15 @@ public class DawnNativeInstance: Instance {
             initializedCount = count
         }
         
-        return adapters.map { DawnNativeAdapter(instance: self, adapter: $0) }
+        return adapters.map { Adapter(instance: self, adapter: $0) }
     }
 }
 
-public class DawnNativeAdapter {
-    let instance: DawnNativeInstance
-    let adapter: CDawnNative.DawnNativeAdapter!
+public class Adapter {
+    let instance: Instance
+    let adapter: DawnNativeAdapter!
     
-    init(instance: DawnNativeInstance, adapter: CDawnNative.DawnNativeAdapter!) {
+    init(instance: Instance, adapter: DawnNativeAdapter!) {
         self.instance = instance
         self.adapter = adapter
     }
@@ -61,8 +62,8 @@ public class DawnNativeAdapter {
             vendorId: cProps.vendorID,
             name: String(cString: cProps.name),
             driverDescription: String(cString: cProps.driverDescription),
-            adapterType: AdapterType(cValue: cProps.adapterType),
-            backendType: BackendType(cValue: cProps.backendType)
+            adapterType: AdapterType(rawValue: cProps.adapterType.rawValue)!,
+            backendType: BackendType(rawValue: cProps.backendType.rawValue)!
         )
     }
     
@@ -73,3 +74,4 @@ public class DawnNativeAdapter {
         return Device(handle: device)
     }
 }
+

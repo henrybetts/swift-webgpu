@@ -957,7 +957,7 @@ public class Fence: Object {
     }
 }
 
-public class Instance: Object {
+open class Instance: Object {
     private let handle: WGPUInstance!
 
     /// Create a wrapper around an existing handle.

@@ -9,18 +9,9 @@ let package = Package(
         .library(
             name: "WebGPU",
             targets: ["WebGPU"]),
-        .executable(
-            name: "DemoInfo",
-            targets: ["DemoInfo"]),
-        .executable(
-            name: "DemoClearColor",
-            targets: ["DemoClearColor"]),
-        .executable(
-            name: "DemoTriangle",
-            targets: ["DemoTriangle"]),
-        .executable(
-            name: "DemoCube",
-            targets: ["DemoCube"]),
+        .library(
+            name: "DawnNative",
+            targets: ["DawnNative", "WebGPU"]),
     ],
     dependencies: [
         .package(url: "https://github.com/SwiftGL/Math.git", .branch("master")) // for demos only
@@ -28,6 +19,10 @@ let package = Package(
     targets: [
         .systemLibrary(
             name: "CWebGPU"),
+        .target(
+            name: "WebGPU",
+            dependencies: ["CWebGPU"]),
+        
         .systemLibrary(
             name: "CDawnProc"),
         .target(
@@ -35,8 +30,8 @@ let package = Package(
             linkerSettings: [
                 .linkedLibrary("dawn_native")]),
         .target(
-            name: "WebGPU",
-            dependencies: ["CWebGPU", "CDawnProc", "CDawnNative"]),
+            name: "DawnNative",
+            dependencies: ["WebGPU", "CDawnProc", "CDawnNative"]),
         
         .systemLibrary(
             name: "CGLFW",
@@ -50,19 +45,19 @@ let package = Package(
             path: "Demos/WindowUtils"),
         .target(
             name: "DemoInfo",
-            dependencies: ["WebGPU"],
+            dependencies: ["DawnNative"],
             path: "Demos/DemoInfo"),
         .target(
             name: "DemoClearColor",
-            dependencies: ["WebGPU", "WindowUtils"],
+            dependencies: ["DawnNative", "WindowUtils"],
             path: "Demos/DemoClearColor"),
         .target(
             name: "DemoTriangle",
-            dependencies: ["WebGPU", "WindowUtils"],
+            dependencies: ["DawnNative", "WindowUtils"],
             path: "Demos/DemoTriangle"),
         .target(
             name: "DemoCube",
-            dependencies: ["WebGPU", "WindowUtils", "SGLMath"],
+            dependencies: ["DawnNative", "WindowUtils", "SGLMath"],
             path: "Demos/DemoCube"),
     ],
     cxxLanguageStandard: .cxx11

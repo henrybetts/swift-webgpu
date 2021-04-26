@@ -1,4 +1,5 @@
 import WebGPU
+import DawnNative
 import WindowUtils
 import SGLMath
 
@@ -13,7 +14,7 @@ struct Camera {
     var projection: mat4
 }
 
-let instance = DawnNativeInstance()
+let instance = DawnNative.Instance()
 
 instance.discoverDefaultAdapters()
 guard let adapter = instance.adapters.first else {

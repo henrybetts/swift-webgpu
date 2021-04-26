@@ -1,4 +1,5 @@
 import WebGPU
+import DawnNative
 import WindowUtils
 
 struct Vertex {
@@ -6,7 +7,7 @@ struct Vertex {
     var color: (Float, Float, Float)
 }
 
-let instance = DawnNativeInstance()
+let instance = DawnNative.Instance()
 
 instance.discoverDefaultAdapters()
 guard let adapter = instance.adapters.first else {

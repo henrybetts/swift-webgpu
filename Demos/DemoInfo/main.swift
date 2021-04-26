@@ -1,6 +1,6 @@
-import WebGPU
+import DawnNative
 
-let instance = DawnNativeInstance()
+let instance = Instance()
 instance.discoverDefaultAdapters()
 let adapters = instance.adapters
 
