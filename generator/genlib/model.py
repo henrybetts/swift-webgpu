@@ -100,6 +100,7 @@ class Member:
         self.length = length
         self.default = default
         self.optional = optional
+        self.length_member: Optional[Member] = None
         self.length_of: Optional[Member] = None
 
     @property
@@ -250,8 +251,10 @@ class StructureType(Type):
                    m.get('default'), m.get('optional', False))
             for m in self.data['members']
         ]
+        members_by_name = {member.name: member for member in self.members}
         members_by_length = {member.length: member for member in self.members if member.length}
         for member in self.members:
+            member.length_member = members_by_name.get(member.length)
             member.length_of = members_by_length.get(member.name)
 
 
@@ -326,8 +329,10 @@ class ObjectType(Type):
                        arg.get('default'), arg.get('optional', False))
                 for arg in method.get('args', [])
             ]
+            args_by_name = {arg.name: arg for arg in args}
             args_by_length = {arg.length: arg for arg in args if arg.length}
             for arg in args:
+                arg.length_member = args_by_name.get(arg.length)
                 arg.length_of = args_by_length.get(arg.name)
 
             returns = method.get('returns')

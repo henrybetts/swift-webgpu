@@ -29,54 +29,67 @@ class Conversion:
     def requires_closure(self) -> bool:
         return self.closure_template is not None
 
-    def get_swift_value(self, value: str) -> str:
-        return self.swift_value_template.render(value=value)
+    def get_swift_value(self, value: str, length: str = None) -> str:
+        return self.swift_value_template.render(value=value, length=length)
 
 
 implicit_conversion = Conversion('{{ value }}', None, '{{ value }}')
 
 implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
-                                       ('{{ value }}.withUnsafeBufferPointer { buffer_{{ name }} in', '}'))
+                                       ('{{ value }}.withUnsafeBufferPointer { buffer_{{ name }} in', '}'),
+                                       'Array(UnsafeBufferPointer(start: {{ value }}), count: Int({{ length }})))')
 
-optional_implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
-                                                ('{{ value }}.withOptionalUnsafeBufferPointer { buffer_{{ name }} in',
-                                                 '}'))
+optional_implicit_array_conversion =\
+    Conversion('buffer_{{ name }}.baseAddress',
+               ('{{ value }}.withOptionalUnsafeBufferPointer { buffer_{{ name }} in', '}'),
+               '{{ value }} != nil ? Array(UnsafeBufferPointer(start: {{ value }}), count: Int({{ length }})))')
 
 enum_conversion = Conversion('{{ value }}.cValue', None, '.init(cValue: {{ value }})')
 
-enum_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
-                                   ('{{ value }}.map { $0.cValue }.withUnsafeBufferPointer { buffer_{{ name }} in',
-                                    '}'))
+enum_array_conversion =\
+    Conversion('buffer_{{ name }}.baseAddress',
+               ('{{ value }}.map { $0.cValue }.withUnsafeBufferPointer { buffer_{{ name }} in', '}'),
+               'UnsafeBufferPointer(start: {{ value }}, count: Int({{ length }})).map { .init(cValue: $0) }')
 
-bitmask_conversion = Conversion('{{ value }}.rawValue')
+bitmask_conversion = Conversion('{{ value }}.rawValue', None, '.init(rawValue: {{ value }})')
 
 string_conversion = Conversion('cString_{{ name }}',
                                ('{{ value }}.withCString { cString_{{ name }} in', '}'),
                                'String(cString: {{ value }})')
 
 optional_string_conversion = Conversion('cString_{{ name }}',
-                                        ('{{ value }}.withOptionalCString { cString_{{ name }} in', '}'))
+                                        ('{{ value }}.withOptionalCString { cString_{{ name }} in', '}'),
+                                        '{{ value }} != nil ? String(cString: {{ value }}) : nil')
 
 struct_conversion = Conversion('cStruct_{{ name }}.pointee',
-                               ('{{ value }}.withCStruct { cStruct_{{ name }} in', '}'))
+                               ('{{ value }}.withCStruct { cStruct_{{ name }} in', '}'),
+                               '.init(cStruct: {{ value }})')
 
-struct_pointer_conversion = Conversion('cStruct_{{ name }}', ('{{ value }}.withCStruct { cStruct_{{ name }} in', '}'))
+struct_pointer_conversion = Conversion('cStruct_{{ name }}',
+                                       ('{{ value }}.withCStruct { cStruct_{{ name }} in', '}'),
+                                       '.init(cStruct: {{ value }}.pointee)')
 
 optional_struct_conversion = Conversion('cStruct_{{ name }}',
-                                        ('{{ value }}.withOptionalCStruct { cStruct_{{ name }} in', '}'))
+                                        ('{{ value }}.withOptionalCStruct { cStruct_{{ name }} in', '}'),
+                                        '{{ value }} != nil ? .init(cStruct: {{ value }}) : nil')
 
-struct_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
-                                     ('{{ value }}.withCStructBufferPointer { buffer_{{ name }} in', '}'))
+struct_array_conversion =\
+    Conversion('buffer_{{ name }}.baseAddress',
+               ('{{ value }}.withCStructBufferPointer { buffer_{{ name }} in', '}'),
+               'UnsafeBufferPointer(start: {{ value }}, count: Int({{ length }})).map { .init(cStruct: $0) }')
 
 object_conversion = Conversion('handle_{{ name }}',
                                ('{{ value }}.withUnsafeHandle { handle_{{ name }} in', '}'),
                                '.init(handle: {{ value }})')
 
 optional_object_conversion = Conversion('handle_{{ name }}',
-                                        ('{{ value }}.withOptionalHandle { handle_{{ name }} in', '}'))
+                                        ('{{ value }}.withOptionalHandle { handle_{{ name }} in', '}'),
+                                        '{{ value }} != nil ? .init(handle: {{ value }}) : nil')
 
-object_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
-                                     ('{{ value }}.withHandleBufferPointer { buffer_{{ name }} in', '}'))
+object_array_conversion =\
+    Conversion('buffer_{{ name }}.baseAddress',
+               ('{{ value }}.withHandleBufferPointer { buffer_{{ name }} in', '}'),
+               'UnsafeBufferPointer(start: {{ value }}, count: Int({{ length }})).map { .init(handle: $0) }')
 
 array_length_conversion = Conversion('.init(buffer_{{ name }}.count)')
 

@@ -70,6 +70,15 @@ public struct BindGroupEntry: CStructConvertible {
         self.textureView = textureView
     }
 
+    init(cStruct: WGPUBindGroupEntry) {
+        self.binding = cStruct.binding
+        self.buffer = cStruct.buffer != nil ? .init(handle: cStruct.buffer) : nil
+        self.offset = cStruct.offset
+        self.size = cStruct.size
+        self.sampler = cStruct.sampler != nil ? .init(handle: cStruct.sampler) : nil
+        self.textureView = cStruct.textureView != nil ? .init(handle: cStruct.textureView) : nil
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupEntry>) throws -> R) rethrows -> R {
         return try self.buffer.withOptionalHandle { handle_buffer in
         return try self.sampler.withOptionalHandle { handle_sampler in
@@ -391,6 +400,12 @@ public struct BlendComponent: CStructConvertible {
         self.dstFactor = dstFactor
     }
 
+    init(cStruct: WGPUBlendComponent) {
+        self.operation = .init(cValue: cStruct.operation)
+        self.srcFactor = .init(cValue: cStruct.srcFactor)
+        self.dstFactor = .init(cValue: cStruct.dstFactor)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBlendComponent>) throws -> R) rethrows -> R {
         var cStruct = WGPUBlendComponent(
             operation: self.operation.cValue, 
@@ -498,6 +513,13 @@ public struct Color: CStructConvertible {
         self.g = g
         self.b = b
         self.a = a
+    }
+
+    init(cStruct: WGPUColor) {
+        self.r = cStruct.r
+        self.g = cStruct.g
+        self.b = cStruct.b
+        self.a = cStruct.a
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUColor>) throws -> R) rethrows -> R {
@@ -683,6 +705,14 @@ public struct DeviceProperties: CStructConvertible {
         self.multiPlanarFormats = multiPlanarFormats
     }
 
+    init(cStruct: WGPUDeviceProperties) {
+        self.textureCompressionBc = cStruct.textureCompressionBC
+        self.shaderFloat16 = cStruct.shaderFloat16
+        self.pipelineStatisticsQuery = cStruct.pipelineStatisticsQuery
+        self.timestampQuery = cStruct.timestampQuery
+        self.multiPlanarFormats = cStruct.multiPlanarFormats
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceProperties>) throws -> R) rethrows -> R {
         var cStruct = WGPUDeviceProperties(
             textureCompressionBC: self.textureCompressionBc, 
@@ -763,6 +793,13 @@ public struct Extent3d: CStructConvertible {
         self.height = height
         self.depthOrArrayLayers = depthOrArrayLayers
         self.depth = depth
+    }
+
+    init(cStruct: WGPUExtent3D) {
+        self.width = cStruct.width
+        self.height = cStruct.height
+        self.depthOrArrayLayers = cStruct.depthOrArrayLayers
+        self.depth = cStruct.depth
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUExtent3D>) throws -> R) rethrows -> R {
@@ -956,6 +993,12 @@ public struct VertexAttribute: CStructConvertible {
         self.shaderLocation = shaderLocation
     }
 
+    init(cStruct: WGPUVertexAttribute) {
+        self.format = .init(cValue: cStruct.format)
+        self.offset = cStruct.offset
+        self.shaderLocation = cStruct.shaderLocation
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexAttribute>) throws -> R) rethrows -> R {
         var cStruct = WGPUVertexAttribute(
             format: self.format.cValue, 
@@ -977,6 +1020,12 @@ public struct VertexBufferLayout: CStructConvertible {
         self.arrayStride = arrayStride
         self.stepMode = stepMode
         self.attributes = attributes
+    }
+
+    init(cStruct: WGPUVertexBufferLayout) {
+        self.arrayStride = cStruct.arrayStride
+        self.stepMode = .init(cValue: cStruct.stepMode)
+        self.attributes = UnsafeBufferPointer(start: cStruct.attributes, count: Int(cStruct.attributeCount)).map { .init(cStruct: $0) }
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexBufferLayout>) throws -> R) rethrows -> R {
@@ -1037,6 +1086,12 @@ public struct Origin3d: CStructConvertible {
         self.x = x
         self.y = y
         self.z = z
+    }
+
+    init(cStruct: WGPUOrigin3D) {
+        self.x = cStruct.x
+        self.y = cStruct.y
+        self.z = cStruct.z
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUOrigin3D>) throws -> R) rethrows -> R {
@@ -1297,6 +1352,14 @@ public struct RenderPassColorAttachmentDescriptor: CStructConvertible {
         self.clearColor = clearColor
     }
 
+    init(cStruct: WGPURenderPassColorAttachmentDescriptor) {
+        self.attachment = .init(handle: cStruct.attachment)
+        self.resolveTarget = cStruct.resolveTarget != nil ? .init(handle: cStruct.resolveTarget) : nil
+        self.loadOp = .init(cValue: cStruct.loadOp)
+        self.storeOp = .init(cValue: cStruct.storeOp)
+        self.clearColor = .init(cStruct: cStruct.clearColor)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassColorAttachmentDescriptor>) throws -> R) rethrows -> R {
         return try self.attachment.withUnsafeHandle { handle_attachment in
         return try self.resolveTarget.withOptionalHandle { handle_resolveTarget in
@@ -1338,6 +1401,18 @@ public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
         self.stencilStoreOp = stencilStoreOp
         self.clearStencil = clearStencil
         self.stencilReadOnly = stencilReadOnly
+    }
+
+    init(cStruct: WGPURenderPassDepthStencilAttachmentDescriptor) {
+        self.attachment = .init(handle: cStruct.attachment)
+        self.depthLoadOp = .init(cValue: cStruct.depthLoadOp)
+        self.depthStoreOp = .init(cValue: cStruct.depthStoreOp)
+        self.clearDepth = cStruct.clearDepth
+        self.depthReadOnly = cStruct.depthReadOnly
+        self.stencilLoadOp = .init(cValue: cStruct.stencilLoadOp)
+        self.stencilStoreOp = .init(cValue: cStruct.stencilStoreOp)
+        self.clearStencil = cStruct.clearStencil
+        self.stencilReadOnly = cStruct.stencilReadOnly
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDepthStencilAttachmentDescriptor>) throws -> R) rethrows -> R {
@@ -1677,6 +1752,11 @@ public struct BlendState: CStructConvertible {
     public init(color: BlendComponent = BlendComponent(), alpha: BlendComponent = BlendComponent()) {
         self.color = color
         self.alpha = alpha
+    }
+
+    init(cStruct: WGPUBlendState) {
+        self.color = .init(cStruct: cStruct.color)
+        self.alpha = .init(cStruct: cStruct.alpha)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBlendState>) throws -> R) rethrows -> R {
@@ -2099,6 +2179,13 @@ public struct StencilFaceState: CStructConvertible {
         self.failOp = failOp
         self.depthFailOp = depthFailOp
         self.passOp = passOp
+    }
+
+    init(cStruct: WGPUStencilFaceState) {
+        self.compare = .init(cValue: cStruct.compare)
+        self.failOp = .init(cValue: cStruct.failOp)
+        self.depthFailOp = .init(cValue: cStruct.depthFailOp)
+        self.passOp = .init(cValue: cStruct.passOp)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUStencilFaceState>) throws -> R) rethrows -> R {

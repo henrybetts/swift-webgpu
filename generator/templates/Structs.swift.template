@@ -25,8 +25,8 @@ public struct {{ struct.swift_name }}: CStructConvertible
         self.{{ member.swift_name }} = {{ member.swift_name }}
         {% endfor %}
     }
-    {% if struct.extensible or struct.chained %}
 
+    {% if struct.extensible or struct.chained %}
     public init(
     {%- for member in struct.swift_members %}{{ member.swift_name }}: {{ member.swift_type }}, {% endfor -%}
     nextInChain: Chained?) {
@@ -34,6 +34,12 @@ public struct {{ struct.swift_name }}: CStructConvertible
         self.{{ member.swift_name }} = {{ member.swift_name }}
         {% endfor %}
         self.nextInChain = nextInChain
+    }
+    {% else %}
+    init(cStruct: {{ struct.c_name }}) {
+        {% for member in struct.swift_members %}
+        self.{{ member.swift_name }} = {{ member.conversion.get_swift_value('cStruct.' + member.c_name, member.length_member and 'cStruct.' + member.length_member.c_name) }}
+        {% endfor %}
     }
     {% endif %}
 
