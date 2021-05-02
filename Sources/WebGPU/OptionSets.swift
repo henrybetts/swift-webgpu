@@ -7,7 +7,7 @@ public struct BufferUsage: OptionSet {
         self.rawValue = rawValue
     }
 
-    public static let none = BufferUsage(rawValue: 0)
+    public static let none = BufferUsage([])
     public static let mapRead = BufferUsage(rawValue: 1)
     public static let mapWrite = BufferUsage(rawValue: 2)
     public static let copySrc = BufferUsage(rawValue: 4)
@@ -27,7 +27,7 @@ public struct ColorWriteMask: OptionSet {
         self.rawValue = rawValue
     }
 
-    public static let none = ColorWriteMask(rawValue: 0)
+    public static let none = ColorWriteMask([])
     public static let red = ColorWriteMask(rawValue: 1)
     public static let green = ColorWriteMask(rawValue: 2)
     public static let blue = ColorWriteMask(rawValue: 4)
@@ -42,7 +42,7 @@ public struct MapMode: OptionSet {
         self.rawValue = rawValue
     }
 
-    public static let none = MapMode(rawValue: 0)
+    public static let none = MapMode([])
     public static let read = MapMode(rawValue: 1)
     public static let write = MapMode(rawValue: 2)
 }
@@ -54,7 +54,7 @@ public struct ShaderStage: OptionSet {
         self.rawValue = rawValue
     }
 
-    public static let none = ShaderStage(rawValue: 0)
+    public static let none = ShaderStage([])
     public static let vertex = ShaderStage(rawValue: 1)
     public static let fragment = ShaderStage(rawValue: 2)
     public static let compute = ShaderStage(rawValue: 4)
@@ -67,7 +67,7 @@ public struct TextureUsage: OptionSet {
         self.rawValue = rawValue
     }
 
-    public static let none = TextureUsage(rawValue: 0)
+    public static let none = TextureUsage([])
     public static let copySrc = TextureUsage(rawValue: 1)
     public static let copyDst = TextureUsage(rawValue: 2)
     public static let sampled = TextureUsage(rawValue: 4)

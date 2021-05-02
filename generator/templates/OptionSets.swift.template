@@ -9,7 +9,11 @@ public struct {{ bitmask.swift_name }}: OptionSet {
     }
 
     {% for value in bitmask.values %}
+    {% if value.value %}
     public static let {{ value.swift_name }} = {{ bitmask.swift_name }}(rawValue: {{ value.value }})
+    {% else %}
+    public static let {{ value.swift_name }} = {{ bitmask.swift_name }}([])
+    {% endif %}
     {% endfor %}
 }
 
