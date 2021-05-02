@@ -66,11 +66,11 @@ withGLFW {
             label: nil,
             nextInChain: ShaderModuleWgslDescriptor(source: fragmentShaderSource)))
     
-    let pipeline = device.createRenderPipeline(descriptor: RenderPipelineDescriptor(
-        vertexStage: ProgrammableStageDescriptor(module: vertexShader, entryPoint: "main"),
-        fragmentStage: ProgrammableStageDescriptor(module: fragmentShader, entryPoint: "main"),
-        vertexState: VertexStateDescriptor(
-            vertexBuffers: [
+    let pipeline = device.createRenderPipeline2(descriptor: RenderPipelineDescriptor2(
+        vertex: VertexState(
+            module: vertexShader,
+            entryPoint: "main",
+            buffers: [
                 VertexBufferLayout(
                     arrayStride: UInt64(MemoryLayout<Vertex>.stride),
                     attributes: [
@@ -82,10 +82,11 @@ withGLFW {
                             format: .float32x3,
                             offset: UInt64(MemoryLayout.offset(of: \Vertex.color)!),
                             shaderLocation: 1)])]),
-        primitiveTopology: .triangleList,
-        colorStates: [
-            ColorStateDescriptor(
-                format: window.preferredTextureFormat)]))
+        fragment: FragmentState(
+            module: fragmentShader,
+            entryPoint: "main",
+            targets: [
+                ColorTargetState(format: window.preferredTextureFormat)])))
     
     let vertexData = [
         Vertex(position: (0, 0.5, 0), color: (1, 0, 0)),
@@ -109,8 +110,8 @@ withGLFW {
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
-                RenderPassColorAttachmentDescriptor(
-                    attachment: swapchain.currentTextureView,
+                RenderPassColorAttachment(
+                    view: swapchain.currentTextureView,
                     loadOp: .clear,
                     storeOp: .store,
                     clearColor: Color(r: 0, g: 0, b: 0, a: 1))]))

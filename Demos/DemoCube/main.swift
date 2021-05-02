@@ -89,12 +89,12 @@ withGLFW {
     let pipelineLayout = device.createPipelineLayout(descriptor: PipelineLayoutDescriptor(
         bindGroupLayouts: [bindGroupLayout]))
     
-    let pipeline = device.createRenderPipeline(descriptor: RenderPipelineDescriptor(
+    let pipeline = device.createRenderPipeline2(descriptor: RenderPipelineDescriptor2(
         layout: pipelineLayout,
-        vertexStage: ProgrammableStageDescriptor(module: vertexShader, entryPoint: "main"),
-        fragmentStage: ProgrammableStageDescriptor(module: fragmentShader, entryPoint: "main"),
-        vertexState: VertexStateDescriptor(
-            vertexBuffers: [
+        vertex: VertexState(
+            module: vertexShader,
+            entryPoint: "main",
+            buffers: [
                 VertexBufferLayout(
                     arrayStride: UInt64(MemoryLayout<Vertex>.stride),
                     attributes: [
@@ -106,14 +106,16 @@ withGLFW {
                             format: .float32x3,
                             offset: UInt64(MemoryLayout.offset(of: \Vertex.color)!),
                             shaderLocation: 1)])]),
-        primitiveTopology: .triangleList,
-        depthStencilState: DepthStencilStateDescriptor(
+        depthStencil: DepthStencilState(
             format: .depth24Plus,
             depthWriteEnabled: true,
             depthCompare: .less),
-        colorStates: [
-            ColorStateDescriptor(
-                format: window.preferredTextureFormat)]))
+        fragment: FragmentState(
+            module: fragmentShader,
+            entryPoint: "main",
+            targets: [
+                ColorTargetState(
+                    format: window.preferredTextureFormat)])))
     
     let vertexBuffer = cubeVertices.withUnsafeBytes { vertexBytes -> Buffer in
         let vertexBuffer = device.createBuffer(descriptor: BufferDescriptor(
@@ -173,13 +175,13 @@ withGLFW {
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
-                RenderPassColorAttachmentDescriptor(
-                    attachment: swapchain.currentTextureView,
+                RenderPassColorAttachment(
+                    view: swapchain.currentTextureView,
                     loadOp: .clear,
                     storeOp: .store,
                     clearColor: Color(r: 0, g: 0, b: 0, a: 1))],
-            depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor(
-                attachment: depthStencilView,
+            depthStencilAttachment: RenderPassDepthStencilAttachment(
+                view: depthStencilView,
                 depthLoadOp: .clear,
                 depthStoreOp: .store,
                 clearDepth: 1,

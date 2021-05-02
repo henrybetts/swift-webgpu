@@ -37,8 +37,8 @@ withGLFW {
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
-                RenderPassColorAttachmentDescriptor(
-                    attachment: swapchain.currentTextureView,
+                RenderPassColorAttachment(
+                    view: swapchain.currentTextureView,
                     loadOp: .clear,
                     storeOp: .store,
                     clearColor: Color(h: hue, s: 0.9, v: 0.9, a: 1.0))]))
