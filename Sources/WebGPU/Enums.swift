@@ -132,17 +132,23 @@ public enum BindingType: UInt32 {
 public enum BlendFactor: UInt32 {
     case zero = 0
     case one = 1
-    case srcColor = 2
-    case oneMinusSrcColor = 3
+    case src = 2
+    case oneMinusSrc = 3
     case srcAlpha = 4
     case oneMinusSrcAlpha = 5
-    case dstColor = 6
-    case oneMinusDstColor = 7
+    case dst = 6
+    case oneMinusDst = 7
     case dstAlpha = 8
     case oneMinusDstAlpha = 9
     case srcAlphaSaturated = 10
-    case blendColor = 11
-    case oneMinusBlendColor = 12
+    case constant = 11
+    case oneMinusConstant = 12
+    case srcColor = 102
+    case oneMinusSrcColor = 103
+    case dstColor = 106
+    case oneMinusDstColor = 107
+    case blendColor = 111
+    case oneMinusBlendColor = 112
 
     init(cValue: WGPUBlendFactor) {
         self.init(rawValue: cValue.rawValue)!
@@ -203,6 +209,35 @@ public enum CompareFunction: UInt32 {
 
     var cValue: WGPUCompareFunction {
         return WGPUCompareFunction(rawValue: self.rawValue)
+    }
+}
+
+public enum CompilationInfoRequestStatus: UInt32 {
+    case success = 0
+    case error = 1
+    case deviceLost = 2
+    case unknown = 3
+
+    init(cValue: WGPUCompilationInfoRequestStatus) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUCompilationInfoRequestStatus {
+        return WGPUCompilationInfoRequestStatus(rawValue: self.rawValue)
+    }
+}
+
+public enum CompilationMessageType: UInt32 {
+    case error = 0
+    case warning = 1
+    case info = 2
+
+    init(cValue: WGPUCompilationMessageType) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUCompilationMessageType {
+        return WGPUCompilationMessageType(rawValue: self.rawValue)
     }
 }
 
@@ -462,8 +497,8 @@ public enum SType: UInt32 {
     case surfaceDescriptorFromCanvasHtmlSelector = 4
     case shaderModuleSpirvDescriptor = 5
     case shaderModuleWgslDescriptor = 6
-    case samplerDescriptorDummyAnisotropicFiltering = 7
-    case renderPipelineDescriptorDummyExtension = 8
+    case primitiveDepthClampingState = 7
+    case surfaceDescriptorFromWindowsCoreWindow = 8
 
     init(cValue: WGPUSType) {
         self.init(rawValue: cValue.rawValue)!

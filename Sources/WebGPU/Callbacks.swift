@@ -9,6 +9,16 @@ func bufferMapCallback(status: WGPUBufferMapAsyncStatus, userdata: UnsafeMutable
     )
 }
 
+public typealias CompilationInfoCallback = (CompilationInfoRequestStatus, CompilationInfo) -> ()
+
+func compilationInfoCallback(status: WGPUCompilationInfoRequestStatus, compilationInfo: UnsafePointer<WGPUCompilationInfo>!, userdata: UnsafeMutableRawPointer!) {
+    let swiftCallback = UserData<CompilationInfoCallback>.takeValue(userdata)
+    swiftCallback(
+        .init(cValue: status), 
+        .init(cStruct: compilationInfo.pointee)
+    )
+}
+
 public typealias CreateComputePipelineAsyncCallback = (CreatePipelineAsyncStatus, ComputePipeline, String) -> ()
 
 func createComputePipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pipeline: WGPUComputePipeline!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {

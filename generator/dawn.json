@@ -226,17 +226,24 @@
         "values": [
             {"value": 0, "name": "zero"},
             {"value": 1, "name": "one"},
-            {"value": 2, "name": "src color"},
-            {"value": 3, "name": "one minus src color"},
+            {"value": 2, "name": "src"},
+            {"value": 3, "name": "one minus src"},
             {"value": 4, "name": "src alpha"},
             {"value": 5, "name": "one minus src alpha"},
-            {"value": 6, "name": "dst color"},
-            {"value": 7, "name": "one minus dst color"},
+            {"value": 6, "name": "dst"},
+            {"value": 7, "name": "one minus dst"},
             {"value": 8, "name": "dst alpha"},
             {"value": 9, "name": "one minus dst alpha"},
             {"value": 10, "name": "src alpha saturated"},
-            {"value": 11, "name": "blend color"},
-            {"value": 12, "name": "one minus blend color"}
+            {"value": 11, "name": "constant"},
+            {"value": 12, "name": "one minus constant"},
+
+            {"value": 102, "name": "src color"},
+            {"value": 103, "name": "one minus src color"},
+            {"value": 106, "name": "dst color"},
+            {"value": 107, "name": "one minus dst color"},
+            {"value": 111, "name": "blend color"},
+            {"value": 112, "name": "one minus blend color"}
         ]
     },
     "blend operation": {
@@ -490,7 +497,7 @@
     "compare function": {
         "category": "enum",
         "values": [
-            {"value": 0, "name": "undefined", "jsrepr": "undefined"},
+            {"value": 0, "name": "undefined", "jsrepr": "undefined", "valid": false},
             {"value": 1, "name": "never"},
             {"value": 2, "name": "less"},
             {"value": 3, "name": "less equal"},
@@ -499,6 +506,51 @@
             {"value": 6, "name": "equal"},
             {"value": 7, "name": "not equal"},
             {"value": 8, "name": "always"}
+        ]
+    },
+    "compilation info": {
+        "category": "structure",
+        "extensible": false,
+        "members": [
+            {"name": "message count", "type": "uint32_t"},
+            {"name": "messages", "type": "compilation message", "annotation": "const*", "length": "message count"}
+        ]
+    },
+    "compilation info callback": {
+        "category": "callback",
+        "args": [
+            {"name": "status", "type": "compilation info request status"},
+            {"name": "compilation info", "type": "compilation info", "annotation": "const*"},
+            {"name": "userdata", "type": "void", "annotation": "*"}
+        ]
+    },
+    "compilation info request status": {
+        "category": "enum",
+        "values": [
+            {"value": 0, "name": "success"},
+            {"value": 1, "name": "error"},
+            {"value": 2, "name": "device lost"},
+            {"value": 3, "name": "unknown"}
+        ]
+    },
+    "compilation message": {
+        "category": "structure",
+        "extensible": false,
+        "members": [
+            {"name": "message", "type": "char", "annotation": "const*", "length": "strlen", "optional": true},
+            {"name": "type", "type": "compilation message type"},
+            {"name": "line num", "type": "uint64_t"},
+            {"name": "line pos", "type": "uint64_t"},
+            {"name": "offset", "type": "uint64_t"},
+            {"name": "length", "type": "uint64_t"}
+        ]
+    },
+    "compilation message type": {
+        "category": "enum",
+        "values": [
+            {"value": 0, "name": "error"},
+            {"value": 1, "name": "warning"},
+            {"value": 2, "name": "info"}
         ]
     },
     "compute pass descriptor": {
@@ -832,7 +884,8 @@
             {"name": "shader float16", "type": "bool", "default": "false"},
             {"name": "pipeline statistics query", "type": "bool", "default": "false"},
             {"name": "timestamp query", "type": "bool", "default": "false"},
-            {"name": "multi planar formats", "type": "bool", "default": "false"}
+            {"name": "multi planar formats", "type": "bool", "default": "false"},
+            {"name": "depth clamping", "type": "bool", "default": "false"}
         ]
     },
     "depth stencil state descriptor": {
@@ -1372,21 +1425,27 @@
         ]
     },
 
-    "render pass color attachment descriptor": {
+    "render pass color attachment": {
         "category": "structure",
         "members": [
-            {"name": "attachment", "type": "texture view"},
+            {"name": "view", "type": "texture view", "optional": true},
             {"name": "resolve target", "type": "texture view", "optional": true},
             {"name": "load op", "type": "load op"},
             {"name": "store op", "type": "store op"},
-            {"name": "clear color", "type": "color"}
+            {"name": "clear color", "type": "color"},
+            {"name": "attachment", "type": "texture view", "optional": true}
         ]
     },
 
-    "render pass depth stencil attachment descriptor": {
+    "render pass color attachment descriptor": {
+        "category": "typedef",
+        "type": "render pass color attachment"
+    },
+
+    "render pass depth stencil attachment": {
         "category": "structure",
         "members": [
-            {"name": "attachment", "type": "texture view"},
+            {"name": "view", "type": "texture view", "optional": true},
             {"name": "depth load op", "type": "load op"},
             {"name": "depth store op", "type": "store op"},
             {"name": "clear depth", "type": "float"},
@@ -1394,8 +1453,14 @@
             {"name": "stencil load op", "type": "load op"},
             {"name": "stencil store op", "type": "store op"},
             {"name": "clear stencil", "type": "uint32_t", "default": "0"},
-            {"name": "stencil read only", "type": "bool", "default": "false"}
+            {"name": "stencil read only", "type": "bool", "default": "false"},
+            {"name": "attachment", "type": "texture view", "optional": true}
         ]
+    },
+
+    "render pass depth stencil attachment descriptor": {
+        "category": "typedef",
+        "type": "render pass depth stencil attachment"
     },
 
     "render pass descriptor": {
@@ -1404,8 +1469,8 @@
         "members": [
             {"name": "label", "type": "char", "annotation": "const*", "length": "strlen", "optional": true},
             {"name": "color attachment count", "type": "uint32_t"},
-            {"name": "color attachments", "type": "render pass color attachment descriptor", "annotation": "const*", "length": "color attachment count"},
-            {"name": "depth stencil attachment", "type": "render pass depth stencil attachment descriptor", "annotation": "const*", "optional": true},
+            {"name": "color attachments", "type": "render pass color attachment", "annotation": "const*", "length": "color attachment count"},
+            {"name": "depth stencil attachment", "type": "render pass depth stencil attachment", "annotation": "const*", "optional": true},
             {"name": "occlusion query set", "type": "query set", "optional": true}
         ]
     },
@@ -1491,6 +1556,12 @@
             },
             {
                 "name": "set blend color",
+                "args": [
+                    {"name": "color", "type": "color", "annotation": "const*"}
+                ]
+            },
+            {
+                "name": "set blend constant",
                 "args": [
                     {"name": "color", "type": "color", "annotation": "const*"}
                 ]
@@ -1582,7 +1653,7 @@
         "members": [
             {"name": "module", "type": "shader module"},
             {"name": "entry point", "type": "char", "annotation": "const*", "length": "strlen"},
-            {"name": "buffer count", "type": "uint32_t"},
+            {"name": "buffer count", "type": "uint32_t", "default": 0},
             {"name": "buffers", "type": "vertex buffer layout", "annotation": "const*", "length": "buffer count"}
         ]
     },
@@ -1595,6 +1666,14 @@
             {"name": "strip index format", "type": "index format", "default": "undefined"},
             {"name": "front face", "type": "front face", "default": "CCW"},
             {"name": "cull mode", "type": "cull mode", "default": "none"}
+        ]
+    },
+
+    "primitive depth clamping state": {
+        "category": "structure",
+        "chained": true,
+        "members": [
+            {"name": "clamp depth", "type": "bool", "default": "false"}
         ]
     },
 
@@ -1687,13 +1766,6 @@
         ]
     },
 
-    "render pipeline descriptor dummy extension": {
-        "category": "structure",
-        "chained": true,
-        "members": [
-            {"name": "dummy stage", "type": "programmable stage descriptor"}
-        ]
-    },
     "sampler": {
         "category": "object"
     },
@@ -1714,15 +1786,17 @@
             {"name": "max anisotropy", "type": "uint16_t", "default": "1"}
         ]
     },
-    "sampler descriptor dummy anisotropic filtering": {
-        "category": "structure",
-        "chained": true,
-        "members": [
-            {"name": "max anisotropy", "type": "float"}
-        ]
-    },
     "shader module": {
-        "category": "object"
+        "category": "object",
+        "methods": [
+            {
+                "name": "get compilation info",
+                "args": [
+                    {"name": "callback", "type": "compilation info callback"},
+                    {"name": "userdata", "type": "void", "annotation": "*"}
+                ]
+            }
+        ]
     },
     "shader module descriptor": {
         "category": "structure",
@@ -1825,6 +1899,14 @@
             {"name": "window", "type": "uint32_t"}
         ]
     },
+    "surface descriptor from windows core window": {
+        "category": "structure",
+        "chained": true,
+        "javascript": false,
+        "members": [
+            {"name": "core window", "type": "void", "annotation": "*"}
+        ]
+    },
     "swap chain": {
         "category": "object",
         "methods": [
@@ -1865,8 +1947,8 @@
             {"value": 4, "name": "surface descriptor from canvas HTML selector"},
             {"value": 5, "name": "shader module SPIRV descriptor"},
             {"value": 6, "name": "shader module WGSL descriptor"},
-            {"value": 7, "name": "sampler descriptor dummy anisotropic filtering"},
-            {"value": 8, "name": "render pipeline descriptor dummy extension"}
+            {"value": 7, "name": "primitive depth clamping state"},
+            {"value": 8, "name": "surface descriptor from windows core window"}
         ]
     },
     "texture": {

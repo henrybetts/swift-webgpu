@@ -1570,6 +1570,17 @@ public class RenderPassEncoder: Object {
         }
     }
 
+    public func setBlendConstant(color: Color) {
+        self.withUnsafeHandle { handle_self in
+            color.withCStruct { cStruct_color in
+            wgpuRenderPassEncoderSetBlendConstant(
+                handle_self, 
+                cStruct_color
+            )
+            }
+        }
+    }
+
     public func setViewport(x: Float, y: Float, width: Float, height: Float, minDepth: Float, maxDepth: Float) {
         self.withUnsafeHandle { handle_self in
             wgpuRenderPassEncoderSetViewport(
@@ -1766,6 +1777,16 @@ public class ShaderModule: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUShaderModule) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
+        }
+    }
+
+    public func getCompilationInfo(callback: @escaping CompilationInfoCallback) {
+        self.withUnsafeHandle { handle_self in
+            wgpuShaderModuleGetCompilationInfo(
+                handle_self, 
+                compilationInfoCallback, 
+                UserData.passRetained(callback)
+            )
         }
     }
 }

@@ -591,6 +591,73 @@ public struct CommandEncoderDescriptor: CStructConvertible, Extensible {
     }
 }
 
+public struct CompilationInfo: CStructConvertible {
+    typealias CStruct = WGPUCompilationInfo
+
+    public var messages: [CompilationMessage]
+
+    public init(messages: [CompilationMessage]) {
+        self.messages = messages
+    }
+
+    init(cStruct: WGPUCompilationInfo) {
+        self.messages = UnsafeBufferPointer(start: cStruct.messages, count: Int(cStruct.messageCount)).map { .init(cStruct: $0) }
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUCompilationInfo>) throws -> R) rethrows -> R {
+        return try self.messages.withCStructBufferPointer { buffer_messages in
+        var cStruct = WGPUCompilationInfo(
+            messageCount: .init(buffer_messages.count), 
+            messages: buffer_messages.baseAddress
+        )
+        return try body(&cStruct)
+        }
+    }
+}
+
+public struct CompilationMessage: CStructConvertible {
+    typealias CStruct = WGPUCompilationMessage
+
+    public var message: String?
+    public var type: CompilationMessageType
+    public var lineNum: UInt64
+    public var linePos: UInt64
+    public var offset: UInt64
+    public var length: UInt64
+
+    public init(message: String? = nil, type: CompilationMessageType, lineNum: UInt64, linePos: UInt64, offset: UInt64, length: UInt64) {
+        self.message = message
+        self.type = type
+        self.lineNum = lineNum
+        self.linePos = linePos
+        self.offset = offset
+        self.length = length
+    }
+
+    init(cStruct: WGPUCompilationMessage) {
+        self.message = cStruct.message != nil ? String(cString: cStruct.message) : nil
+        self.type = .init(cValue: cStruct.type)
+        self.lineNum = cStruct.lineNum
+        self.linePos = cStruct.linePos
+        self.offset = cStruct.offset
+        self.length = cStruct.length
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUCompilationMessage>) throws -> R) rethrows -> R {
+        return try self.message.withOptionalCString { cString_message in
+        var cStruct = WGPUCompilationMessage(
+            message: cString_message, 
+            type: self.type.cValue, 
+            lineNum: self.lineNum, 
+            linePos: self.linePos, 
+            offset: self.offset, 
+            length: self.length
+        )
+        return try body(&cStruct)
+        }
+    }
+}
+
 public struct ComputePassDescriptor: CStructConvertible, Extensible {
     typealias CStruct = WGPUComputePassDescriptor
 
@@ -696,13 +763,15 @@ public struct DeviceProperties: CStructConvertible {
     public var pipelineStatisticsQuery: Bool
     public var timestampQuery: Bool
     public var multiPlanarFormats: Bool
+    public var depthClamping: Bool
 
-    public init(textureCompressionBc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false) {
+    public init(textureCompressionBc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false) {
         self.textureCompressionBc = textureCompressionBc
         self.shaderFloat16 = shaderFloat16
         self.pipelineStatisticsQuery = pipelineStatisticsQuery
         self.timestampQuery = timestampQuery
         self.multiPlanarFormats = multiPlanarFormats
+        self.depthClamping = depthClamping
     }
 
     init(cStruct: WGPUDeviceProperties) {
@@ -711,6 +780,7 @@ public struct DeviceProperties: CStructConvertible {
         self.pipelineStatisticsQuery = cStruct.pipelineStatisticsQuery
         self.timestampQuery = cStruct.timestampQuery
         self.multiPlanarFormats = cStruct.multiPlanarFormats
+        self.depthClamping = cStruct.depthClamping
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceProperties>) throws -> R) rethrows -> R {
@@ -719,7 +789,8 @@ public struct DeviceProperties: CStructConvertible {
             shaderFloat16: self.shaderFloat16, 
             pipelineStatisticsQuery: self.pipelineStatisticsQuery, 
             timestampQuery: self.timestampQuery, 
-            multiPlanarFormats: self.multiPlanarFormats
+            multiPlanarFormats: self.multiPlanarFormats, 
+            depthClamping: self.depthClamping
         )
         return try body(&cStruct)
     }
@@ -1335,53 +1406,59 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible, Extensible {
     }
 }
 
-public struct RenderPassColorAttachmentDescriptor: CStructConvertible {
-    typealias CStruct = WGPURenderPassColorAttachmentDescriptor
+public struct RenderPassColorAttachment: CStructConvertible {
+    typealias CStruct = WGPURenderPassColorAttachment
 
-    public var attachment: TextureView
+    public var view: TextureView?
     public var resolveTarget: TextureView?
     public var loadOp: LoadOp
     public var storeOp: StoreOp
     public var clearColor: Color
+    public var attachment: TextureView?
 
-    public init(attachment: TextureView, resolveTarget: TextureView? = nil, loadOp: LoadOp, storeOp: StoreOp, clearColor: Color) {
-        self.attachment = attachment
+    public init(view: TextureView? = nil, resolveTarget: TextureView? = nil, loadOp: LoadOp, storeOp: StoreOp, clearColor: Color, attachment: TextureView? = nil) {
+        self.view = view
         self.resolveTarget = resolveTarget
         self.loadOp = loadOp
         self.storeOp = storeOp
         self.clearColor = clearColor
+        self.attachment = attachment
     }
 
-    init(cStruct: WGPURenderPassColorAttachmentDescriptor) {
-        self.attachment = .init(handle: cStruct.attachment)
+    init(cStruct: WGPURenderPassColorAttachment) {
+        self.view = cStruct.view != nil ? .init(handle: cStruct.view) : nil
         self.resolveTarget = cStruct.resolveTarget != nil ? .init(handle: cStruct.resolveTarget) : nil
         self.loadOp = .init(cValue: cStruct.loadOp)
         self.storeOp = .init(cValue: cStruct.storeOp)
         self.clearColor = .init(cStruct: cStruct.clearColor)
+        self.attachment = cStruct.attachment != nil ? .init(handle: cStruct.attachment) : nil
     }
 
-    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassColorAttachmentDescriptor>) throws -> R) rethrows -> R {
-        return try self.attachment.withUnsafeHandle { handle_attachment in
+    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassColorAttachment>) throws -> R) rethrows -> R {
+        return try self.view.withOptionalHandle { handle_view in
         return try self.resolveTarget.withOptionalHandle { handle_resolveTarget in
         return try self.clearColor.withCStruct { cStruct_clearColor in
-        var cStruct = WGPURenderPassColorAttachmentDescriptor(
-            attachment: handle_attachment, 
+        return try self.attachment.withOptionalHandle { handle_attachment in
+        var cStruct = WGPURenderPassColorAttachment(
+            view: handle_view, 
             resolveTarget: handle_resolveTarget, 
             loadOp: self.loadOp.cValue, 
             storeOp: self.storeOp.cValue, 
-            clearColor: cStruct_clearColor.pointee
+            clearColor: cStruct_clearColor.pointee, 
+            attachment: handle_attachment
         )
         return try body(&cStruct)
+        }
         }
         }
         }
     }
 }
 
-public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
-    typealias CStruct = WGPURenderPassDepthStencilAttachmentDescriptor
+public struct RenderPassDepthStencilAttachment: CStructConvertible {
+    typealias CStruct = WGPURenderPassDepthStencilAttachment
 
-    public var attachment: TextureView
+    public var view: TextureView?
     public var depthLoadOp: LoadOp
     public var depthStoreOp: StoreOp
     public var clearDepth: Float
@@ -1390,9 +1467,10 @@ public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
     public var stencilStoreOp: StoreOp
     public var clearStencil: UInt32
     public var stencilReadOnly: Bool
+    public var attachment: TextureView?
 
-    public init(attachment: TextureView, depthLoadOp: LoadOp, depthStoreOp: StoreOp, clearDepth: Float, depthReadOnly: Bool = false, stencilLoadOp: LoadOp, stencilStoreOp: StoreOp, clearStencil: UInt32 = 0, stencilReadOnly: Bool = false) {
-        self.attachment = attachment
+    public init(view: TextureView? = nil, depthLoadOp: LoadOp, depthStoreOp: StoreOp, clearDepth: Float, depthReadOnly: Bool = false, stencilLoadOp: LoadOp, stencilStoreOp: StoreOp, clearStencil: UInt32 = 0, stencilReadOnly: Bool = false, attachment: TextureView? = nil) {
+        self.view = view
         self.depthLoadOp = depthLoadOp
         self.depthStoreOp = depthStoreOp
         self.clearDepth = clearDepth
@@ -1401,10 +1479,11 @@ public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
         self.stencilStoreOp = stencilStoreOp
         self.clearStencil = clearStencil
         self.stencilReadOnly = stencilReadOnly
+        self.attachment = attachment
     }
 
-    init(cStruct: WGPURenderPassDepthStencilAttachmentDescriptor) {
-        self.attachment = .init(handle: cStruct.attachment)
+    init(cStruct: WGPURenderPassDepthStencilAttachment) {
+        self.view = cStruct.view != nil ? .init(handle: cStruct.view) : nil
         self.depthLoadOp = .init(cValue: cStruct.depthLoadOp)
         self.depthStoreOp = .init(cValue: cStruct.depthStoreOp)
         self.clearDepth = cStruct.clearDepth
@@ -1413,12 +1492,14 @@ public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
         self.stencilStoreOp = .init(cValue: cStruct.stencilStoreOp)
         self.clearStencil = cStruct.clearStencil
         self.stencilReadOnly = cStruct.stencilReadOnly
+        self.attachment = cStruct.attachment != nil ? .init(handle: cStruct.attachment) : nil
     }
 
-    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDepthStencilAttachmentDescriptor>) throws -> R) rethrows -> R {
-        return try self.attachment.withUnsafeHandle { handle_attachment in
-        var cStruct = WGPURenderPassDepthStencilAttachmentDescriptor(
-            attachment: handle_attachment, 
+    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDepthStencilAttachment>) throws -> R) rethrows -> R {
+        return try self.view.withOptionalHandle { handle_view in
+        return try self.attachment.withOptionalHandle { handle_attachment in
+        var cStruct = WGPURenderPassDepthStencilAttachment(
+            view: handle_view, 
             depthLoadOp: self.depthLoadOp.cValue, 
             depthStoreOp: self.depthStoreOp.cValue, 
             clearDepth: self.clearDepth, 
@@ -1426,9 +1507,11 @@ public struct RenderPassDepthStencilAttachmentDescriptor: CStructConvertible {
             stencilLoadOp: self.stencilLoadOp.cValue, 
             stencilStoreOp: self.stencilStoreOp.cValue, 
             clearStencil: self.clearStencil, 
-            stencilReadOnly: self.stencilReadOnly
+            stencilReadOnly: self.stencilReadOnly, 
+            attachment: handle_attachment
         )
         return try body(&cStruct)
+        }
         }
     }
 }
@@ -1437,20 +1520,20 @@ public struct RenderPassDescriptor: CStructConvertible, Extensible {
     typealias CStruct = WGPURenderPassDescriptor
 
     public var label: String?
-    public var colorAttachments: [RenderPassColorAttachmentDescriptor]
-    public var depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor?
+    public var colorAttachments: [RenderPassColorAttachment]
+    public var depthStencilAttachment: RenderPassDepthStencilAttachment?
     public var occlusionQuerySet: QuerySet?
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, colorAttachments: [RenderPassColorAttachmentDescriptor], depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor? = nil, occlusionQuerySet: QuerySet? = nil) {
+    public init(label: String? = nil, colorAttachments: [RenderPassColorAttachment], depthStencilAttachment: RenderPassDepthStencilAttachment? = nil, occlusionQuerySet: QuerySet? = nil) {
         self.label = label
         self.colorAttachments = colorAttachments
         self.depthStencilAttachment = depthStencilAttachment
         self.occlusionQuerySet = occlusionQuerySet
     }
 
-    public init(label: String?, colorAttachments: [RenderPassColorAttachmentDescriptor], depthStencilAttachment: RenderPassDepthStencilAttachmentDescriptor?, occlusionQuerySet: QuerySet?, nextInChain: Chained?) {
+    public init(label: String?, colorAttachments: [RenderPassColorAttachment], depthStencilAttachment: RenderPassDepthStencilAttachment?, occlusionQuerySet: QuerySet?, nextInChain: Chained?) {
         self.label = label
         self.colorAttachments = colorAttachments
         self.depthStencilAttachment = depthStencilAttachment
@@ -1558,6 +1641,40 @@ public struct PrimitiveState: CStructConvertible, Extensible {
             cullMode: self.cullMode.cValue
         )
         return try body(&cStruct)
+        }
+    }
+}
+
+public struct PrimitiveDepthClampingState: CStructConvertible, Chained {
+    typealias CStruct = WGPUPrimitiveDepthClampingState
+
+    public var clampDepth: Bool
+
+    public var nextInChain: Chained?
+
+    public init(clampDepth: Bool = false) {
+        self.clampDepth = clampDepth
+    }
+
+    public init(clampDepth: Bool, nextInChain: Chained?) {
+        self.clampDepth = clampDepth
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUPrimitiveDepthClampingState>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        var cStruct = WGPUPrimitiveDepthClampingState(
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_PrimitiveDepthClampingState), 
+            clampDepth: self.clampDepth
+        )
+        return try body(&cStruct)
+        }
+    }
+
+    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
+        return try withCStruct { cStruct in
+            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
+            return try body(chainedCStruct)
         }
     }
 }
@@ -1925,42 +2042,6 @@ public struct RenderPipelineDescriptor2: CStructConvertible, Extensible {
     }
 }
 
-public struct RenderPipelineDescriptorDummyExtension: CStructConvertible, Chained {
-    typealias CStruct = WGPURenderPipelineDescriptorDummyExtension
-
-    public var dummyStage: ProgrammableStageDescriptor
-
-    public var nextInChain: Chained?
-
-    public init(dummyStage: ProgrammableStageDescriptor) {
-        self.dummyStage = dummyStage
-    }
-
-    public init(dummyStage: ProgrammableStageDescriptor, nextInChain: Chained?) {
-        self.dummyStage = dummyStage
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPipelineDescriptorDummyExtension>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.dummyStage.withCStruct { cStruct_dummyStage in
-        var cStruct = WGPURenderPipelineDescriptorDummyExtension(
-            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_RenderPipelineDescriptorDummyExtension), 
-            dummyStage: cStruct_dummyStage.pointee
-        )
-        return try body(&cStruct)
-        }
-        }
-    }
-
-    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
-        return try withCStruct { cStruct in
-            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
-            return try body(chainedCStruct)
-        }
-    }
-}
-
 public struct SamplerDescriptor: CStructConvertible, Extensible {
     typealias CStruct = WGPUSamplerDescriptor
 
@@ -2026,40 +2107,6 @@ public struct SamplerDescriptor: CStructConvertible, Extensible {
         )
         return try body(&cStruct)
         }
-        }
-    }
-}
-
-public struct SamplerDescriptorDummyAnisotropicFiltering: CStructConvertible, Chained {
-    typealias CStruct = WGPUSamplerDescriptorDummyAnisotropicFiltering
-
-    public var maxAnisotropy: Float
-
-    public var nextInChain: Chained?
-
-    public init(maxAnisotropy: Float) {
-        self.maxAnisotropy = maxAnisotropy
-    }
-
-    public init(maxAnisotropy: Float, nextInChain: Chained?) {
-        self.maxAnisotropy = maxAnisotropy
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPUSamplerDescriptorDummyAnisotropicFiltering>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        var cStruct = WGPUSamplerDescriptorDummyAnisotropicFiltering(
-            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_SamplerDescriptorDummyAnisotropicFiltering), 
-            maxAnisotropy: self.maxAnisotropy
-        )
-        return try body(&cStruct)
-        }
-    }
-
-    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
-        return try withCStruct { cStruct in
-            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
-            return try body(chainedCStruct)
         }
     }
 }
@@ -2361,6 +2408,40 @@ public struct SurfaceDescriptorFromXlib: CStructConvertible, Chained {
             chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_SurfaceDescriptorFromXlib), 
             display: self.display, 
             window: self.window
+        )
+        return try body(&cStruct)
+        }
+    }
+
+    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
+        return try withCStruct { cStruct in
+            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
+            return try body(chainedCStruct)
+        }
+    }
+}
+
+public struct SurfaceDescriptorFromWindowsCoreWindow: CStructConvertible, Chained {
+    typealias CStruct = WGPUSurfaceDescriptorFromWindowsCoreWindow
+
+    public var coreWindow: UnsafeMutableRawPointer!
+
+    public var nextInChain: Chained?
+
+    public init(coreWindow: UnsafeMutableRawPointer!) {
+        self.coreWindow = coreWindow
+    }
+
+    public init(coreWindow: UnsafeMutableRawPointer!, nextInChain: Chained?) {
+        self.coreWindow = coreWindow
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromWindowsCoreWindow>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        var cStruct = WGPUSurfaceDescriptorFromWindowsCoreWindow(
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_SurfaceDescriptorFromWindowsCoreWindow), 
+            coreWindow: self.coreWindow
         )
         return try body(&cStruct)
         }
