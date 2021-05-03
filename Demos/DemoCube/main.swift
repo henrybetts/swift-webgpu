@@ -6,7 +6,7 @@ import SGLMath
 #if canImport(Darwin)
 import Darwin.C
 #else
-import GLibC
+import Glibc
 #endif
 
 struct Camera {

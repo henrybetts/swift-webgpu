@@ -38,17 +38,17 @@ public class Window {
             surfaceDescriptor.nextInChain = SurfaceDescriptorFromMetalLayer(
                 layer: Unmanaged.passUnretained(view.layer!).toOpaque()
             )
+        #elseif os(Linux)
+            surfaceDescriptor.nextInChain = SurfaceDescriptorFromXlib(
+                    display: UnsafeMutableRawPointer(glfwGetX11Display()),
+                    window: UInt32(glfwGetX11Window(handle)))
         #endif
         
         return surfaceDescriptor
     }
     
     public var preferredTextureFormat: TextureFormat {
-        #if os(macOS)
-            return .bgra8Unorm
-        #else
-            return .undefined
-        #endif
+        return .bgra8Unorm
     }
     
     public var shouldClose: Bool {
