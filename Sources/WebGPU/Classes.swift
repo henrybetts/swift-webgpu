@@ -545,6 +545,7 @@ public class Device: Object {
 
     deinit {
         setUncapturedErrorCallback(nil)
+        setLoggingCallback(nil)
         setDeviceLostCallback(nil)
         wgpuDeviceRelease(self.handle)
     }
@@ -666,7 +667,7 @@ public class Device: Object {
         }
     }
 
-    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor2, callback: @escaping CreateRenderPipelineAsyncCallback) {
+    public func createRenderPipelineAsync(descriptor: RenderPipelineDescriptor, callback: @escaping CreateRenderPipelineAsyncCallback) {
         self.withUnsafeHandle { handle_self in
             descriptor.withCStruct { cStruct_descriptor in
             wgpuDeviceCreateRenderPipelineAsync(
@@ -703,7 +704,7 @@ public class Device: Object {
         }
     }
 
-    public func createRenderPipeline2(descriptor: RenderPipelineDescriptor2) -> RenderPipeline {
+    public func createRenderPipeline2(descriptor: RenderPipelineDescriptor) -> RenderPipeline {
         self.withUnsafeHandle { handle_self in
             descriptor.withCStruct { cStruct_descriptor in
             let result = wgpuDeviceCreateRenderPipeline2(
@@ -775,15 +776,6 @@ public class Device: Object {
         }
     }
 
-    public var defaultQueue: Queue {
-        self.withUnsafeHandle { handle_self in
-            let result = wgpuDeviceGetDefaultQueue(
-                handle_self
-            )
-            return .init(handle: result)
-        }
-    }
-
     public func createExternalTexture(externalTextureDescriptor: ExternalTextureDescriptor) -> ExternalTexture {
         self.withUnsafeHandle { handle_self in
             externalTextureDescriptor.withCStruct { cStruct_externalTextureDescriptor in
@@ -834,6 +826,20 @@ public class Device: Object {
             } else {
                 self._setUncapturedErrorCallback = nil
                 wgpuDeviceSetUncapturedErrorCallback(handle_self, nil, nil)
+            }
+        }
+    }
+
+    var _setLoggingCallback: UserData<LoggingCallback>? = nil
+    public func setLoggingCallback(_ callback: LoggingCallback?) {
+        self.withUnsafeHandle { handle_self in
+            if let callback = callback {
+                let userData = UserData(callback)
+                self._setLoggingCallback = userData
+                wgpuDeviceSetLoggingCallback(handle_self, loggingCallback, userData.toOpaque())
+            } else {
+                self._setLoggingCallback = nil
+                wgpuDeviceSetLoggingCallback(handle_self, nil, nil)
             }
         }
     }
@@ -904,54 +910,6 @@ public class ExternalTexture: Object {
         self.withUnsafeHandle { handle_self in
             wgpuExternalTextureDestroy(
                 handle_self
-            )
-        }
-    }
-}
-
-public class Fence: Object {
-    private let handle: WGPUFence!
-
-    /// Create a wrapper around an existing handle.
-    ///
-    /// The ownership of the handle is transferred to this class.
-    ///
-    /// - Parameter handle: The handle to wrap.
-    public init(handle: WGPUFence!) {
-        self.handle = handle
-    }
-
-    deinit {
-        wgpuFenceRelease(self.handle)
-    }
-
-    /// Calls the given closure with the underlying handle.
-    ///
-    /// The underlying handle is guaranteed not to be released before the closure returns.
-    ///
-    /// - Parameter body: A closure to call with the underlying handle.
-    public func withUnsafeHandle<R>(_ body: (WGPUFence) throws -> R) rethrows -> R {
-        return try withExtendedLifetime(self) {
-            return try body(self.handle)
-        }
-    }
-
-    public var completedValue: UInt64 {
-        self.withUnsafeHandle { handle_self in
-            let result = wgpuFenceGetCompletedValue(
-                handle_self
-            )
-            return result
-        }
-    }
-
-    public func onCompletion(value: UInt64, callback: @escaping FenceOnCompletionCallback) {
-        self.withUnsafeHandle { handle_self in
-            wgpuFenceOnCompletion(
-                handle_self, 
-                value, 
-                fenceOnCompletionCallback, 
-                UserData.passRetained(callback)
             )
         }
     }
@@ -1096,30 +1054,6 @@ public class Queue: Object {
                 .init(buffer_commands.count), 
                 buffer_commands.baseAddress
             )
-            }
-        }
-    }
-
-    public func signal(fence: Fence, signalValue: UInt64) {
-        self.withUnsafeHandle { handle_self in
-            fence.withUnsafeHandle { handle_fence in
-            wgpuQueueSignal(
-                handle_self, 
-                handle_fence, 
-                signalValue
-            )
-            }
-        }
-    }
-
-    public func createFence(descriptor: FenceDescriptor? = nil) -> Fence {
-        self.withUnsafeHandle { handle_self in
-            descriptor.withOptionalCStruct { cStruct_descriptor in
-            let result = wgpuQueueCreateFence(
-                handle_self, 
-                cStruct_descriptor
-            )
-            return .init(handle: result)
             }
         }
     }
@@ -1378,20 +1312,6 @@ public class RenderBundleEncoder: Object {
         }
     }
 
-    public func setIndexBufferWithFormat(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
-        self.withUnsafeHandle { handle_self in
-            buffer.withUnsafeHandle { handle_buffer in
-            wgpuRenderBundleEncoderSetIndexBufferWithFormat(
-                handle_self, 
-                handle_buffer, 
-                format.cValue, 
-                offset, 
-                size
-            )
-            }
-        }
-    }
-
     public func finish(descriptor: RenderBundleDescriptor? = nil) -> RenderBundle {
         self.withUnsafeHandle { handle_self in
             descriptor.withOptionalCStruct { cStruct_descriptor in
@@ -1625,20 +1545,6 @@ public class RenderPassEncoder: Object {
         self.withUnsafeHandle { handle_self in
             buffer.withUnsafeHandle { handle_buffer in
             wgpuRenderPassEncoderSetIndexBuffer(
-                handle_self, 
-                handle_buffer, 
-                format.cValue, 
-                offset, 
-                size
-            )
-            }
-        }
-    }
-
-    public func setIndexBufferWithFormat(buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
-        self.withUnsafeHandle { handle_self in
-            buffer.withUnsafeHandle { handle_buffer in
-            wgpuRenderPassEncoderSetIndexBufferWithFormat(
                 handle_self, 
                 handle_buffer, 
                 format.cValue, 

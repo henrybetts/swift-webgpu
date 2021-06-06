@@ -72,7 +72,6 @@ public struct TextureUsage: OptionSet {
     public static let copyDst = TextureUsage(rawValue: 2)
     public static let sampled = TextureUsage(rawValue: 4)
     public static let storage = TextureUsage(rawValue: 8)
-    public static let outputAttachment = TextureUsage(rawValue: 16)
     public static let renderAttachment = TextureUsage(rawValue: 16)
     public static let present = TextureUsage(rawValue: 32)
 }

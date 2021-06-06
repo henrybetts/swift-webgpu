@@ -51,7 +51,7 @@ public struct AdapterProperties: CStructConvertible, Extensible {
     }
 }
 
-public struct BindGroupEntry: CStructConvertible {
+public struct BindGroupEntry: CStructConvertible, Extensible {
     typealias CStruct = WGPUBindGroupEntry
 
     public var binding: UInt32
@@ -60,6 +60,8 @@ public struct BindGroupEntry: CStructConvertible {
     public var size: UInt64
     public var sampler: Sampler?
     public var textureView: TextureView?
+
+    public var nextInChain: Chained?
 
     public init(binding: UInt32, buffer: Buffer? = nil, offset: UInt64 = 0, size: UInt64, sampler: Sampler? = nil, textureView: TextureView? = nil) {
         self.binding = binding
@@ -70,20 +72,23 @@ public struct BindGroupEntry: CStructConvertible {
         self.textureView = textureView
     }
 
-    init(cStruct: WGPUBindGroupEntry) {
-        self.binding = cStruct.binding
-        self.buffer = cStruct.buffer != nil ? .init(handle: cStruct.buffer) : nil
-        self.offset = cStruct.offset
-        self.size = cStruct.size
-        self.sampler = cStruct.sampler != nil ? .init(handle: cStruct.sampler) : nil
-        self.textureView = cStruct.textureView != nil ? .init(handle: cStruct.textureView) : nil
+    public init(binding: UInt32, buffer: Buffer?, offset: UInt64, size: UInt64, sampler: Sampler?, textureView: TextureView?, nextInChain: Chained?) {
+        self.binding = binding
+        self.buffer = buffer
+        self.offset = offset
+        self.size = size
+        self.sampler = sampler
+        self.textureView = textureView
+        self.nextInChain = nextInChain
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupEntry>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.buffer.withOptionalHandle { handle_buffer in
         return try self.sampler.withOptionalHandle { handle_sampler in
         return try self.textureView.withOptionalHandle { handle_textureView in
         var cStruct = WGPUBindGroupEntry(
+            nextInChain: chainedCStruct, 
             binding: self.binding, 
             buffer: handle_buffer, 
             offset: self.offset, 
@@ -92,6 +97,7 @@ public struct BindGroupEntry: CStructConvertible {
             textureView: handle_textureView
         )
         return try body(&cStruct)
+        }
         }
         }
         }
@@ -237,6 +243,72 @@ public struct TextureBindingLayout: CStructConvertible, Extensible {
     }
 }
 
+public struct ExternalTextureBindingEntry: CStructConvertible, Chained {
+    typealias CStruct = WGPUExternalTextureBindingEntry
+
+    public var externalTexture: ExternalTexture
+
+    public var nextInChain: Chained?
+
+    public init(externalTexture: ExternalTexture) {
+        self.externalTexture = externalTexture
+    }
+
+    public init(externalTexture: ExternalTexture, nextInChain: Chained?) {
+        self.externalTexture = externalTexture
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUExternalTextureBindingEntry>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.externalTexture.withUnsafeHandle { handle_externalTexture in
+        var cStruct = WGPUExternalTextureBindingEntry(
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_ExternalTextureBindingEntry), 
+            externalTexture: handle_externalTexture
+        )
+        return try body(&cStruct)
+        }
+        }
+    }
+
+    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
+        return try withCStruct { cStruct in
+            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
+            return try body(chainedCStruct)
+        }
+    }
+}
+
+public struct ExternalTextureBindingLayout: CStructConvertible, Chained {
+    typealias CStruct = WGPUExternalTextureBindingLayout
+
+
+    public var nextInChain: Chained?
+
+    public init() {
+    }
+
+    public init(nextInChain: Chained?) {
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUExternalTextureBindingLayout>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        var cStruct = WGPUExternalTextureBindingLayout(
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_ExternalTextureBindingLayout)
+        )
+        return try body(&cStruct)
+        }
+    }
+
+    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
+        return try withCStruct { cStruct in
+            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
+            return try body(chainedCStruct)
+        }
+    }
+}
+
 public struct StorageTextureBindingLayout: CStructConvertible, Extensible {
     typealias CStruct = WGPUStorageTextureBindingLayout
 
@@ -277,12 +349,6 @@ public struct BindGroupLayoutEntry: CStructConvertible, Extensible {
 
     public var binding: UInt32
     public var visibility: ShaderStage
-    public var type: BindingType
-    public var hasDynamicOffset: Bool
-    public var minBufferBindingSize: UInt64
-    public var viewDimension: TextureViewDimension
-    public var textureComponentType: TextureComponentType
-    public var storageTextureFormat: TextureFormat
     public var buffer: BufferBindingLayout
     public var sampler: SamplerBindingLayout
     public var texture: TextureBindingLayout
@@ -290,30 +356,18 @@ public struct BindGroupLayoutEntry: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(binding: UInt32, visibility: ShaderStage, type: BindingType = .undefined, hasDynamicOffset: Bool = false, minBufferBindingSize: UInt64 = 0, viewDimension: TextureViewDimension = .typeUndefined, textureComponentType: TextureComponentType = .float, storageTextureFormat: TextureFormat = .undefined, buffer: BufferBindingLayout = BufferBindingLayout(), sampler: SamplerBindingLayout = SamplerBindingLayout(), texture: TextureBindingLayout = TextureBindingLayout(), storageTexture: StorageTextureBindingLayout = StorageTextureBindingLayout()) {
+    public init(binding: UInt32, visibility: ShaderStage, buffer: BufferBindingLayout = BufferBindingLayout(), sampler: SamplerBindingLayout = SamplerBindingLayout(), texture: TextureBindingLayout = TextureBindingLayout(), storageTexture: StorageTextureBindingLayout = StorageTextureBindingLayout()) {
         self.binding = binding
         self.visibility = visibility
-        self.type = type
-        self.hasDynamicOffset = hasDynamicOffset
-        self.minBufferBindingSize = minBufferBindingSize
-        self.viewDimension = viewDimension
-        self.textureComponentType = textureComponentType
-        self.storageTextureFormat = storageTextureFormat
         self.buffer = buffer
         self.sampler = sampler
         self.texture = texture
         self.storageTexture = storageTexture
     }
 
-    public init(binding: UInt32, visibility: ShaderStage, type: BindingType, hasDynamicOffset: Bool, minBufferBindingSize: UInt64, viewDimension: TextureViewDimension, textureComponentType: TextureComponentType, storageTextureFormat: TextureFormat, buffer: BufferBindingLayout, sampler: SamplerBindingLayout, texture: TextureBindingLayout, storageTexture: StorageTextureBindingLayout, nextInChain: Chained?) {
+    public init(binding: UInt32, visibility: ShaderStage, buffer: BufferBindingLayout, sampler: SamplerBindingLayout, texture: TextureBindingLayout, storageTexture: StorageTextureBindingLayout, nextInChain: Chained?) {
         self.binding = binding
         self.visibility = visibility
-        self.type = type
-        self.hasDynamicOffset = hasDynamicOffset
-        self.minBufferBindingSize = minBufferBindingSize
-        self.viewDimension = viewDimension
-        self.textureComponentType = textureComponentType
-        self.storageTextureFormat = storageTextureFormat
         self.buffer = buffer
         self.sampler = sampler
         self.texture = texture
@@ -331,12 +385,6 @@ public struct BindGroupLayoutEntry: CStructConvertible, Extensible {
             nextInChain: chainedCStruct, 
             binding: self.binding, 
             visibility: self.visibility.rawValue, 
-            type: self.type.cValue, 
-            hasDynamicOffset: self.hasDynamicOffset, 
-            minBufferBindingSize: self.minBufferBindingSize, 
-            viewDimension: self.viewDimension.cValue, 
-            textureComponentType: self.textureComponentType.cValue, 
-            storageTextureFormat: self.storageTextureFormat.cValue, 
             buffer: cStruct_buffer.pointee, 
             sampler: cStruct_sampler.pointee, 
             texture: cStruct_texture.pointee, 
@@ -413,49 +461,6 @@ public struct BlendComponent: CStructConvertible {
             dstFactor: self.dstFactor.cValue
         )
         return try body(&cStruct)
-    }
-}
-
-public struct ColorStateDescriptor: CStructConvertible, Extensible {
-    typealias CStruct = WGPUColorStateDescriptor
-
-    public var format: TextureFormat
-    public var alphaBlend: BlendComponent
-    public var colorBlend: BlendComponent
-    public var writeMask: ColorWriteMask
-
-    public var nextInChain: Chained?
-
-    public init(format: TextureFormat, alphaBlend: BlendComponent = BlendComponent(), colorBlend: BlendComponent = BlendComponent(), writeMask: ColorWriteMask = .all) {
-        self.format = format
-        self.alphaBlend = alphaBlend
-        self.colorBlend = colorBlend
-        self.writeMask = writeMask
-    }
-
-    public init(format: TextureFormat, alphaBlend: BlendComponent, colorBlend: BlendComponent, writeMask: ColorWriteMask, nextInChain: Chained?) {
-        self.format = format
-        self.alphaBlend = alphaBlend
-        self.colorBlend = colorBlend
-        self.writeMask = writeMask
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPUColorStateDescriptor>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.alphaBlend.withCStruct { cStruct_alphaBlend in
-        return try self.colorBlend.withCStruct { cStruct_colorBlend in
-        var cStruct = WGPUColorStateDescriptor(
-            nextInChain: chainedCStruct, 
-            format: self.format.cValue, 
-            alphaBlend: cStruct_alphaBlend.pointee, 
-            colorBlend: cStruct_colorBlend.pointee, 
-            writeMask: self.writeMask.rawValue
-        )
-        return try body(&cStruct)
-        }
-        }
-        }
     }
 }
 
@@ -796,89 +801,30 @@ public struct DeviceProperties: CStructConvertible {
     }
 }
 
-public struct DepthStencilStateDescriptor: CStructConvertible, Extensible {
-    typealias CStruct = WGPUDepthStencilStateDescriptor
-
-    public var format: TextureFormat
-    public var depthWriteEnabled: Bool
-    public var depthCompare: CompareFunction
-    public var stencilFront: StencilFaceState
-    public var stencilBack: StencilFaceState
-    public var stencilReadMask: UInt32
-    public var stencilWriteMask: UInt32
-
-    public var nextInChain: Chained?
-
-    public init(format: TextureFormat, depthWriteEnabled: Bool = false, depthCompare: CompareFunction = .always, stencilFront: StencilFaceState = StencilFaceState(), stencilBack: StencilFaceState = StencilFaceState(), stencilReadMask: UInt32 = 0xFFFFFFFF, stencilWriteMask: UInt32 = 0xFFFFFFFF) {
-        self.format = format
-        self.depthWriteEnabled = depthWriteEnabled
-        self.depthCompare = depthCompare
-        self.stencilFront = stencilFront
-        self.stencilBack = stencilBack
-        self.stencilReadMask = stencilReadMask
-        self.stencilWriteMask = stencilWriteMask
-    }
-
-    public init(format: TextureFormat, depthWriteEnabled: Bool, depthCompare: CompareFunction, stencilFront: StencilFaceState, stencilBack: StencilFaceState, stencilReadMask: UInt32, stencilWriteMask: UInt32, nextInChain: Chained?) {
-        self.format = format
-        self.depthWriteEnabled = depthWriteEnabled
-        self.depthCompare = depthCompare
-        self.stencilFront = stencilFront
-        self.stencilBack = stencilBack
-        self.stencilReadMask = stencilReadMask
-        self.stencilWriteMask = stencilWriteMask
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPUDepthStencilStateDescriptor>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.stencilFront.withCStruct { cStruct_stencilFront in
-        return try self.stencilBack.withCStruct { cStruct_stencilBack in
-        var cStruct = WGPUDepthStencilStateDescriptor(
-            nextInChain: chainedCStruct, 
-            format: self.format.cValue, 
-            depthWriteEnabled: self.depthWriteEnabled, 
-            depthCompare: self.depthCompare.cValue, 
-            stencilFront: cStruct_stencilFront.pointee, 
-            stencilBack: cStruct_stencilBack.pointee, 
-            stencilReadMask: self.stencilReadMask, 
-            stencilWriteMask: self.stencilWriteMask
-        )
-        return try body(&cStruct)
-        }
-        }
-        }
-    }
-}
-
 public struct Extent3d: CStructConvertible {
     typealias CStruct = WGPUExtent3D
 
     public var width: UInt32
     public var height: UInt32
     public var depthOrArrayLayers: UInt32
-    public var depth: UInt32
 
-    public init(width: UInt32, height: UInt32 = 1, depthOrArrayLayers: UInt32 = 1, depth: UInt32 = 1) {
+    public init(width: UInt32, height: UInt32 = 1, depthOrArrayLayers: UInt32 = 1) {
         self.width = width
         self.height = height
         self.depthOrArrayLayers = depthOrArrayLayers
-        self.depth = depth
     }
 
     init(cStruct: WGPUExtent3D) {
         self.width = cStruct.width
         self.height = cStruct.height
         self.depthOrArrayLayers = cStruct.depthOrArrayLayers
-        self.depth = cStruct.depth
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUExtent3D>) throws -> R) rethrows -> R {
         var cStruct = WGPUExtent3D(
             width: self.width, 
             height: self.height, 
-            depthOrArrayLayers: self.depthOrArrayLayers, 
-            depth: self.depth
+            depthOrArrayLayers: self.depthOrArrayLayers
         )
         return try body(&cStruct)
     }
@@ -910,39 +856,6 @@ public struct ExternalTextureDescriptor: CStructConvertible, Extensible {
             nextInChain: chainedCStruct, 
             plane0: handle_plane0, 
             format: self.format.cValue
-        )
-        return try body(&cStruct)
-        }
-        }
-    }
-}
-
-public struct FenceDescriptor: CStructConvertible, Extensible {
-    typealias CStruct = WGPUFenceDescriptor
-
-    public var label: String?
-    public var initialValue: UInt64
-
-    public var nextInChain: Chained?
-
-    public init(label: String? = nil, initialValue: UInt64 = 0) {
-        self.label = label
-        self.initialValue = initialValue
-    }
-
-    public init(label: String?, initialValue: UInt64, nextInChain: Chained?) {
-        self.label = label
-        self.initialValue = initialValue
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPUFenceDescriptor>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.label.withOptionalCString { cString_label in
-        var cStruct = WGPUFenceDescriptor(
-            nextInChain: chainedCStruct, 
-            label: cString_label, 
-            initialValue: self.initialValue
         )
         return try body(&cStruct)
         }
@@ -1112,40 +1025,6 @@ public struct VertexBufferLayout: CStructConvertible {
     }
 }
 
-public struct VertexStateDescriptor: CStructConvertible, Extensible {
-    typealias CStruct = WGPUVertexStateDescriptor
-
-    public var indexFormat: IndexFormat
-    public var vertexBuffers: [VertexBufferLayout]
-
-    public var nextInChain: Chained?
-
-    public init(indexFormat: IndexFormat = .undefined, vertexBuffers: [VertexBufferLayout]) {
-        self.indexFormat = indexFormat
-        self.vertexBuffers = vertexBuffers
-    }
-
-    public init(indexFormat: IndexFormat, vertexBuffers: [VertexBufferLayout], nextInChain: Chained?) {
-        self.indexFormat = indexFormat
-        self.vertexBuffers = vertexBuffers
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexStateDescriptor>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.vertexBuffers.withCStructBufferPointer { buffer_vertexBuffers in
-        var cStruct = WGPUVertexStateDescriptor(
-            nextInChain: chainedCStruct, 
-            indexFormat: self.indexFormat.cValue, 
-            vertexBufferCount: .init(buffer_vertexBuffers.count), 
-            vertexBuffers: buffer_vertexBuffers.baseAddress
-        )
-        return try body(&cStruct)
-        }
-        }
-    }
-}
-
 public struct Origin3d: CStructConvertible {
     typealias CStruct = WGPUOrigin3D
 
@@ -1286,49 +1165,6 @@ public struct QuerySetDescriptor: CStructConvertible, Extensible {
         return try body(&cStruct)
         }
         }
-        }
-    }
-}
-
-public struct RasterizationStateDescriptor: CStructConvertible, Extensible {
-    typealias CStruct = WGPURasterizationStateDescriptor
-
-    public var frontFace: FrontFace
-    public var cullMode: CullMode
-    public var depthBias: Int32
-    public var depthBiasSlopeScale: Float
-    public var depthBiasClamp: Float
-
-    public var nextInChain: Chained?
-
-    public init(frontFace: FrontFace = .ccw, cullMode: CullMode = .none, depthBias: Int32 = 0, depthBiasSlopeScale: Float = 0.0, depthBiasClamp: Float = 0.0) {
-        self.frontFace = frontFace
-        self.cullMode = cullMode
-        self.depthBias = depthBias
-        self.depthBiasSlopeScale = depthBiasSlopeScale
-        self.depthBiasClamp = depthBiasClamp
-    }
-
-    public init(frontFace: FrontFace, cullMode: CullMode, depthBias: Int32, depthBiasSlopeScale: Float, depthBiasClamp: Float, nextInChain: Chained?) {
-        self.frontFace = frontFace
-        self.cullMode = cullMode
-        self.depthBias = depthBias
-        self.depthBiasSlopeScale = depthBiasSlopeScale
-        self.depthBiasClamp = depthBiasClamp
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPURasterizationStateDescriptor>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        var cStruct = WGPURasterizationStateDescriptor(
-            nextInChain: chainedCStruct, 
-            frontFace: self.frontFace.cValue, 
-            cullMode: self.cullMode.cValue, 
-            depthBias: self.depthBias, 
-            depthBiasSlopeScale: self.depthBiasSlopeScale, 
-            depthBiasClamp: self.depthBiasClamp
-        )
-        return try body(&cStruct)
         }
     }
 }
@@ -1894,94 +1730,6 @@ public struct RenderPipelineDescriptor: CStructConvertible, Extensible {
 
     public var label: String?
     public var layout: PipelineLayout?
-    public var vertexStage: ProgrammableStageDescriptor
-    public var fragmentStage: ProgrammableStageDescriptor?
-    public var vertexState: VertexStateDescriptor?
-    public var primitiveTopology: PrimitiveTopology
-    public var rasterizationState: RasterizationStateDescriptor?
-    public var sampleCount: UInt32
-    public var depthStencilState: DepthStencilStateDescriptor?
-    public var colorStates: [ColorStateDescriptor]
-    public var sampleMask: UInt32
-    public var alphaToCoverageEnabled: Bool
-
-    public var nextInChain: Chained?
-
-    public init(label: String? = nil, layout: PipelineLayout? = nil, vertexStage: ProgrammableStageDescriptor, fragmentStage: ProgrammableStageDescriptor? = nil, vertexState: VertexStateDescriptor? = nil, primitiveTopology: PrimitiveTopology, rasterizationState: RasterizationStateDescriptor? = nil, sampleCount: UInt32 = 1, depthStencilState: DepthStencilStateDescriptor? = nil, colorStates: [ColorStateDescriptor], sampleMask: UInt32 = 0xFFFFFFFF, alphaToCoverageEnabled: Bool = false) {
-        self.label = label
-        self.layout = layout
-        self.vertexStage = vertexStage
-        self.fragmentStage = fragmentStage
-        self.vertexState = vertexState
-        self.primitiveTopology = primitiveTopology
-        self.rasterizationState = rasterizationState
-        self.sampleCount = sampleCount
-        self.depthStencilState = depthStencilState
-        self.colorStates = colorStates
-        self.sampleMask = sampleMask
-        self.alphaToCoverageEnabled = alphaToCoverageEnabled
-    }
-
-    public init(label: String?, layout: PipelineLayout?, vertexStage: ProgrammableStageDescriptor, fragmentStage: ProgrammableStageDescriptor?, vertexState: VertexStateDescriptor?, primitiveTopology: PrimitiveTopology, rasterizationState: RasterizationStateDescriptor?, sampleCount: UInt32, depthStencilState: DepthStencilStateDescriptor?, colorStates: [ColorStateDescriptor], sampleMask: UInt32, alphaToCoverageEnabled: Bool, nextInChain: Chained?) {
-        self.label = label
-        self.layout = layout
-        self.vertexStage = vertexStage
-        self.fragmentStage = fragmentStage
-        self.vertexState = vertexState
-        self.primitiveTopology = primitiveTopology
-        self.rasterizationState = rasterizationState
-        self.sampleCount = sampleCount
-        self.depthStencilState = depthStencilState
-        self.colorStates = colorStates
-        self.sampleMask = sampleMask
-        self.alphaToCoverageEnabled = alphaToCoverageEnabled
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPipelineDescriptor>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.label.withOptionalCString { cString_label in
-        return try self.layout.withOptionalHandle { handle_layout in
-        return try self.vertexStage.withCStruct { cStruct_vertexStage in
-        return try self.fragmentStage.withOptionalCStruct { cStruct_fragmentStage in
-        return try self.vertexState.withOptionalCStruct { cStruct_vertexState in
-        return try self.rasterizationState.withOptionalCStruct { cStruct_rasterizationState in
-        return try self.depthStencilState.withOptionalCStruct { cStruct_depthStencilState in
-        return try self.colorStates.withCStructBufferPointer { buffer_colorStates in
-        var cStruct = WGPURenderPipelineDescriptor(
-            nextInChain: chainedCStruct, 
-            label: cString_label, 
-            layout: handle_layout, 
-            vertexStage: cStruct_vertexStage.pointee, 
-            fragmentStage: cStruct_fragmentStage, 
-            vertexState: cStruct_vertexState, 
-            primitiveTopology: self.primitiveTopology.cValue, 
-            rasterizationState: cStruct_rasterizationState, 
-            sampleCount: self.sampleCount, 
-            depthStencilState: cStruct_depthStencilState, 
-            colorStateCount: .init(buffer_colorStates.count), 
-            colorStates: buffer_colorStates.baseAddress, 
-            sampleMask: self.sampleMask, 
-            alphaToCoverageEnabled: self.alphaToCoverageEnabled
-        )
-        return try body(&cStruct)
-        }
-        }
-        }
-        }
-        }
-        }
-        }
-        }
-        }
-    }
-}
-
-public struct RenderPipelineDescriptor2: CStructConvertible, Extensible {
-    typealias CStruct = WGPURenderPipelineDescriptor2
-
-    public var label: String?
-    public var layout: PipelineLayout?
     public var vertex: VertexState
     public var primitive: PrimitiveState
     public var depthStencil: DepthStencilState?
@@ -2011,7 +1759,7 @@ public struct RenderPipelineDescriptor2: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
-    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPipelineDescriptor2>) throws -> R) rethrows -> R {
+    func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPipelineDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
         return try self.layout.withOptionalHandle { handle_layout in
@@ -2020,7 +1768,7 @@ public struct RenderPipelineDescriptor2: CStructConvertible, Extensible {
         return try self.depthStencil.withOptionalCStruct { cStruct_depthStencil in
         return try self.multisample.withCStruct { cStruct_multisample in
         return try self.fragment.withOptionalCStruct { cStruct_fragment in
-        var cStruct = WGPURenderPipelineDescriptor2(
+        var cStruct = WGPURenderPipelineDescriptor(
             nextInChain: chainedCStruct, 
             label: cString_label, 
             layout: handle_layout, 

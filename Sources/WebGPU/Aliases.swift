@@ -16,6 +16,9 @@ public typealias RenderPassColorAttachmentDescriptor = RenderPassColorAttachment
 @available(*, deprecated, renamed: "RenderPassDepthStencilAttachment")
 public typealias RenderPassDepthStencilAttachmentDescriptor = RenderPassDepthStencilAttachment
 
+@available(*, deprecated, renamed: "RenderPipelineDescriptor")
+public typealias RenderPipelineDescriptor2 = RenderPipelineDescriptor
+
 @available(*, deprecated, renamed: "StencilFaceState")
 public typealias StencilStateFaceDescriptor = StencilFaceState
 

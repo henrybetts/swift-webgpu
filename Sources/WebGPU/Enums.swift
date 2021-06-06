@@ -108,27 +108,6 @@ public enum StorageTextureAccess: UInt32 {
     }
 }
 
-public enum BindingType: UInt32 {
-    case undefined = 0
-    case uniformBuffer = 1
-    case storageBuffer = 2
-    case readonlyStorageBuffer = 3
-    case sampler = 4
-    case comparisonSampler = 5
-    case sampledTexture = 6
-    case multisampledTexture = 7
-    case readonlyStorageTexture = 8
-    case writeonlyStorageTexture = 9
-
-    init(cValue: WGPUBindingType) {
-        self.init(rawValue: cValue.rawValue)!
-    }
-
-    var cValue: WGPUBindingType {
-        return WGPUBindingType(rawValue: self.rawValue)
-    }
-}
-
 public enum BlendFactor: UInt32 {
     case zero = 0
     case one = 1
@@ -301,18 +280,18 @@ public enum ErrorType: UInt32 {
     }
 }
 
-public enum FenceCompletionStatus: UInt32 {
-    case success = 0
-    case error = 1
-    case unknown = 2
-    case deviceLost = 3
+public enum LoggingType: UInt32 {
+    case verbose = 0
+    case info = 1
+    case warning = 2
+    case error = 3
 
-    init(cValue: WGPUFenceCompletionStatus) {
+    init(cValue: WGPULoggingType) {
         self.init(rawValue: cValue.rawValue)!
     }
 
-    var cValue: WGPUFenceCompletionStatus {
-        return WGPUFenceCompletionStatus(rawValue: self.rawValue)
+    var cValue: WGPULoggingType {
+        return WGPULoggingType(rawValue: self.rawValue)
     }
 }
 
@@ -499,6 +478,8 @@ public enum SType: UInt32 {
     case shaderModuleWgslDescriptor = 6
     case primitiveDepthClampingState = 7
     case surfaceDescriptorFromWindowsCoreWindow = 8
+    case externalTextureBindingEntry = 9
+    case externalTextureBindingLayout = 10
 
     init(cValue: WGPUSType) {
         self.init(rawValue: cValue.rawValue)!
@@ -671,36 +652,6 @@ public enum VertexFormat: UInt32 {
     case sint32x2 = 28
     case sint32x3 = 29
     case sint32x4 = 30
-    case uchar2 = 101
-    case uchar4 = 102
-    case char2 = 103
-    case char4 = 104
-    case uchar2Norm = 105
-    case uchar4Norm = 106
-    case char2Norm = 107
-    case char4Norm = 108
-    case ushort2 = 109
-    case ushort4 = 110
-    case short2 = 111
-    case short4 = 112
-    case ushort2Norm = 113
-    case ushort4Norm = 114
-    case short2Norm = 115
-    case short4Norm = 116
-    case half2 = 117
-    case half4 = 118
-    case float = 119
-    case float2 = 120
-    case float3 = 121
-    case float4 = 122
-    case uint = 123
-    case uint2 = 124
-    case uint3 = 125
-    case uint4 = 126
-    case int = 127
-    case int2 = 128
-    case int3 = 129
-    case int4 = 130
 
     init(cValue: WGPUVertexFormat) {
         self.init(rawValue: cValue.rawValue)!

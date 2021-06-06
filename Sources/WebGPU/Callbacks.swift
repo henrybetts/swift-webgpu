@@ -60,12 +60,13 @@ func errorCallback(type: WGPUErrorType, message: UnsafePointer<CChar>!, userdata
     )
 }
 
-public typealias FenceOnCompletionCallback = (FenceCompletionStatus) -> ()
+public typealias LoggingCallback = (LoggingType, String) -> ()
 
-func fenceOnCompletionCallback(status: WGPUFenceCompletionStatus, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = UserData<FenceOnCompletionCallback>.takeValue(userdata)
+func loggingCallback(type: WGPULoggingType, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
+    let swiftCallback = UserData<LoggingCallback>.takeValue(userdata)
     swiftCallback(
-        .init(cValue: status)
+        .init(cValue: type), 
+        String(cString: message)
     )
 }
 
