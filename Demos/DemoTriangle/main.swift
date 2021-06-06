@@ -36,23 +36,25 @@ withGLFW {
         implementation: 0))
     
     let vertexShaderSource = """
-        [[location(0)]] var<in> position : vec4<f32>;
-        [[location(1)]] var<in> color : vec4<f32>;
-        [[builtin(position)]] var<out> Position : vec4<f32>;
-        [[location(0)]] var<out> Color: vec4<f32>;
-        [[stage(vertex)]] fn main() -> void {
-            Position = position;
-            Color = color;
-            return;
+        struct VertexOut {
+            [[builtin(position)]] position : vec4<f32>;
+            [[location(0)]] color: vec4<f32>;
+        };
+
+        [[stage(vertex)]] fn main(
+            [[location(0)]] position : vec4<f32>,
+            [[location(1)]] color : vec4<f32>) -> VertexOut {
+            var output : VertexOut;
+            output.position = position;
+            output.color = color;
+            return output;
         }
     """
     
     let fragmentShaderSource = """
-        [[location(0)]] var<in> color : vec4<f32>;
-        [[location(0)]] var<out> FragColor : vec4<f32>;
-        [[stage(fragment)]] fn main() -> void {
-            FragColor = color;
-            return;
+        [[stage(fragment)]] fn main(
+            [[location(0)]] color : vec4<f32>) -> [[location(0)]] vec4<f32> {
+            return color;
         }
     """
     
@@ -66,7 +68,7 @@ withGLFW {
             label: nil,
             nextInChain: ShaderModuleWgslDescriptor(source: fragmentShaderSource)))
     
-    let pipeline = device.createRenderPipeline2(descriptor: RenderPipelineDescriptor2(
+    let pipeline = device.createRenderPipeline(descriptor: RenderPipelineDescriptor(
         vertex: VertexState(
             module: vertexShader,
             entryPoint: "main",
