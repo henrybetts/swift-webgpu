@@ -697,19 +697,22 @@ public struct ComputePipelineDescriptor: CStructConvertible, Extensible {
 
     public var label: String?
     public var layout: PipelineLayout?
+    public var compute: ProgrammableStageDescriptor
     public var computeStage: ProgrammableStageDescriptor
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, layout: PipelineLayout? = nil, computeStage: ProgrammableStageDescriptor) {
+    public init(label: String? = nil, layout: PipelineLayout? = nil, compute: ProgrammableStageDescriptor, computeStage: ProgrammableStageDescriptor) {
         self.label = label
         self.layout = layout
+        self.compute = compute
         self.computeStage = computeStage
     }
 
-    public init(label: String?, layout: PipelineLayout?, computeStage: ProgrammableStageDescriptor, nextInChain: Chained?) {
+    public init(label: String?, layout: PipelineLayout?, compute: ProgrammableStageDescriptor, computeStage: ProgrammableStageDescriptor, nextInChain: Chained?) {
         self.label = label
         self.layout = layout
+        self.compute = compute
         self.computeStage = computeStage
         self.nextInChain = nextInChain
     }
@@ -718,14 +721,17 @@ public struct ComputePipelineDescriptor: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
         return try self.layout.withOptionalHandle { handle_layout in
+        return try self.compute.withCStruct { cStruct_compute in
         return try self.computeStage.withCStruct { cStruct_computeStage in
         var cStruct = WGPUComputePipelineDescriptor(
             nextInChain: chainedCStruct, 
             label: cString_label, 
             layout: handle_layout, 
+            compute: cStruct_compute.pointee, 
             computeStage: cStruct_computeStage.pointee
         )
         return try body(&cStruct)
+        }
         }
         }
         }
@@ -769,14 +775,16 @@ public struct DeviceProperties: CStructConvertible {
     public var timestampQuery: Bool
     public var multiPlanarFormats: Bool
     public var depthClamping: Bool
+    public var invalidExtension: Bool
 
-    public init(textureCompressionBc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false) {
+    public init(textureCompressionBc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false, invalidExtension: Bool = false) {
         self.textureCompressionBc = textureCompressionBc
         self.shaderFloat16 = shaderFloat16
         self.pipelineStatisticsQuery = pipelineStatisticsQuery
         self.timestampQuery = timestampQuery
         self.multiPlanarFormats = multiPlanarFormats
         self.depthClamping = depthClamping
+        self.invalidExtension = invalidExtension
     }
 
     init(cStruct: WGPUDeviceProperties) {
@@ -786,6 +794,7 @@ public struct DeviceProperties: CStructConvertible {
         self.timestampQuery = cStruct.timestampQuery
         self.multiPlanarFormats = cStruct.multiPlanarFormats
         self.depthClamping = cStruct.depthClamping
+        self.invalidExtension = cStruct.invalidExtension
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceProperties>) throws -> R) rethrows -> R {
@@ -795,7 +804,8 @@ public struct DeviceProperties: CStructConvertible {
             pipelineStatisticsQuery: self.pipelineStatisticsQuery, 
             timestampQuery: self.timestampQuery, 
             multiPlanarFormats: self.multiPlanarFormats, 
-            depthClamping: self.depthClamping
+            depthClamping: self.depthClamping, 
+            invalidExtension: self.invalidExtension
         )
         return try body(&cStruct)
     }
@@ -2190,6 +2200,40 @@ public struct SurfaceDescriptorFromWindowsCoreWindow: CStructConvertible, Chaine
         var cStruct = WGPUSurfaceDescriptorFromWindowsCoreWindow(
             chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_SurfaceDescriptorFromWindowsCoreWindow), 
             coreWindow: self.coreWindow
+        )
+        return try body(&cStruct)
+        }
+    }
+
+    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
+        return try withCStruct { cStruct in
+            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
+            return try body(chainedCStruct)
+        }
+    }
+}
+
+public struct SurfaceDescriptorFromWindowsSwapChainPanel: CStructConvertible, Chained {
+    typealias CStruct = WGPUSurfaceDescriptorFromWindowsSwapChainPanel
+
+    public var swapChainPanel: UnsafeMutableRawPointer!
+
+    public var nextInChain: Chained?
+
+    public init(swapChainPanel: UnsafeMutableRawPointer!) {
+        self.swapChainPanel = swapChainPanel
+    }
+
+    public init(swapChainPanel: UnsafeMutableRawPointer!, nextInChain: Chained?) {
+        self.swapChainPanel = swapChainPanel
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromWindowsSwapChainPanel>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        var cStruct = WGPUSurfaceDescriptorFromWindowsSwapChainPanel(
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_SurfaceDescriptorFromWindowsSwapChainPanel), 
+            swapChainPanel: self.swapChainPanel
         )
         return try body(&cStruct)
         }

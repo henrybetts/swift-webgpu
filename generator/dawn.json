@@ -620,6 +620,7 @@
         "members": [
             {"name": "label", "type": "char", "annotation": "const*", "length": "strlen", "optional": true},
             {"name": "layout", "type": "pipeline layout", "optional": true},
+            {"name": "compute", "type": "programmable stage descriptor"},
             {"name": "compute stage", "type": "programmable stage descriptor"}
         ]
     },
@@ -869,7 +870,8 @@
             {"name": "pipeline statistics query", "type": "bool", "default": "false"},
             {"name": "timestamp query", "type": "bool", "default": "false"},
             {"name": "multi planar formats", "type": "bool", "default": "false"},
-            {"name": "depth clamping", "type": "bool", "default": "false"}
+            {"name": "depth clamping", "type": "bool", "default": "false"},
+            {"name": "invalid extension", "type": "bool", "default": "false"}
         ]
     },
     "double": {
@@ -1784,6 +1786,14 @@
             {"name": "core window", "type": "void", "annotation": "*"}
         ]
     },
+    "surface descriptor from windows swap chain panel": {
+        "category": "structure",
+        "chained": true,
+        "javascript": false,
+        "members": [
+            {"name": "swap chain panel", "type": "void", "annotation": "*"}
+        ]
+    },
     "swap chain": {
         "category": "object",
         "methods": [
@@ -1827,7 +1837,8 @@
             {"value": 7, "name": "primitive depth clamping state"},
             {"value": 8, "name": "surface descriptor from windows core window"},
             {"value": 9, "name": "external texture binding entry"},
-            {"value": 10, "name": "external texture binding layout"}
+            {"value": 10, "name": "external texture binding layout"},
+            {"value": 11, "name": "surface descriptor from windows swap chain panel"}
         ]
     },
     "texture": {

@@ -480,6 +480,7 @@ public enum SType: UInt32 {
     case surfaceDescriptorFromWindowsCoreWindow = 8
     case externalTextureBindingEntry = 9
     case externalTextureBindingLayout = 10
+    case surfaceDescriptorFromWindowsSwapChainPanel = 11
 
     init(cValue: WGPUSType) {
         self.init(rawValue: cValue.rawValue)!
