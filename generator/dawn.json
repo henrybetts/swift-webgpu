@@ -572,7 +572,7 @@
                     {"name": "group index", "type": "uint32_t"},
                     {"name": "group", "type": "bind group"},
                     {"name": "dynamic offset count", "type": "uint32_t", "default": "0"},
-                    {"name": "dynamic offsets", "type": "uint32_t", "annotation": "const*", "length": "dynamic offset count", "optional": true}
+                    {"name": "dynamic offsets", "type": "uint32_t", "annotation": "const*", "length": "dynamic offset count", "default": "nullptr"}
                 ]
             },
             {
@@ -624,11 +624,20 @@
             {"name": "compute stage", "type": "programmable stage descriptor"}
         ]
     },
+    "alpha op": {
+        "category": "enum",
+        "values": [
+            {"value": 0, "name": "dont change"},
+            {"value": 1, "name": "premultiply"},
+            {"value": 2, "name": "unpremultiply"}
+        ]
+    },
     "copy texture for browser options": {
         "category": "structure",
         "extensible": true,
         "members": [
-            {"name": "flipY", "type": "bool", "default": "false"}
+            {"name": "flipY", "type": "bool", "default": "false"},
+            {"name": "alphaOp", "type": "alpha op", "default": "dont change"}
         ]
     },
     "create compute pipeline async callback": {
@@ -1229,7 +1238,7 @@
                     {"name": "group index", "type": "uint32_t"},
                     {"name": "group", "type": "bind group"},
                     {"name": "dynamic offset count", "type": "uint32_t", "default": "0"},
-                    {"name": "dynamic offsets", "type": "uint32_t", "annotation": "const*", "length": "dynamic offset count", "optional": true}
+                    {"name": "dynamic offsets", "type": "uint32_t", "annotation": "const*", "length": "dynamic offset count", "default": "nullptr"}
                 ]
             },
             {
@@ -1393,7 +1402,7 @@
                     {"name": "group index", "type": "uint32_t"},
                     {"name": "group", "type": "bind group"},
                     {"name": "dynamic offset count", "type": "uint32_t", "default": "0"},
-                    {"name": "dynamic offsets", "type": "uint32_t", "annotation": "const*", "length": "dynamic offset count", "optional": true}
+                    {"name": "dynamic offsets", "type": "uint32_t", "annotation": "const*", "length": "dynamic offset count", "default": "nullptr"}
                 ]
             },
             {

@@ -743,15 +743,18 @@ public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
     typealias CStruct = WGPUCopyTextureForBrowserOptions
 
     public var flipy: Bool
+    public var alphaop: AlphaOp
 
     public var nextInChain: Chained?
 
-    public init(flipy: Bool = false) {
+    public init(flipy: Bool = false, alphaop: AlphaOp = .dontChange) {
         self.flipy = flipy
+        self.alphaop = alphaop
     }
 
-    public init(flipy: Bool, nextInChain: Chained?) {
+    public init(flipy: Bool, alphaop: AlphaOp, nextInChain: Chained?) {
         self.flipy = flipy
+        self.alphaop = alphaop
         self.nextInChain = nextInChain
     }
 
@@ -759,7 +762,8 @@ public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUCopyTextureForBrowserOptions(
             nextInChain: chainedCStruct, 
-            flipY: self.flipy
+            flipY: self.flipy, 
+            alphaOp: self.alphaop.cValue
         )
         return try body(&cStruct)
         }

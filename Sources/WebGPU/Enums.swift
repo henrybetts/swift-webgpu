@@ -220,6 +220,20 @@ public enum CompilationMessageType: UInt32 {
     }
 }
 
+public enum AlphaOp: UInt32 {
+    case dontChange = 0
+    case premultiply = 1
+    case unpremultiply = 2
+
+    init(cValue: WGPUAlphaOp) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUAlphaOp {
+        return WGPUAlphaOp(rawValue: self.rawValue)
+    }
+}
+
 public enum CreatePipelineAsyncStatus: UInt32 {
     case success = 0
     case error = 1
