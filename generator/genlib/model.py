@@ -112,6 +112,10 @@ class Member:
         return swift_safe(camel_case(self.name.lower()))
 
     @property
+    def nullable(self) -> bool:
+        return self.optional or self.default == 'nullptr'
+
+    @property
     def c_type(self) -> str:
         if self.type.name == 'void' and self.annotation == 'const*':
             return 'UnsafeRawPointer!'
@@ -153,7 +157,7 @@ class Member:
         if self.type.category == 'callback':
             swift_type = '@escaping ' + swift_type
 
-        if self.optional:
+        if self.nullable:
             swift_type += '?'
 
         return swift_type
@@ -169,7 +173,7 @@ class Member:
             return typeconversion.userdata_conversion
 
         if self.type.name == 'char' and self.annotation == 'const*':
-            return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
+            return typeconversion.optional_string_conversion if self.nullable else typeconversion.string_conversion
 
         if self.annotation == 'const*' and self.length:
             if self.type.name == 'void':
@@ -184,7 +188,7 @@ class Member:
             if self.type.category == 'object':
                 return typeconversion.object_array_conversion
 
-            if self.optional:
+            if self.nullable:
                 return typeconversion.optional_implicit_array_conversion
 
             return typeconversion.implicit_array_conversion
@@ -196,14 +200,14 @@ class Member:
             return typeconversion.bitmask_conversion
 
         if self.type.category == 'structure':
-            if self.optional:
+            if self.nullable:
                 return typeconversion.optional_struct_conversion
             if self.annotation == 'const*':
                 return typeconversion.struct_pointer_conversion
             return typeconversion.struct_conversion
 
         if self.type.category == 'object':
-            return typeconversion.optional_object_conversion if self.optional else typeconversion.object_conversion
+            return typeconversion.optional_object_conversion if self.nullable else typeconversion.object_conversion
 
         if isinstance(self.type, CallbackType):
             return typeconversion.Conversion(self.type.function_name)
@@ -216,7 +220,7 @@ class Member:
 
     @property
     def default_swift_value(self) -> Optional[str]:
-        if self.optional:
+        if self.nullable:
             return 'nil'
 
         if self.default:

@@ -433,10 +433,10 @@ public class ComputePassEncoder: Object {
         }
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32] = nullptr) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]? = nil) {
         self.withUnsafeHandle { handle_self in
             group.withUnsafeHandle { handle_group in
-            dynamicOffsets.withUnsafeBufferPointer { buffer_dynamicOffsets in
+            dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
             wgpuComputePassEncoderSetBindGroup(
                 handle_self, 
                 groupIndex, 
@@ -1189,10 +1189,10 @@ public class RenderBundleEncoder: Object {
         }
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32] = nullptr) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]? = nil) {
         self.withUnsafeHandle { handle_self in
             group.withUnsafeHandle { handle_group in
-            dynamicOffsets.withUnsafeBufferPointer { buffer_dynamicOffsets in
+            dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
             wgpuRenderBundleEncoderSetBindGroup(
                 handle_self, 
                 groupIndex, 
@@ -1363,10 +1363,10 @@ public class RenderPassEncoder: Object {
         }
     }
 
-    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32] = nullptr) {
+    public func setBindGroup(groupIndex: UInt32, group: BindGroup, dynamicOffsets: [UInt32]? = nil) {
         self.withUnsafeHandle { handle_self in
             group.withUnsafeHandle { handle_group in
-            dynamicOffsets.withUnsafeBufferPointer { buffer_dynamicOffsets in
+            dynamicOffsets.withOptionalUnsafeBufferPointer { buffer_dynamicOffsets in
             wgpuRenderPassEncoderSetBindGroup(
                 handle_self, 
                 groupIndex, 
