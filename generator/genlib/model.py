@@ -109,7 +109,10 @@ class Member:
 
     @property
     def swift_name(self) -> str:
-        return swift_safe(camel_case(self.name.lower()))
+        if ' ' in self.name:
+            return swift_safe(camel_case(self.name.lower()))
+        else:
+            return swift_safe(self.name)
 
     @property
     def nullable(self) -> bool:

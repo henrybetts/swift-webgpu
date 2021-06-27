@@ -742,19 +742,19 @@ public struct ComputePipelineDescriptor: CStructConvertible, Extensible {
 public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
     typealias CStruct = WGPUCopyTextureForBrowserOptions
 
-    public var flipy: Bool
-    public var alphaop: AlphaOp
+    public var flipY: Bool
+    public var alphaOp: AlphaOp
 
     public var nextInChain: Chained?
 
-    public init(flipy: Bool = false, alphaop: AlphaOp = .dontChange) {
-        self.flipy = flipy
-        self.alphaop = alphaop
+    public init(flipY: Bool = false, alphaOp: AlphaOp = .dontChange) {
+        self.flipY = flipY
+        self.alphaOp = alphaOp
     }
 
-    public init(flipy: Bool, alphaop: AlphaOp, nextInChain: Chained?) {
-        self.flipy = flipy
-        self.alphaop = alphaop
+    public init(flipY: Bool, alphaOp: AlphaOp, nextInChain: Chained?) {
+        self.flipY = flipY
+        self.alphaOp = alphaOp
         self.nextInChain = nextInChain
     }
 
@@ -762,8 +762,8 @@ public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUCopyTextureForBrowserOptions(
             nextInChain: chainedCStruct, 
-            flipY: self.flipy, 
-            alphaOp: self.alphaop.cValue
+            flipY: self.flipY, 
+            alphaOp: self.alphaOp.cValue
         )
         return try body(&cStruct)
         }
