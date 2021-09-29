@@ -1,10 +1,47 @@
 import CWebGPU
 
+public struct RequestAdapterOptions: CStructConvertible, Extensible {
+    typealias CStruct = WGPURequestAdapterOptions
+
+    public var compatibleSurface: Surface
+    public var powerPreference: PowerPreference
+    public var forceFallbackAdapter: Bool
+
+    public var nextInChain: Chained?
+
+    public init(compatibleSurface: Surface, powerPreference: PowerPreference, forceFallbackAdapter: Bool) {
+        self.compatibleSurface = compatibleSurface
+        self.powerPreference = powerPreference
+        self.forceFallbackAdapter = forceFallbackAdapter
+    }
+
+    public init(compatibleSurface: Surface, powerPreference: PowerPreference, forceFallbackAdapter: Bool, nextInChain: Chained?) {
+        self.compatibleSurface = compatibleSurface
+        self.powerPreference = powerPreference
+        self.forceFallbackAdapter = forceFallbackAdapter
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPURequestAdapterOptions>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.compatibleSurface.withUnsafeHandle { handle_compatibleSurface in
+        var cStruct = WGPURequestAdapterOptions(
+            nextInChain: chainedCStruct, 
+            compatibleSurface: handle_compatibleSurface, 
+            powerPreference: self.powerPreference.cValue, 
+            forceFallbackAdapter: self.forceFallbackAdapter
+        )
+        return try body(&cStruct)
+        }
+        }
+    }
+}
+
 public struct AdapterProperties: CStructConvertible, Extensible {
     typealias CStruct = WGPUAdapterProperties
 
-    public var deviceId: UInt32
     public var vendorId: UInt32
+    public var deviceId: UInt32
     public var name: String
     public var driverDescription: String
     public var adapterType: AdapterType
@@ -12,18 +49,18 @@ public struct AdapterProperties: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(deviceId: UInt32, vendorId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType) {
-        self.deviceId = deviceId
+    public init(vendorId: UInt32, deviceId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType) {
         self.vendorId = vendorId
+        self.deviceId = deviceId
         self.name = name
         self.driverDescription = driverDescription
         self.adapterType = adapterType
         self.backendType = backendType
     }
 
-    public init(deviceId: UInt32, vendorId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType, nextInChain: Chained?) {
-        self.deviceId = deviceId
+    public init(vendorId: UInt32, deviceId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType, nextInChain: Chained?) {
         self.vendorId = vendorId
+        self.deviceId = deviceId
         self.name = name
         self.driverDescription = driverDescription
         self.adapterType = adapterType
@@ -37,12 +74,48 @@ public struct AdapterProperties: CStructConvertible, Extensible {
         return try self.driverDescription.withCString { cString_driverDescription in
         var cStruct = WGPUAdapterProperties(
             nextInChain: chainedCStruct, 
-            deviceID: self.deviceId, 
             vendorID: self.vendorId, 
+            deviceID: self.deviceId, 
             name: cString_name, 
             driverDescription: cString_driverDescription, 
             adapterType: self.adapterType.cValue, 
             backendType: self.backendType.cValue
+        )
+        return try body(&cStruct)
+        }
+        }
+        }
+    }
+}
+
+public struct DeviceDescriptor: CStructConvertible, Extensible {
+    typealias CStruct = WGPUDeviceDescriptor
+
+    public var requiredFeatures: [FeatureName]
+    public var requiredLimits: RequiredLimits
+
+    public var nextInChain: Chained?
+
+    public init(requiredFeatures: [FeatureName], requiredLimits: RequiredLimits) {
+        self.requiredFeatures = requiredFeatures
+        self.requiredLimits = requiredLimits
+    }
+
+    public init(requiredFeatures: [FeatureName], requiredLimits: RequiredLimits, nextInChain: Chained?) {
+        self.requiredFeatures = requiredFeatures
+        self.requiredLimits = requiredLimits
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceDescriptor>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.requiredFeatures.map { $0.cValue }.withUnsafeBufferPointer { buffer_requiredFeatures in
+        return try self.requiredLimits.withCStruct { cStruct_requiredLimits in
+        var cStruct = WGPUDeviceDescriptor(
+            nextInChain: chainedCStruct, 
+            requiredFeaturesCount: .init(buffer_requiredFeatures.count), 
+            requiredFeatures: buffer_requiredFeatures.baseAddress, 
+            requiredLimits: cStruct_requiredLimits
         )
         return try body(&cStruct)
         }
@@ -538,6 +611,39 @@ public struct Color: CStructConvertible {
     }
 }
 
+public struct ConstantEntry: CStructConvertible, Extensible {
+    typealias CStruct = WGPUConstantEntry
+
+    public var key: String
+    public var value: Double
+
+    public var nextInChain: Chained?
+
+    public init(key: String, value: Double) {
+        self.key = key
+        self.value = value
+    }
+
+    public init(key: String, value: Double, nextInChain: Chained?) {
+        self.key = key
+        self.value = value
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUConstantEntry>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.key.withCString { cString_key in
+        var cStruct = WGPUConstantEntry(
+            nextInChain: chainedCStruct, 
+            key: cString_key, 
+            value: self.value
+        )
+        return try body(&cStruct)
+        }
+        }
+    }
+}
+
 public struct CommandBufferDescriptor: CStructConvertible, Extensible {
     typealias CStruct = WGPUCommandBufferDescriptor
 
@@ -698,22 +804,19 @@ public struct ComputePipelineDescriptor: CStructConvertible, Extensible {
     public var label: String?
     public var layout: PipelineLayout?
     public var compute: ProgrammableStageDescriptor
-    public var computeStage: ProgrammableStageDescriptor
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, layout: PipelineLayout? = nil, compute: ProgrammableStageDescriptor, computeStage: ProgrammableStageDescriptor) {
+    public init(label: String? = nil, layout: PipelineLayout? = nil, compute: ProgrammableStageDescriptor) {
         self.label = label
         self.layout = layout
         self.compute = compute
-        self.computeStage = computeStage
     }
 
-    public init(label: String?, layout: PipelineLayout?, compute: ProgrammableStageDescriptor, computeStage: ProgrammableStageDescriptor, nextInChain: Chained?) {
+    public init(label: String?, layout: PipelineLayout?, compute: ProgrammableStageDescriptor, nextInChain: Chained?) {
         self.label = label
         self.layout = layout
         self.compute = compute
-        self.computeStage = computeStage
         self.nextInChain = nextInChain
     }
 
@@ -722,16 +825,13 @@ public struct ComputePipelineDescriptor: CStructConvertible, Extensible {
         return try self.label.withOptionalCString { cString_label in
         return try self.layout.withOptionalHandle { handle_layout in
         return try self.compute.withCStruct { cStruct_compute in
-        return try self.computeStage.withCStruct { cStruct_computeStage in
         var cStruct = WGPUComputePipelineDescriptor(
             nextInChain: chainedCStruct, 
             label: cString_label, 
             layout: handle_layout, 
-            compute: cStruct_compute.pointee, 
-            computeStage: cStruct_computeStage.pointee
+            compute: cStruct_compute.pointee
         )
         return try body(&cStruct)
-        }
         }
         }
         }
@@ -773,45 +873,250 @@ public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
 public struct DeviceProperties: CStructConvertible {
     typealias CStruct = WGPUDeviceProperties
 
+    public var deviceId: UInt32
+    public var vendorId: UInt32
     public var textureCompressionBc: Bool
+    public var textureCompressionEtc2: Bool
+    public var textureCompressionAstc: Bool
     public var shaderFloat16: Bool
     public var pipelineStatisticsQuery: Bool
     public var timestampQuery: Bool
     public var multiPlanarFormats: Bool
     public var depthClamping: Bool
     public var invalidExtension: Bool
+    public var dawnInternalUsages: Bool
+    public var limits: SupportedLimits
 
-    public init(textureCompressionBc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false, invalidExtension: Bool = false) {
+    public init(deviceId: UInt32, vendorId: UInt32, textureCompressionBc: Bool = false, textureCompressionEtc2: Bool = false, textureCompressionAstc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false, invalidExtension: Bool = false, dawnInternalUsages: Bool = false, limits: SupportedLimits = SupportedLimits()) {
+        self.deviceId = deviceId
+        self.vendorId = vendorId
         self.textureCompressionBc = textureCompressionBc
+        self.textureCompressionEtc2 = textureCompressionEtc2
+        self.textureCompressionAstc = textureCompressionAstc
         self.shaderFloat16 = shaderFloat16
         self.pipelineStatisticsQuery = pipelineStatisticsQuery
         self.timestampQuery = timestampQuery
         self.multiPlanarFormats = multiPlanarFormats
         self.depthClamping = depthClamping
         self.invalidExtension = invalidExtension
+        self.dawnInternalUsages = dawnInternalUsages
+        self.limits = limits
     }
 
     init(cStruct: WGPUDeviceProperties) {
+        self.deviceId = cStruct.deviceID
+        self.vendorId = cStruct.vendorID
         self.textureCompressionBc = cStruct.textureCompressionBC
+        self.textureCompressionEtc2 = cStruct.textureCompressionETC2
+        self.textureCompressionAstc = cStruct.textureCompressionASTC
         self.shaderFloat16 = cStruct.shaderFloat16
         self.pipelineStatisticsQuery = cStruct.pipelineStatisticsQuery
         self.timestampQuery = cStruct.timestampQuery
         self.multiPlanarFormats = cStruct.multiPlanarFormats
         self.depthClamping = cStruct.depthClamping
         self.invalidExtension = cStruct.invalidExtension
+        self.dawnInternalUsages = cStruct.dawnInternalUsages
+        self.limits = .init(cStruct: cStruct.limits)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceProperties>) throws -> R) rethrows -> R {
+        return try self.limits.withCStruct { cStruct_limits in
         var cStruct = WGPUDeviceProperties(
+            deviceID: self.deviceId, 
+            vendorID: self.vendorId, 
             textureCompressionBC: self.textureCompressionBc, 
+            textureCompressionETC2: self.textureCompressionEtc2, 
+            textureCompressionASTC: self.textureCompressionAstc, 
             shaderFloat16: self.shaderFloat16, 
             pipelineStatisticsQuery: self.pipelineStatisticsQuery, 
             timestampQuery: self.timestampQuery, 
             multiPlanarFormats: self.multiPlanarFormats, 
             depthClamping: self.depthClamping, 
-            invalidExtension: self.invalidExtension
+            invalidExtension: self.invalidExtension, 
+            dawnInternalUsages: self.dawnInternalUsages, 
+            limits: cStruct_limits.pointee
         )
         return try body(&cStruct)
+        }
+    }
+}
+
+public struct Limits: CStructConvertible {
+    typealias CStruct = WGPULimits
+
+    public var maxTextureDimension1d: UInt32
+    public var maxTextureDimension2d: UInt32
+    public var maxTextureDimension3d: UInt32
+    public var maxTextureArrayLayers: UInt32
+    public var maxBindGroups: UInt32
+    public var maxDynamicUniformBuffersPerPipelineLayout: UInt32
+    public var maxDynamicStorageBuffersPerPipelineLayout: UInt32
+    public var maxSampledTexturesPerShaderStage: UInt32
+    public var maxSamplersPerShaderStage: UInt32
+    public var maxStorageBuffersPerShaderStage: UInt32
+    public var maxStorageTexturesPerShaderStage: UInt32
+    public var maxUniformBuffersPerShaderStage: UInt32
+    public var maxUniformBufferBindingSize: UInt64
+    public var maxStorageBufferBindingSize: UInt64
+    public var minUniformBufferOffsetAlignment: UInt32
+    public var minStorageBufferOffsetAlignment: UInt32
+    public var maxVertexBuffers: UInt32
+    public var maxVertexAttributes: UInt32
+    public var maxVertexBufferArrayStride: UInt32
+    public var maxInterStageShaderComponents: UInt32
+    public var maxComputeWorkgroupStorageSize: UInt32
+    public var maxComputeInvocationsPerWorkgroup: UInt32
+    public var maxComputeWorkgroupSizeX: UInt32
+    public var maxComputeWorkgroupSizeY: UInt32
+    public var maxComputeWorkgroupSizeZ: UInt32
+    public var maxComputeWorkgroupsPerDimension: UInt32
+
+    public init(maxTextureDimension1d: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxTextureDimension2d: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxTextureDimension3d: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxTextureArrayLayers: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxBindGroups: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxDynamicUniformBuffersPerPipelineLayout: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxDynamicStorageBuffersPerPipelineLayout: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxSampledTexturesPerShaderStage: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxSamplersPerShaderStage: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxStorageBuffersPerShaderStage: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxStorageTexturesPerShaderStage: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxUniformBuffersPerShaderStage: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxUniformBufferBindingSize: UInt64 = UInt64(WGPU_LIMIT_U64_UNDEFINED), maxStorageBufferBindingSize: UInt64 = UInt64(WGPU_LIMIT_U64_UNDEFINED), minUniformBufferOffsetAlignment: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), minStorageBufferOffsetAlignment: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxVertexBuffers: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxVertexAttributes: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxVertexBufferArrayStride: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxInterStageShaderComponents: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxComputeWorkgroupStorageSize: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxComputeInvocationsPerWorkgroup: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxComputeWorkgroupSizeX: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxComputeWorkgroupSizeY: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxComputeWorkgroupSizeZ: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED), maxComputeWorkgroupsPerDimension: UInt32 = UInt32(WGPU_LIMIT_U32_UNDEFINED)) {
+        self.maxTextureDimension1d = maxTextureDimension1d
+        self.maxTextureDimension2d = maxTextureDimension2d
+        self.maxTextureDimension3d = maxTextureDimension3d
+        self.maxTextureArrayLayers = maxTextureArrayLayers
+        self.maxBindGroups = maxBindGroups
+        self.maxDynamicUniformBuffersPerPipelineLayout = maxDynamicUniformBuffersPerPipelineLayout
+        self.maxDynamicStorageBuffersPerPipelineLayout = maxDynamicStorageBuffersPerPipelineLayout
+        self.maxSampledTexturesPerShaderStage = maxSampledTexturesPerShaderStage
+        self.maxSamplersPerShaderStage = maxSamplersPerShaderStage
+        self.maxStorageBuffersPerShaderStage = maxStorageBuffersPerShaderStage
+        self.maxStorageTexturesPerShaderStage = maxStorageTexturesPerShaderStage
+        self.maxUniformBuffersPerShaderStage = maxUniformBuffersPerShaderStage
+        self.maxUniformBufferBindingSize = maxUniformBufferBindingSize
+        self.maxStorageBufferBindingSize = maxStorageBufferBindingSize
+        self.minUniformBufferOffsetAlignment = minUniformBufferOffsetAlignment
+        self.minStorageBufferOffsetAlignment = minStorageBufferOffsetAlignment
+        self.maxVertexBuffers = maxVertexBuffers
+        self.maxVertexAttributes = maxVertexAttributes
+        self.maxVertexBufferArrayStride = maxVertexBufferArrayStride
+        self.maxInterStageShaderComponents = maxInterStageShaderComponents
+        self.maxComputeWorkgroupStorageSize = maxComputeWorkgroupStorageSize
+        self.maxComputeInvocationsPerWorkgroup = maxComputeInvocationsPerWorkgroup
+        self.maxComputeWorkgroupSizeX = maxComputeWorkgroupSizeX
+        self.maxComputeWorkgroupSizeY = maxComputeWorkgroupSizeY
+        self.maxComputeWorkgroupSizeZ = maxComputeWorkgroupSizeZ
+        self.maxComputeWorkgroupsPerDimension = maxComputeWorkgroupsPerDimension
+    }
+
+    init(cStruct: WGPULimits) {
+        self.maxTextureDimension1d = cStruct.maxTextureDimension1D
+        self.maxTextureDimension2d = cStruct.maxTextureDimension2D
+        self.maxTextureDimension3d = cStruct.maxTextureDimension3D
+        self.maxTextureArrayLayers = cStruct.maxTextureArrayLayers
+        self.maxBindGroups = cStruct.maxBindGroups
+        self.maxDynamicUniformBuffersPerPipelineLayout = cStruct.maxDynamicUniformBuffersPerPipelineLayout
+        self.maxDynamicStorageBuffersPerPipelineLayout = cStruct.maxDynamicStorageBuffersPerPipelineLayout
+        self.maxSampledTexturesPerShaderStage = cStruct.maxSampledTexturesPerShaderStage
+        self.maxSamplersPerShaderStage = cStruct.maxSamplersPerShaderStage
+        self.maxStorageBuffersPerShaderStage = cStruct.maxStorageBuffersPerShaderStage
+        self.maxStorageTexturesPerShaderStage = cStruct.maxStorageTexturesPerShaderStage
+        self.maxUniformBuffersPerShaderStage = cStruct.maxUniformBuffersPerShaderStage
+        self.maxUniformBufferBindingSize = cStruct.maxUniformBufferBindingSize
+        self.maxStorageBufferBindingSize = cStruct.maxStorageBufferBindingSize
+        self.minUniformBufferOffsetAlignment = cStruct.minUniformBufferOffsetAlignment
+        self.minStorageBufferOffsetAlignment = cStruct.minStorageBufferOffsetAlignment
+        self.maxVertexBuffers = cStruct.maxVertexBuffers
+        self.maxVertexAttributes = cStruct.maxVertexAttributes
+        self.maxVertexBufferArrayStride = cStruct.maxVertexBufferArrayStride
+        self.maxInterStageShaderComponents = cStruct.maxInterStageShaderComponents
+        self.maxComputeWorkgroupStorageSize = cStruct.maxComputeWorkgroupStorageSize
+        self.maxComputeInvocationsPerWorkgroup = cStruct.maxComputeInvocationsPerWorkgroup
+        self.maxComputeWorkgroupSizeX = cStruct.maxComputeWorkgroupSizeX
+        self.maxComputeWorkgroupSizeY = cStruct.maxComputeWorkgroupSizeY
+        self.maxComputeWorkgroupSizeZ = cStruct.maxComputeWorkgroupSizeZ
+        self.maxComputeWorkgroupsPerDimension = cStruct.maxComputeWorkgroupsPerDimension
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPULimits>) throws -> R) rethrows -> R {
+        var cStruct = WGPULimits(
+            maxTextureDimension1D: self.maxTextureDimension1d, 
+            maxTextureDimension2D: self.maxTextureDimension2d, 
+            maxTextureDimension3D: self.maxTextureDimension3d, 
+            maxTextureArrayLayers: self.maxTextureArrayLayers, 
+            maxBindGroups: self.maxBindGroups, 
+            maxDynamicUniformBuffersPerPipelineLayout: self.maxDynamicUniformBuffersPerPipelineLayout, 
+            maxDynamicStorageBuffersPerPipelineLayout: self.maxDynamicStorageBuffersPerPipelineLayout, 
+            maxSampledTexturesPerShaderStage: self.maxSampledTexturesPerShaderStage, 
+            maxSamplersPerShaderStage: self.maxSamplersPerShaderStage, 
+            maxStorageBuffersPerShaderStage: self.maxStorageBuffersPerShaderStage, 
+            maxStorageTexturesPerShaderStage: self.maxStorageTexturesPerShaderStage, 
+            maxUniformBuffersPerShaderStage: self.maxUniformBuffersPerShaderStage, 
+            maxUniformBufferBindingSize: self.maxUniformBufferBindingSize, 
+            maxStorageBufferBindingSize: self.maxStorageBufferBindingSize, 
+            minUniformBufferOffsetAlignment: self.minUniformBufferOffsetAlignment, 
+            minStorageBufferOffsetAlignment: self.minStorageBufferOffsetAlignment, 
+            maxVertexBuffers: self.maxVertexBuffers, 
+            maxVertexAttributes: self.maxVertexAttributes, 
+            maxVertexBufferArrayStride: self.maxVertexBufferArrayStride, 
+            maxInterStageShaderComponents: self.maxInterStageShaderComponents, 
+            maxComputeWorkgroupStorageSize: self.maxComputeWorkgroupStorageSize, 
+            maxComputeInvocationsPerWorkgroup: self.maxComputeInvocationsPerWorkgroup, 
+            maxComputeWorkgroupSizeX: self.maxComputeWorkgroupSizeX, 
+            maxComputeWorkgroupSizeY: self.maxComputeWorkgroupSizeY, 
+            maxComputeWorkgroupSizeZ: self.maxComputeWorkgroupSizeZ, 
+            maxComputeWorkgroupsPerDimension: self.maxComputeWorkgroupsPerDimension
+        )
+        return try body(&cStruct)
+    }
+}
+
+public struct RequiredLimits: CStructConvertible, Extensible {
+    typealias CStruct = WGPURequiredLimits
+
+    public var limits: Limits
+
+    public var nextInChain: Chained?
+
+    public init(limits: Limits = Limits()) {
+        self.limits = limits
+    }
+
+    public init(limits: Limits, nextInChain: Chained?) {
+        self.limits = limits
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPURequiredLimits>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.limits.withCStruct { cStruct_limits in
+        var cStruct = WGPURequiredLimits(
+            nextInChain: chainedCStruct, 
+            limits: cStruct_limits.pointee
+        )
+        return try body(&cStruct)
+        }
+        }
+    }
+}
+
+public struct SupportedLimits: CStructConvertible, Extensible {
+    typealias CStruct = WGPUSupportedLimits
+
+    public var limits: Limits
+
+    public var nextInChain: Chained?
+
+    public init(limits: Limits = Limits()) {
+        self.limits = limits
+    }
+
+    public init(limits: Limits, nextInChain: Chained?) {
+        self.limits = limits
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUSupportedLimits>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.limits.withCStruct { cStruct_limits in
+        var cStruct = WGPUSupportedLimits(
+            nextInChain: chainedCStruct, 
+            limits: cStruct_limits.pointee
+        )
+        return try body(&cStruct)
+        }
+        }
     }
 }
 
@@ -1011,10 +1316,10 @@ public struct VertexBufferLayout: CStructConvertible {
     typealias CStruct = WGPUVertexBufferLayout
 
     public var arrayStride: UInt64
-    public var stepMode: InputStepMode
+    public var stepMode: VertexStepMode
     public var attributes: [VertexAttribute]
 
-    public init(arrayStride: UInt64, stepMode: InputStepMode = .vertex, attributes: [VertexAttribute]) {
+    public init(arrayStride: UInt64, stepMode: VertexStepMode = .vertex, attributes: [VertexAttribute]) {
         self.arrayStride = arrayStride
         self.stepMode = stepMode
         self.attributes = attributes
@@ -1109,17 +1414,20 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
+    public var constants: [ConstantEntry]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry]) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
     }
 
-    public init(module: ShaderModule, entryPoint: String, nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.nextInChain = nextInChain
     }
 
@@ -1127,12 +1435,16 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
+        return try self.constants.withCStructBufferPointer { buffer_constants in
         var cStruct = WGPUProgrammableStageDescriptor(
             nextInChain: chainedCStruct, 
             module: handle_module, 
-            entryPoint: cString_entryPoint
+            entryPoint: cString_entryPoint, 
+            constantCount: .init(buffer_constants.count), 
+            constants: buffer_constants.baseAddress
         )
         return try body(&cStruct)
+        }
         }
         }
         }
@@ -1259,46 +1571,40 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible, Extensible {
 public struct RenderPassColorAttachment: CStructConvertible {
     typealias CStruct = WGPURenderPassColorAttachment
 
-    public var view: TextureView?
+    public var view: TextureView
     public var resolveTarget: TextureView?
     public var loadOp: LoadOp
     public var storeOp: StoreOp
     public var clearColor: Color
-    public var attachment: TextureView?
 
-    public init(view: TextureView? = nil, resolveTarget: TextureView? = nil, loadOp: LoadOp, storeOp: StoreOp, clearColor: Color, attachment: TextureView? = nil) {
+    public init(view: TextureView, resolveTarget: TextureView? = nil, loadOp: LoadOp, storeOp: StoreOp, clearColor: Color) {
         self.view = view
         self.resolveTarget = resolveTarget
         self.loadOp = loadOp
         self.storeOp = storeOp
         self.clearColor = clearColor
-        self.attachment = attachment
     }
 
     init(cStruct: WGPURenderPassColorAttachment) {
-        self.view = cStruct.view != nil ? .init(handle: cStruct.view) : nil
+        self.view = .init(handle: cStruct.view)
         self.resolveTarget = cStruct.resolveTarget != nil ? .init(handle: cStruct.resolveTarget) : nil
         self.loadOp = .init(cValue: cStruct.loadOp)
         self.storeOp = .init(cValue: cStruct.storeOp)
         self.clearColor = .init(cStruct: cStruct.clearColor)
-        self.attachment = cStruct.attachment != nil ? .init(handle: cStruct.attachment) : nil
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassColorAttachment>) throws -> R) rethrows -> R {
-        return try self.view.withOptionalHandle { handle_view in
+        return try self.view.withUnsafeHandle { handle_view in
         return try self.resolveTarget.withOptionalHandle { handle_resolveTarget in
         return try self.clearColor.withCStruct { cStruct_clearColor in
-        return try self.attachment.withOptionalHandle { handle_attachment in
         var cStruct = WGPURenderPassColorAttachment(
             view: handle_view, 
             resolveTarget: handle_resolveTarget, 
             loadOp: self.loadOp.cValue, 
             storeOp: self.storeOp.cValue, 
-            clearColor: cStruct_clearColor.pointee, 
-            attachment: handle_attachment
+            clearColor: cStruct_clearColor.pointee
         )
         return try body(&cStruct)
-        }
         }
         }
         }
@@ -1308,7 +1614,7 @@ public struct RenderPassColorAttachment: CStructConvertible {
 public struct RenderPassDepthStencilAttachment: CStructConvertible {
     typealias CStruct = WGPURenderPassDepthStencilAttachment
 
-    public var view: TextureView?
+    public var view: TextureView
     public var depthLoadOp: LoadOp
     public var depthStoreOp: StoreOp
     public var clearDepth: Float
@@ -1317,9 +1623,8 @@ public struct RenderPassDepthStencilAttachment: CStructConvertible {
     public var stencilStoreOp: StoreOp
     public var clearStencil: UInt32
     public var stencilReadOnly: Bool
-    public var attachment: TextureView?
 
-    public init(view: TextureView? = nil, depthLoadOp: LoadOp, depthStoreOp: StoreOp, clearDepth: Float, depthReadOnly: Bool = false, stencilLoadOp: LoadOp, stencilStoreOp: StoreOp, clearStencil: UInt32 = 0, stencilReadOnly: Bool = false, attachment: TextureView? = nil) {
+    public init(view: TextureView, depthLoadOp: LoadOp, depthStoreOp: StoreOp, clearDepth: Float, depthReadOnly: Bool = false, stencilLoadOp: LoadOp, stencilStoreOp: StoreOp, clearStencil: UInt32 = 0, stencilReadOnly: Bool = false) {
         self.view = view
         self.depthLoadOp = depthLoadOp
         self.depthStoreOp = depthStoreOp
@@ -1329,11 +1634,10 @@ public struct RenderPassDepthStencilAttachment: CStructConvertible {
         self.stencilStoreOp = stencilStoreOp
         self.clearStencil = clearStencil
         self.stencilReadOnly = stencilReadOnly
-        self.attachment = attachment
     }
 
     init(cStruct: WGPURenderPassDepthStencilAttachment) {
-        self.view = cStruct.view != nil ? .init(handle: cStruct.view) : nil
+        self.view = .init(handle: cStruct.view)
         self.depthLoadOp = .init(cValue: cStruct.depthLoadOp)
         self.depthStoreOp = .init(cValue: cStruct.depthStoreOp)
         self.clearDepth = cStruct.clearDepth
@@ -1342,12 +1646,10 @@ public struct RenderPassDepthStencilAttachment: CStructConvertible {
         self.stencilStoreOp = .init(cValue: cStruct.stencilStoreOp)
         self.clearStencil = cStruct.clearStencil
         self.stencilReadOnly = cStruct.stencilReadOnly
-        self.attachment = cStruct.attachment != nil ? .init(handle: cStruct.attachment) : nil
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDepthStencilAttachment>) throws -> R) rethrows -> R {
-        return try self.view.withOptionalHandle { handle_view in
-        return try self.attachment.withOptionalHandle { handle_attachment in
+        return try self.view.withUnsafeHandle { handle_view in
         var cStruct = WGPURenderPassDepthStencilAttachment(
             view: handle_view, 
             depthLoadOp: self.depthLoadOp.cValue, 
@@ -1357,11 +1659,9 @@ public struct RenderPassDepthStencilAttachment: CStructConvertible {
             stencilLoadOp: self.stencilLoadOp.cValue, 
             stencilStoreOp: self.stencilStoreOp.cValue, 
             clearStencil: self.clearStencil, 
-            stencilReadOnly: self.stencilReadOnly, 
-            attachment: handle_attachment
+            stencilReadOnly: self.stencilReadOnly
         )
         return try body(&cStruct)
-        }
         }
     }
 }
@@ -1419,19 +1719,22 @@ public struct VertexState: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
+    public var constants: [ConstantEntry]
     public var buffers: [VertexBufferLayout]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, buffers: [VertexBufferLayout]) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], buffers: [VertexBufferLayout]) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.buffers = buffers
     }
 
-    public init(module: ShaderModule, entryPoint: String, buffers: [VertexBufferLayout], nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], buffers: [VertexBufferLayout], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.buffers = buffers
         self.nextInChain = nextInChain
     }
@@ -1440,15 +1743,19 @@ public struct VertexState: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
+        return try self.constants.withCStructBufferPointer { buffer_constants in
         return try self.buffers.withCStructBufferPointer { buffer_buffers in
         var cStruct = WGPUVertexState(
             nextInChain: chainedCStruct, 
             module: handle_module, 
             entryPoint: cString_entryPoint, 
+            constantCount: .init(buffer_constants.count), 
+            constants: buffer_constants.baseAddress, 
             bufferCount: .init(buffer_buffers.count), 
             buffers: buffer_buffers.baseAddress
         )
         return try body(&cStruct)
+        }
         }
         }
         }
@@ -1636,19 +1943,22 @@ public struct FragmentState: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
+    public var constants: [ConstantEntry]
     public var targets: [ColorTargetState]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, targets: [ColorTargetState]) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], targets: [ColorTargetState]) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.targets = targets
     }
 
-    public init(module: ShaderModule, entryPoint: String, targets: [ColorTargetState], nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], targets: [ColorTargetState], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.targets = targets
         self.nextInChain = nextInChain
     }
@@ -1657,15 +1967,19 @@ public struct FragmentState: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
+        return try self.constants.withCStructBufferPointer { buffer_constants in
         return try self.targets.withCStructBufferPointer { buffer_targets in
         var cStruct = WGPUFragmentState(
             nextInChain: chainedCStruct, 
             module: handle_module, 
             entryPoint: cString_entryPoint, 
+            constantCount: .init(buffer_constants.count), 
+            constants: buffer_constants.baseAddress, 
             targetCount: .init(buffer_targets.count), 
             targets: buffer_targets.baseAddress
         )
         return try body(&cStruct)
+        }
         }
         }
         }
@@ -2408,7 +2722,7 @@ public struct TextureViewDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, format: TextureFormat = .undefined, dimension: TextureViewDimension = .typeUndefined, baseMipLevel: UInt32 = 0, mipLevelCount: UInt32 = 0, baseArrayLayer: UInt32 = 0, arrayLayerCount: UInt32 = 0, aspect: TextureAspect = .all) {
+    public init(label: String? = nil, format: TextureFormat = .undefined, dimension: TextureViewDimension = .typeUndefined, baseMipLevel: UInt32 = 0, mipLevelCount: UInt32 = UInt32(WGPU_MIP_LEVEL_COUNT_UNDEFINED), baseArrayLayer: UInt32 = 0, arrayLayerCount: UInt32 = UInt32(WGPU_ARRAY_LAYER_COUNT_UNDEFINED), aspect: TextureAspect = .all) {
         self.label = label
         self.format = format
         self.dimension = dimension
@@ -2447,6 +2761,40 @@ public struct TextureViewDescriptor: CStructConvertible, Extensible {
         )
         return try body(&cStruct)
         }
+        }
+    }
+}
+
+public struct DawnTextureInternalUsageDescriptor: CStructConvertible, Chained {
+    typealias CStruct = WGPUDawnTextureInternalUsageDescriptor
+
+    public var internalUsage: TextureUsage
+
+    public var nextInChain: Chained?
+
+    public init(internalUsage: TextureUsage = .none) {
+        self.internalUsage = internalUsage
+    }
+
+    public init(internalUsage: TextureUsage, nextInChain: Chained?) {
+        self.internalUsage = internalUsage
+        self.nextInChain = nextInChain
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUDawnTextureInternalUsageDescriptor>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        var cStruct = WGPUDawnTextureInternalUsageDescriptor(
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_DawnTextureInternalUsageDescriptor), 
+            internalUsage: self.internalUsage.rawValue
+        )
+        return try body(&cStruct)
+        }
+    }
+
+    public func withChainedCStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R {
+        return try withCStruct { cStruct in
+            let chainedCStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)
+            return try body(chainedCStruct)
         }
     }
 }

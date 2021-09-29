@@ -1,5 +1,16 @@
 import CWebGPU
 
+public typealias RequestAdapterCallback = (RequestAdapterStatus, Adapter, String) -> ()
+
+func requestAdapterCallback(status: WGPURequestAdapterStatus, adapter: WGPUAdapter!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
+    let swiftCallback = UserData<RequestAdapterCallback>.takeValue(userdata)
+    swiftCallback(
+        .init(cValue: status), 
+        .init(handle: adapter), 
+        String(cString: message)
+    )
+}
+
 public typealias BufferMapCallback = (BufferMapAsyncStatus) -> ()
 
 func bufferMapCallback(status: WGPUBufferMapAsyncStatus, userdata: UnsafeMutableRawPointer!) {
@@ -76,6 +87,17 @@ func queueWorkDoneCallback(status: WGPUQueueWorkDoneStatus, userdata: UnsafeMuta
     let swiftCallback = UserData<QueueWorkDoneCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status)
+    )
+}
+
+public typealias RequestDeviceCallback = (RequestDeviceStatus, Device, String) -> ()
+
+func requestDeviceCallback(status: WGPURequestDeviceStatus, device: WGPUDevice!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
+    let swiftCallback = UserData<RequestDeviceCallback>.takeValue(userdata)
+    swiftCallback(
+        .init(cValue: status), 
+        .init(handle: device), 
+        String(cString: message)
     )
 }
 

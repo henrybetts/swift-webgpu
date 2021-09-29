@@ -1,5 +1,20 @@
 import CWebGPU
 
+public enum RequestAdapterStatus: UInt32 {
+    case success = 0
+    case unavailable = 1
+    case error = 2
+    case unknown = 3
+
+    init(cValue: WGPURequestAdapterStatus) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPURequestAdapterStatus {
+        return WGPURequestAdapterStatus(rawValue: self.rawValue)
+    }
+}
+
 public enum AdapterType: UInt32 {
     case discreteGpu = 0
     case integratedGpu = 1
@@ -31,12 +46,13 @@ public enum AddressMode: UInt32 {
 
 public enum BackendType: UInt32 {
     case null = 0
-    case d3d11 = 1
-    case d3d12 = 2
-    case metal = 3
-    case vulkan = 4
-    case opengl = 5
-    case opengles = 6
+    case webgpu = 1
+    case d3d11 = 2
+    case d3d12 = 3
+    case metal = 4
+    case vulkan = 5
+    case opengl = 6
+    case opengles = 7
 
     init(cValue: WGPUBackendType) {
         self.init(rawValue: cValue.rawValue)!
@@ -96,8 +112,7 @@ public enum TextureSampleType: UInt32 {
 
 public enum StorageTextureAccess: UInt32 {
     case undefined = 0
-    case readOnly = 1
-    case writeOnly = 2
+    case writeOnly = 1
 
     init(cValue: WGPUStorageTextureAccess) {
         self.init(rawValue: cValue.rawValue)!
@@ -122,12 +137,6 @@ public enum BlendFactor: UInt32 {
     case srcAlphaSaturated = 10
     case constant = 11
     case oneMinusConstant = 12
-    case srcColor = 102
-    case oneMinusSrcColor = 103
-    case dstColor = 106
-    case oneMinusDstColor = 107
-    case blendColor = 111
-    case oneMinusBlendColor = 112
 
     init(cValue: WGPUBlendFactor) {
         self.init(rawValue: cValue.rawValue)!
@@ -264,6 +273,19 @@ public enum CullMode: UInt32 {
     }
 }
 
+public enum DeviceLostReason: UInt32 {
+    case undefined = 0
+    case destroyed = 1
+
+    init(cValue: WGPUDeviceLostReason) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUDeviceLostReason {
+        return WGPUDeviceLostReason(rawValue: self.rawValue)
+    }
+}
+
 public enum ErrorFilter: UInt32 {
     case none = 0
     case validation = 1
@@ -309,6 +331,26 @@ public enum LoggingType: UInt32 {
     }
 }
 
+public enum FeatureName: UInt32 {
+    case undefined = 0
+    case depthClamping = 1
+    case depth24UnormStencil8 = 2
+    case depth32FloatStencil8 = 3
+    case timestampQuery = 4
+    case pipelineStatisticsQuery = 5
+    case textureCompressionBc = 6
+    case textureCompressionEtc2 = 7
+    case textureCompressionAstc = 8
+
+    init(cValue: WGPUFeatureName) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUFeatureName {
+        return WGPUFeatureName(rawValue: self.rawValue)
+    }
+}
+
 public enum FilterMode: UInt32 {
     case nearest = 0
     case linear = 1
@@ -349,16 +391,16 @@ public enum IndexFormat: UInt32 {
     }
 }
 
-public enum InputStepMode: UInt32 {
+public enum VertexStepMode: UInt32 {
     case vertex = 0
     case instance = 1
 
-    init(cValue: WGPUInputStepMode) {
+    init(cValue: WGPUVertexStepMode) {
         self.init(rawValue: cValue.rawValue)!
     }
 
-    var cValue: WGPUInputStepMode {
-        return WGPUInputStepMode(rawValue: self.rawValue)
+    var cValue: WGPUVertexStepMode {
+        return WGPUVertexStepMode(rawValue: self.rawValue)
     }
 }
 
@@ -377,7 +419,7 @@ public enum LoadOp: UInt32 {
 
 public enum StoreOp: UInt32 {
     case store = 0
-    case clear = 1
+    case discard = 1
 
     init(cValue: WGPUStoreOp) {
         self.init(rawValue: cValue.rawValue)!
@@ -401,6 +443,19 @@ public enum PipelineStatisticName: UInt32 {
 
     var cValue: WGPUPipelineStatisticName {
         return WGPUPipelineStatisticName(rawValue: self.rawValue)
+    }
+}
+
+public enum PowerPreference: UInt32 {
+    case lowPower = 0
+    case highPerformance = 1
+
+    init(cValue: WGPUPowerPreference) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUPowerPreference {
+        return WGPUPowerPreference(rawValue: self.rawValue)
     }
 }
 
@@ -463,6 +518,20 @@ public enum QueueWorkDoneStatus: UInt32 {
     }
 }
 
+public enum RequestDeviceStatus: UInt32 {
+    case success = 0
+    case error = 1
+    case unknown = 2
+
+    init(cValue: WGPURequestDeviceStatus) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPURequestDeviceStatus {
+        return WGPURequestDeviceStatus(rawValue: self.rawValue)
+    }
+}
+
 public enum StencilOperation: UInt32 {
     case keep = 0
     case zero = 1
@@ -495,6 +564,7 @@ public enum SType: UInt32 {
     case externalTextureBindingEntry = 9
     case externalTextureBindingLayout = 10
     case surfaceDescriptorFromWindowsSwapChainPanel = 11
+    case dawnTextureInternalUsageDescriptor = 1000
 
     init(cValue: WGPUSType) {
         self.init(rawValue: cValue.rawValue)!
@@ -588,25 +658,64 @@ public enum TextureFormat: UInt32 {
     case rgba32Float = 34
     case rgba32Uint = 35
     case rgba32Sint = 36
-    case depth32Float = 37
-    case depth24Plus = 38
-    case stencil8 = 39
+    case stencil8 = 37
+    case depth16Unorm = 38
+    case depth24Plus = 39
     case depth24PlusStencil8 = 40
-    case bc1RgbaUnorm = 41
-    case bc1RgbaUnormSrgb = 42
-    case bc2RgbaUnorm = 43
-    case bc2RgbaUnormSrgb = 44
-    case bc3RgbaUnorm = 45
-    case bc3RgbaUnormSrgb = 46
-    case bc4RUnorm = 47
-    case bc4RSnorm = 48
-    case bc5RgUnorm = 49
-    case bc5RgSnorm = 50
-    case bc6hRgbUfloat = 51
-    case bc6hRgbFloat = 52
-    case bc7RgbaUnorm = 53
-    case bc7RgbaUnormSrgb = 54
-    case r8Bg8Biplanar420Unorm = 55
+    case depth32Float = 41
+    case bc1RgbaUnorm = 42
+    case bc1RgbaUnormSrgb = 43
+    case bc2RgbaUnorm = 44
+    case bc2RgbaUnormSrgb = 45
+    case bc3RgbaUnorm = 46
+    case bc3RgbaUnormSrgb = 47
+    case bc4RUnorm = 48
+    case bc4RSnorm = 49
+    case bc5RgUnorm = 50
+    case bc5RgSnorm = 51
+    case bc6hRgbUfloat = 52
+    case bc6hRgbFloat = 53
+    case bc7RgbaUnorm = 54
+    case bc7RgbaUnormSrgb = 55
+    case etc2Rgb8Unorm = 56
+    case etc2Rgb8UnormSrgb = 57
+    case etc2Rgb8a1Unorm = 58
+    case etc2Rgb8a1UnormSrgb = 59
+    case etc2Rgba8Unorm = 60
+    case etc2Rgba8UnormSrgb = 61
+    case eacR11Unorm = 62
+    case eacR11Snorm = 63
+    case eacRg11Unorm = 64
+    case eacRg11Snorm = 65
+    case astc4x4Unorm = 66
+    case astc4x4UnormSrgb = 67
+    case astc5x4Unorm = 68
+    case astc5x4UnormSrgb = 69
+    case astc5x5Unorm = 70
+    case astc5x5UnormSrgb = 71
+    case astc6x5Unorm = 72
+    case astc6x5UnormSrgb = 73
+    case astc6x6Unorm = 74
+    case astc6x6UnormSrgb = 75
+    case astc8x5Unorm = 76
+    case astc8x5UnormSrgb = 77
+    case astc8x6Unorm = 78
+    case astc8x6UnormSrgb = 79
+    case astc8x8Unorm = 80
+    case astc8x8UnormSrgb = 81
+    case astc10x5Unorm = 82
+    case astc10x5UnormSrgb = 83
+    case astc10x6Unorm = 84
+    case astc10x6UnormSrgb = 85
+    case astc10x8Unorm = 86
+    case astc10x8UnormSrgb = 87
+    case astc10x10Unorm = 88
+    case astc10x10UnormSrgb = 89
+    case astc12x10Unorm = 90
+    case astc12x10UnormSrgb = 91
+    case astc12x12Unorm = 92
+    case astc12x12UnormSrgb = 93
+    case r8Bg8Biplanar420Unorm = 94
 
     init(cValue: WGPUTextureFormat) {
         self.init(rawValue: cValue.rawValue)!
