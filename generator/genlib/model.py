@@ -3,6 +3,15 @@ from .nameutils import camel_case, pascal_case, swift_safe
 from . import typeconversion
 
 
+def _is_enabled(data: Dict, enabled_tags: Optional[List[str]]):
+    tags = data.get('tags')
+
+    if not tags or enabled_tags is None:
+        return True
+
+    return any(tag in enabled_tags for tag in tags)
+
+
 class Base:
     def __init__(self, data: Dict):
         self.data = data
@@ -94,10 +103,11 @@ class EnumValue(Base):
 
 
 class EnumType(Type):
-    def __init__(self, name: str, data: Dict):
+    def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
-        self.requires_prefix = any((value['name'][0].isdigit() for value in data['values']))
-        self.values = [EnumValue(value, self.requires_prefix) for value in data['values']]
+        values = [value for value in data['values'] if _is_enabled(value, enabled_tags)]
+        self.requires_prefix = any((value['name'][0].isdigit() for value in values))
+        self.values = [EnumValue(value, self.requires_prefix) for value in values]
 
     def get_swift_value(self, value: Any) -> str:
         name = 'type ' + value if self.requires_prefix else value
@@ -271,10 +281,10 @@ class Member(Base):
 
 
 class StructureType(Type):
-    def __init__(self, name: str, data: Dict):
+    def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
 
-        self.members = [Member(m) for m in data['members']]
+        self.members = [Member(m) for m in data['members'] if _is_enabled(m, enabled_tags)]
         members_by_name = {member.name: member for member in self.members}
         members_by_length = {member.length: member for member in self.members if member.length}
         for member in self.members:
@@ -307,12 +317,12 @@ class StructureType(Type):
 
 
 class Method(Base):
-    def __init__(self, data: Dict, object_name: str):
+    def __init__(self, data: Dict, object_name: str, enabled_tags: List[str]):
         super().__init__(data)
         self.object_name = object_name
         self.return_type: Optional[Type] = None
 
-        self.args = [Member(arg) for arg in data.get('args', [])]
+        self.args = [Member(arg) for arg in data.get('args', []) if _is_enabled(arg, enabled_tags)]
         args_by_name = {arg.name: arg for arg in self.args}
         args_by_length = {arg.length: arg for arg in self.args if arg.length}
         for arg in self.args:
@@ -369,9 +379,9 @@ class Method(Base):
 
 
 class ObjectType(Type):
-    def __init__(self, name: str, data: Dict):
+    def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
-        self.methods = [Method(method, name) for method in data.get('methods', [])]
+        self.methods = [Method(m, name, enabled_tags) for m in data.get('methods', []) if _is_enabled(m, enabled_tags)]
 
     @property
     def access_level(self) -> str:
@@ -393,10 +403,10 @@ class ObjectType(Type):
 
 
 class CallbackType(Type):
-    def __init__(self, name: str, data: Dict):
+    def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
 
-        self.args = [Member(m) for m in data['args']]
+        self.args = [Member(m) for m in data['args'] if _is_enabled(m, enabled_tags)]
         args_by_length = {arg.length: arg for arg in self.args if arg.length}
         for arg in self.args:
             arg.length_of = args_by_length.get(arg.name)
@@ -424,21 +434,27 @@ class TypedefType(Type):
 
 
 class Model:
-    def __init__(self, data: Dict):
+    def __init__(self, data: Dict, enabled_tags: List[str] = None):
         self.types: Dict[str, Type] = {}
+
+        def needs_tags(type_):
+            return lambda *args: type_(*args, enabled_tags=enabled_tags)
 
         category_types = {
             'native': NativeType,
-            'enum': EnumType,
-            'bitmask': BitmaskType,
-            'structure': StructureType,
-            'object': ObjectType,
-            'callback': CallbackType,
+            'enum': needs_tags(EnumType),
+            'bitmask': needs_tags(BitmaskType),
+            'structure': needs_tags(StructureType),
+            'object': needs_tags(ObjectType),
+            'callback': needs_tags(CallbackType),
             'typedef': TypedefType,
         }
 
         for name, type_data in data.items():
             if name.startswith('_'):
+                continue
+
+            if not _is_enabled(type_data, enabled_tags):
                 continue
 
             type_ = category_types.get(type_data['category'])

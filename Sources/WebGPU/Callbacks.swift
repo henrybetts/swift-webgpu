@@ -1,16 +1,5 @@
 import CWebGPU
 
-public typealias RequestAdapterCallback = (RequestAdapterStatus, Adapter, String) -> ()
-
-func requestAdapterCallback(status: WGPURequestAdapterStatus, adapter: WGPUAdapter!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = UserData<RequestAdapterCallback>.takeValue(userdata)
-    swiftCallback(
-        .init(cValue: status), 
-        .init(handle: adapter), 
-        String(cString: message)
-    )
-}
-
 public typealias BufferMapCallback = (BufferMapAsyncStatus) -> ()
 
 func bufferMapCallback(status: WGPUBufferMapAsyncStatus, userdata: UnsafeMutableRawPointer!) {

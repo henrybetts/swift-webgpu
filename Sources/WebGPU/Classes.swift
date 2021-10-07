@@ -1,79 +1,5 @@
 import CWebGPU
 
-public class Adapter: Object {
-    private let handle: WGPUAdapter!
-
-    /// Create a wrapper around an existing handle.
-    ///
-    /// The ownership of the handle is transferred to this class.
-    ///
-    /// - Parameter handle: The handle to wrap.
-    public init(handle: WGPUAdapter!) {
-        self.handle = handle
-    }
-
-    deinit {
-        wgpuAdapterRelease(self.handle)
-    }
-
-    /// Calls the given closure with the underlying handle.
-    ///
-    /// The underlying handle is guaranteed not to be released before the closure returns.
-    ///
-    /// - Parameter body: A closure to call with the underlying handle.
-    public func withUnsafeHandle<R>(_ body: (WGPUAdapter) throws -> R) rethrows -> R {
-        return try withExtendedLifetime(self) {
-            return try body(self.handle)
-        }
-    }
-
-    public func getLimits(_ limits: UnsafeMutablePointer<WGPUSupportedLimits>!) -> Bool {
-        self.withUnsafeHandle { handle_self in
-            limits.withCStruct { cStruct_limits in
-            let result = wgpuAdapterGetLimits(
-                handle_self, 
-                cStruct_limits.pointee
-            )
-            return result
-            }
-        }
-    }
-
-    public func getProperties(_ properties: UnsafeMutablePointer<WGPUAdapterProperties>!) {
-        self.withUnsafeHandle { handle_self in
-            properties.withCStruct { cStruct_properties in
-            wgpuAdapterGetProperties(
-                handle_self, 
-                cStruct_properties.pointee
-            )
-            }
-        }
-    }
-
-    public func hasFeature(_ feature: FeatureName) -> Bool {
-        self.withUnsafeHandle { handle_self in
-            let result = wgpuAdapterHasFeature(
-                handle_self, 
-                feature.cValue
-            )
-            return result
-        }
-    }
-
-    public func requestDevice(descriptor: DeviceDescriptor, callback: @escaping RequestDeviceCallback) {
-        self.withUnsafeHandle { handle_self in
-            descriptor.withCStruct { cStruct_descriptor in
-            wgpuAdapterRequestDevice(
-                handle_self, 
-                cStruct_descriptor, 
-                requestDeviceCallback, 
-                UserData.passRetained(callback)
-            )
-            }
-        }
-    }
-}
-
 public class BindGroup: Object {
     private let handle: WGPUBindGroup!
 
@@ -579,18 +505,6 @@ public class ComputePassEncoder: Object {
         }
     }
 
-    public func beginPipelineStatisticsQuery(querySet: QuerySet, queryIndex: UInt32) {
-        self.withUnsafeHandle { handle_self in
-            querySet.withUnsafeHandle { handle_querySet in
-            wgpuComputePassEncoderBeginPipelineStatisticsQuery(
-                handle_self, 
-                handle_querySet, 
-                queryIndex
-            )
-            }
-        }
-    }
-
     public func dispatch(x: UInt32, y: UInt32 = 1, z: UInt32 = 1) {
         self.withUnsafeHandle { handle_self in
             wgpuComputePassEncoderDispatch(
@@ -617,14 +531,6 @@ public class ComputePassEncoder: Object {
     public func endPass() {
         self.withUnsafeHandle { handle_self in
             wgpuComputePassEncoderEndPass(
-                handle_self
-            )
-        }
-    }
-
-    public func endPipelineStatisticsQuery() {
-        self.withUnsafeHandle { handle_self in
-            wgpuComputePassEncoderEndPipelineStatisticsQuery(
                 handle_self
             )
         }
@@ -916,14 +822,6 @@ public class Device: Object {
         }
     }
 
-    public func destroy() {
-        self.withUnsafeHandle { handle_self in
-            wgpuDeviceDestroy(
-                handle_self
-            )
-        }
-    }
-
     public func getLimits(_ limits: UnsafeMutablePointer<WGPUSupportedLimits>!) -> Bool {
         self.withUnsafeHandle { handle_self in
             limits.withCStruct { cStruct_limits in
@@ -1107,27 +1005,6 @@ open class Instance: Object {
                 cStruct_descriptor
             )
             return .init(handle: result)
-            }
-        }
-    }
-
-    public func processEvents() {
-        self.withUnsafeHandle { handle_self in
-            wgpuInstanceProcessEvents(
-                handle_self
-            )
-        }
-    }
-
-    public func requestAdapter(options: RequestAdapterOptions, callback: @escaping RequestAdapterCallback) {
-        self.withUnsafeHandle { handle_self in
-            options.withCStruct { cStruct_options in
-            wgpuInstanceRequestAdapter(
-                handle_self, 
-                cStruct_options, 
-                requestAdapterCallback, 
-                UserData.passRetained(callback)
-            )
             }
         }
     }
@@ -1731,18 +1608,6 @@ public class RenderPassEncoder: Object {
         }
     }
 
-    public func beginPipelineStatisticsQuery(querySet: QuerySet, queryIndex: UInt32) {
-        self.withUnsafeHandle { handle_self in
-            querySet.withUnsafeHandle { handle_querySet in
-            wgpuRenderPassEncoderBeginPipelineStatisticsQuery(
-                handle_self, 
-                handle_querySet, 
-                queryIndex
-            )
-            }
-        }
-    }
-
     public func endOcclusionQuery() {
         self.withUnsafeHandle { handle_self in
             wgpuRenderPassEncoderEndOcclusionQuery(
@@ -1766,14 +1631,6 @@ public class RenderPassEncoder: Object {
     public func endPass() {
         self.withUnsafeHandle { handle_self in
             wgpuRenderPassEncoderEndPass(
-                handle_self
-            )
-        }
-    }
-
-    public func endPipelineStatisticsQuery() {
-        self.withUnsafeHandle { handle_self in
-            wgpuRenderPassEncoderEndPipelineStatisticsQuery(
                 handle_self
             )
         }
@@ -1930,18 +1787,6 @@ public class Surface: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUSurface) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
-        }
-    }
-
-    public func getPreferredFormat(adapter: Adapter) -> TextureFormat {
-        self.withUnsafeHandle { handle_self in
-            adapter.withUnsafeHandle { handle_adapter in
-            let result = wgpuSurfaceGetPreferredFormat(
-                handle_self, 
-                handle_adapter
-            )
-            return result
-            }
         }
     }
 }

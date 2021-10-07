@@ -1,42 +1,5 @@
 import CWebGPU
 
-public struct RequestAdapterOptions: CStructConvertible, Extensible {
-    typealias CStruct = WGPURequestAdapterOptions
-
-    public var compatibleSurface: Surface
-    public var powerPreference: PowerPreference
-    public var forceFallbackAdapter: Bool
-
-    public var nextInChain: Chained?
-
-    public init(compatibleSurface: Surface, powerPreference: PowerPreference, forceFallbackAdapter: Bool) {
-        self.compatibleSurface = compatibleSurface
-        self.powerPreference = powerPreference
-        self.forceFallbackAdapter = forceFallbackAdapter
-    }
-
-    public init(compatibleSurface: Surface, powerPreference: PowerPreference, forceFallbackAdapter: Bool, nextInChain: Chained?) {
-        self.compatibleSurface = compatibleSurface
-        self.powerPreference = powerPreference
-        self.forceFallbackAdapter = forceFallbackAdapter
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPURequestAdapterOptions>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.compatibleSurface.withUnsafeHandle { handle_compatibleSurface in
-        var cStruct = WGPURequestAdapterOptions(
-            nextInChain: chainedCStruct, 
-            compatibleSurface: handle_compatibleSurface, 
-            powerPreference: self.powerPreference.cValue, 
-            forceFallbackAdapter: self.forceFallbackAdapter
-        )
-        return try body(&cStruct)
-        }
-        }
-    }
-}
-
 public struct AdapterProperties: CStructConvertible, Extensible {
     typealias CStruct = WGPUAdapterProperties
 
@@ -80,42 +43,6 @@ public struct AdapterProperties: CStructConvertible, Extensible {
             driverDescription: cString_driverDescription, 
             adapterType: self.adapterType.cValue, 
             backendType: self.backendType.cValue
-        )
-        return try body(&cStruct)
-        }
-        }
-        }
-    }
-}
-
-public struct DeviceDescriptor: CStructConvertible, Extensible {
-    typealias CStruct = WGPUDeviceDescriptor
-
-    public var requiredFeatures: [FeatureName]
-    public var requiredLimits: RequiredLimits
-
-    public var nextInChain: Chained?
-
-    public init(requiredFeatures: [FeatureName], requiredLimits: RequiredLimits) {
-        self.requiredFeatures = requiredFeatures
-        self.requiredLimits = requiredLimits
-    }
-
-    public init(requiredFeatures: [FeatureName], requiredLimits: RequiredLimits, nextInChain: Chained?) {
-        self.requiredFeatures = requiredFeatures
-        self.requiredLimits = requiredLimits
-        self.nextInChain = nextInChain
-    }
-
-    func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceDescriptor>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        return try self.requiredFeatures.map { $0.cValue }.withUnsafeBufferPointer { buffer_requiredFeatures in
-        return try self.requiredLimits.withCStruct { cStruct_requiredLimits in
-        var cStruct = WGPUDeviceDescriptor(
-            nextInChain: chainedCStruct, 
-            requiredFeaturesCount: .init(buffer_requiredFeatures.count), 
-            requiredFeatures: buffer_requiredFeatures.baseAddress, 
-            requiredLimits: cStruct_requiredLimits
         )
         return try body(&cStruct)
         }
@@ -1414,20 +1341,17 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
-    public var constants: [ConstantEntry]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry]) {
+    public init(module: ShaderModule, entryPoint: String) {
         self.module = module
         self.entryPoint = entryPoint
-        self.constants = constants
     }
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
-        self.constants = constants
         self.nextInChain = nextInChain
     }
 
@@ -1435,16 +1359,12 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
-        return try self.constants.withCStructBufferPointer { buffer_constants in
         var cStruct = WGPUProgrammableStageDescriptor(
             nextInChain: chainedCStruct, 
             module: handle_module, 
-            entryPoint: cString_entryPoint, 
-            constantCount: .init(buffer_constants.count), 
-            constants: buffer_constants.baseAddress
+            entryPoint: cString_entryPoint
         )
         return try body(&cStruct)
-        }
         }
         }
         }
@@ -1719,22 +1639,19 @@ public struct VertexState: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
-    public var constants: [ConstantEntry]
     public var buffers: [VertexBufferLayout]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], buffers: [VertexBufferLayout]) {
+    public init(module: ShaderModule, entryPoint: String, buffers: [VertexBufferLayout]) {
         self.module = module
         self.entryPoint = entryPoint
-        self.constants = constants
         self.buffers = buffers
     }
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], buffers: [VertexBufferLayout], nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, buffers: [VertexBufferLayout], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
-        self.constants = constants
         self.buffers = buffers
         self.nextInChain = nextInChain
     }
@@ -1743,19 +1660,15 @@ public struct VertexState: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
-        return try self.constants.withCStructBufferPointer { buffer_constants in
         return try self.buffers.withCStructBufferPointer { buffer_buffers in
         var cStruct = WGPUVertexState(
             nextInChain: chainedCStruct, 
             module: handle_module, 
             entryPoint: cString_entryPoint, 
-            constantCount: .init(buffer_constants.count), 
-            constants: buffer_constants.baseAddress, 
             bufferCount: .init(buffer_buffers.count), 
             buffers: buffer_buffers.baseAddress
         )
         return try body(&cStruct)
-        }
         }
         }
         }
@@ -1943,22 +1856,19 @@ public struct FragmentState: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
-    public var constants: [ConstantEntry]
     public var targets: [ColorTargetState]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], targets: [ColorTargetState]) {
+    public init(module: ShaderModule, entryPoint: String, targets: [ColorTargetState]) {
         self.module = module
         self.entryPoint = entryPoint
-        self.constants = constants
         self.targets = targets
     }
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], targets: [ColorTargetState], nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, targets: [ColorTargetState], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
-        self.constants = constants
         self.targets = targets
         self.nextInChain = nextInChain
     }
@@ -1967,19 +1877,15 @@ public struct FragmentState: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
-        return try self.constants.withCStructBufferPointer { buffer_constants in
         return try self.targets.withCStructBufferPointer { buffer_targets in
         var cStruct = WGPUFragmentState(
             nextInChain: chainedCStruct, 
             module: handle_module, 
             entryPoint: cString_entryPoint, 
-            constantCount: .init(buffer_constants.count), 
-            constants: buffer_constants.baseAddress, 
             targetCount: .init(buffer_targets.count), 
             targets: buffer_targets.baseAddress
         )
         return try body(&cStruct)
-        }
         }
         }
         }

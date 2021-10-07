@@ -1,20 +1,5 @@
 import CWebGPU
 
-public enum RequestAdapterStatus: UInt32 {
-    case success = 0
-    case unavailable = 1
-    case error = 2
-    case unknown = 3
-
-    init(cValue: WGPURequestAdapterStatus) {
-        self.init(rawValue: cValue.rawValue)!
-    }
-
-    var cValue: WGPURequestAdapterStatus {
-        return WGPURequestAdapterStatus(rawValue: self.rawValue)
-    }
-}
-
 public enum AdapterType: UInt32 {
     case discreteGpu = 0
     case integratedGpu = 1
@@ -331,26 +316,6 @@ public enum LoggingType: UInt32 {
     }
 }
 
-public enum FeatureName: UInt32 {
-    case undefined = 0
-    case depthClamping = 1
-    case depth24UnormStencil8 = 2
-    case depth32FloatStencil8 = 3
-    case timestampQuery = 4
-    case pipelineStatisticsQuery = 5
-    case textureCompressionBc = 6
-    case textureCompressionEtc2 = 7
-    case textureCompressionAstc = 8
-
-    init(cValue: WGPUFeatureName) {
-        self.init(rawValue: cValue.rawValue)!
-    }
-
-    var cValue: WGPUFeatureName {
-        return WGPUFeatureName(rawValue: self.rawValue)
-    }
-}
-
 public enum FilterMode: UInt32 {
     case nearest = 0
     case linear = 1
@@ -443,19 +408,6 @@ public enum PipelineStatisticName: UInt32 {
 
     var cValue: WGPUPipelineStatisticName {
         return WGPUPipelineStatisticName(rawValue: self.rawValue)
-    }
-}
-
-public enum PowerPreference: UInt32 {
-    case lowPower = 0
-    case highPerformance = 1
-
-    init(cValue: WGPUPowerPreference) {
-        self.init(rawValue: cValue.rawValue)!
-    }
-
-    var cValue: WGPUPowerPreference {
-        return WGPUPowerPreference(rawValue: self.rawValue)
     }
 }
 
