@@ -3,11 +3,23 @@ from .nameutils import camel_case, pascal_case, swift_safe
 from . import typeconversion
 
 
-class Type:
-    def __init__(self, name: str, data: Dict):
-        self.name = name
+class Base:
+    def __init__(self, data: Dict):
         self.data = data
-        self.category = data['category']
+
+    @property
+    def tags(self) -> List[str]:
+        return self.data.get('tags', [])
+
+
+class Type(Base):
+    def __init__(self, name: str, data: Dict):
+        super().__init__(data)
+        self.name = name
+
+    @property
+    def category(self) -> str:
+        return self.data['category']
 
     @property
     def c_name(self) -> str:
@@ -62,11 +74,18 @@ class NativeType(Type):
         return super().get_swift_value(value)
 
 
-class EnumValue:
-    def __init__(self, name: str, value: int, requires_prefix: bool):
-        self.name = name
-        self.value = value
+class EnumValue(Base):
+    def __init__(self, data: Dict, requires_prefix: bool):
+        super().__init__(data)
         self.requires_prefix = requires_prefix
+
+    @property
+    def name(self) -> str:
+        return self.data['name']
+
+    @property
+    def value(self) -> int:
+        return self.data['value']
 
     @property
     def swift_name(self) -> str:
@@ -78,7 +97,7 @@ class EnumType(Type):
     def __init__(self, name: str, data: Dict):
         super().__init__(name, data)
         self.requires_prefix = any((value['name'][0].isdigit() for value in data['values']))
-        self.values = [EnumValue(value['name'], value['value'], self.requires_prefix) for value in data['values']]
+        self.values = [EnumValue(value, self.requires_prefix) for value in data['values']]
 
     def get_swift_value(self, value: Any) -> str:
         name = 'type ' + value if self.requires_prefix else value
@@ -91,17 +110,32 @@ class BitmaskType(EnumType):
         return super().c_name + 'Flags'
 
 
-class Member:
-    def __init__(self, name: str, type_: Type, annotation: Optional[str], length: Optional[str],
-                 default: Optional[Any], optional: bool):
-        self.name = name
-        self.type = type_
-        self.annotation = annotation
-        self.length = length
-        self.default = default
-        self.optional = optional
+class Member(Base):
+    def __init__(self, data: Dict):
+        super().__init__(data)
+        self.type: Type = None
         self.length_member: Optional[Member] = None
         self.length_of: Optional[Member] = None
+
+    @property
+    def name(self) -> str:
+        return self.data['name']
+
+    @property
+    def annotation(self) -> Optional[str]:
+        return self.data.get('annotation')
+
+    @property
+    def length(self) -> Optional[str]:
+        return self.data.get('length')
+
+    @property
+    def default(self) -> Optional[Any]:
+        return self.data.get('default')
+
+    @property
+    def optional(self) -> bool:
+        return self.data.get('optional', False)
 
     @property
     def c_name(self) -> str:
@@ -232,13 +266,28 @@ class Member:
         if isinstance(self.type, StructureType) and not self.annotation and self.type.has_default_swift_initializer:
             return f'{self.type.swift_name}()'
 
+    def link(self, types: Dict[str, Type]):
+        self.type = types[self.data['type']]
+
 
 class StructureType(Type):
     def __init__(self, name: str, data: Dict):
         super().__init__(name, data)
-        self.extensible = data.get('extensible', False)
-        self.chained = data.get('chained', False)
-        self.members: List[Member] = []
+
+        self.members = [Member(m) for m in data['members']]
+        members_by_name = {member.name: member for member in self.members}
+        members_by_length = {member.length: member for member in self.members if member.length}
+        for member in self.members:
+            member.length_member = members_by_name.get(member.length)
+            member.length_of = members_by_length.get(member.name)
+
+    @property
+    def extensible(self) -> bool:
+        return self.data.get('extensible', False)
+
+    @property
+    def chained(self) -> bool:
+        return self.data.get('chained', False)
 
     @property
     def s_type(self) -> str:
@@ -253,24 +302,26 @@ class StructureType(Type):
         return all(member.default_swift_value for member in self.swift_members)
 
     def link(self, types: Dict[str, Type]):
-        self.members = [
-            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'),
-                   m.get('default'), m.get('optional', False))
-            for m in self.data['members']
-        ]
-        members_by_name = {member.name: member for member in self.members}
-        members_by_length = {member.length: member for member in self.members if member.length}
         for member in self.members:
-            member.length_member = members_by_name.get(member.length)
-            member.length_of = members_by_length.get(member.name)
+            member.link(types)
 
 
-class Method:
-    def __init__(self, object_name: str, name: str, args: List[Member], return_type: Optional[Type]):
+class Method(Base):
+    def __init__(self, data: Dict, object_name: str):
+        super().__init__(data)
         self.object_name = object_name
-        self.name = name
-        self.args = args
-        self.return_type = return_type
+        self.return_type: Optional[Type] = None
+
+        self.args = [Member(arg) for arg in data.get('args', [])]
+        args_by_name = {arg.name: arg for arg in self.args}
+        args_by_length = {arg.length: arg for arg in self.args if arg.length}
+        for arg in self.args:
+            arg.length_member = args_by_name.get(arg.length)
+            arg.length_of = args_by_length.get(arg.name)
+
+    @property
+    def name(self) -> str:
+        return self.data['name']
 
     @property
     def is_getter(self) -> bool:
@@ -309,11 +360,18 @@ class Method:
     def is_callback_setter(self) -> bool:
         return self.name.startswith('set ') and self.name.endswith(' callback')
 
+    def link(self, types: Dict[str, Type]):
+        returns = self.data.get('returns')
+        self.return_type = types[returns] if returns and returns != 'void' else None
+
+        for arg in self.args:
+            arg.link(types)
+
 
 class ObjectType(Type):
     def __init__(self, name: str, data: Dict):
         super().__init__(name, data)
-        self.methods: List[Method] = []
+        self.methods = [Method(method, name) for method in data.get('methods', [])]
 
     @property
     def access_level(self) -> str:
@@ -330,28 +388,18 @@ class ObjectType(Type):
         return 'wgpu' + pascal_case(self.name) + 'Release'
 
     def link(self, types: Dict[str, Type]):
-        for method in self.data.get('methods', []):
-            args = [
-                Member(arg['name'], types[arg['type']], arg.get('annotation'), arg.get('length'),
-                       arg.get('default'), arg.get('optional', False))
-                for arg in method.get('args', [])
-            ]
-            args_by_name = {arg.name: arg for arg in args}
-            args_by_length = {arg.length: arg for arg in args if arg.length}
-            for arg in args:
-                arg.length_member = args_by_name.get(arg.length)
-                arg.length_of = args_by_length.get(arg.name)
-
-            returns = method.get('returns')
-            return_type = types[returns] if returns and returns != 'void' else None
-
-            self.methods.append(Method(self.name, method['name'], args, return_type))
+        for method in self.methods:
+            method.link(types)
 
 
 class CallbackType(Type):
     def __init__(self, name: str, data: Dict):
         super().__init__(name, data)
-        self.args: List[Member] = []
+
+        self.args = [Member(m) for m in data['args']]
+        args_by_length = {arg.length: arg for arg in self.args if arg.length}
+        for arg in self.args:
+            arg.length_of = args_by_length.get(arg.name)
 
     @property
     def function_name(self) -> str:
@@ -362,14 +410,8 @@ class CallbackType(Type):
         return [arg for arg in self.args if not arg.length_of and arg.name != 'userdata']
 
     def link(self, types: Dict[str, Type]):
-        self.args = [
-            Member(m['name'], types[m['type']], m.get('annotation'), m.get('length'),
-                   m.get('default'), m.get('optional', False))
-            for m in self.data['args']
-        ]
-        args_by_length = {arg.length: arg for arg in self.args if arg.length}
         for arg in self.args:
-            arg.length_of = args_by_length.get(arg.name)
+            arg.link(types)
 
 
 class TypedefType(Type):
