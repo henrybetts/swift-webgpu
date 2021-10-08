@@ -824,13 +824,11 @@ public class Device: Object {
 
     public func getLimits(_ limits: UnsafeMutablePointer<WGPUSupportedLimits>!) -> Bool {
         self.withUnsafeHandle { handle_self in
-            limits.withCStruct { cStruct_limits in
             let result = wgpuDeviceGetLimits(
                 handle_self, 
-                cStruct_limits.pointee
+                limits
             )
             return result
-            }
         }
     }
 
