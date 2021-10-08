@@ -58,8 +58,8 @@ public class Adapter {
         var cProps = WGPUAdapterProperties()
         dawnNativeAdapterGetProperties(self.adapter, &cProps)
         return AdapterProperties(
-            deviceId: cProps.deviceID,
             vendorId: cProps.vendorID,
+            deviceId: cProps.deviceID,
             name: String(cString: cProps.name),
             driverDescription: String(cString: cProps.driverDescription),
             adapterType: AdapterType(rawValue: cProps.adapterType.rawValue)!,
