@@ -312,6 +312,12 @@ class StructureType(Type):
     def has_default_swift_initializer(self) -> bool:
         return all(member.default_swift_value for member in self.swift_members)
 
+    @property
+    def has_c_struct_initializer(self) -> bool:
+        return not (self.extensible or self.chained
+                    or any(isinstance(member.type, StructureType) and not member.type.has_c_struct_initializer
+                           for member in self.members))
+
     def link(self, types: Dict[str, Type]):
         for member in self.members:
             member.link(types)

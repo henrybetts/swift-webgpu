@@ -1,6 +1,6 @@
 import CWebGPU
 
-public struct AdapterProperties: CStructConvertible, Extensible {
+public struct AdapterProperties: CStructConvertible {
     typealias CStruct = WGPUAdapterProperties
 
     public var vendorId: UInt32
@@ -9,8 +9,6 @@ public struct AdapterProperties: CStructConvertible, Extensible {
     public var driverDescription: String
     public var adapterType: AdapterType
     public var backendType: BackendType
-
-    public var nextInChain: Chained?
 
     public init(vendorId: UInt32, deviceId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType) {
         self.vendorId = vendorId
@@ -21,22 +19,12 @@ public struct AdapterProperties: CStructConvertible, Extensible {
         self.backendType = backendType
     }
 
-    public init(vendorId: UInt32, deviceId: UInt32, name: String, driverDescription: String, adapterType: AdapterType, backendType: BackendType, nextInChain: Chained?) {
-        self.vendorId = vendorId
-        self.deviceId = deviceId
-        self.name = name
-        self.driverDescription = driverDescription
-        self.adapterType = adapterType
-        self.backendType = backendType
-        self.nextInChain = nextInChain
-    }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUAdapterProperties>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.name.withCString { cString_name in
         return try self.driverDescription.withCString { cString_driverDescription in
         var cStruct = WGPUAdapterProperties(
-            nextInChain: chainedCStruct, 
+            nextInChain: nil, 
             vendorID: self.vendorId, 
             deviceID: self.deviceId, 
             name: cString_name, 
@@ -45,7 +33,6 @@ public struct AdapterProperties: CStructConvertible, Extensible {
             backendType: self.backendType.cValue
         )
         return try body(&cStruct)
-        }
         }
         }
     }
@@ -830,21 +817,6 @@ public struct DeviceProperties: CStructConvertible {
         self.limits = limits
     }
 
-    init(cStruct: WGPUDeviceProperties) {
-        self.deviceId = cStruct.deviceID
-        self.vendorId = cStruct.vendorID
-        self.textureCompressionBc = cStruct.textureCompressionBC
-        self.textureCompressionEtc2 = cStruct.textureCompressionETC2
-        self.textureCompressionAstc = cStruct.textureCompressionASTC
-        self.shaderFloat16 = cStruct.shaderFloat16
-        self.pipelineStatisticsQuery = cStruct.pipelineStatisticsQuery
-        self.timestampQuery = cStruct.timestampQuery
-        self.multiPlanarFormats = cStruct.multiPlanarFormats
-        self.depthClamping = cStruct.depthClamping
-        self.invalidExtension = cStruct.invalidExtension
-        self.dawnInternalUsages = cStruct.dawnInternalUsages
-        self.limits = .init(cStruct: cStruct.limits)
-    }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceProperties>) throws -> R) rethrows -> R {
         return try self.limits.withCStruct { cStruct_limits in
@@ -1018,31 +990,23 @@ public struct RequiredLimits: CStructConvertible, Extensible {
     }
 }
 
-public struct SupportedLimits: CStructConvertible, Extensible {
+public struct SupportedLimits: CStructConvertible {
     typealias CStruct = WGPUSupportedLimits
 
     public var limits: Limits
-
-    public var nextInChain: Chained?
 
     public init(limits: Limits = Limits()) {
         self.limits = limits
     }
 
-    public init(limits: Limits, nextInChain: Chained?) {
-        self.limits = limits
-        self.nextInChain = nextInChain
-    }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSupportedLimits>) throws -> R) rethrows -> R {
-        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.limits.withCStruct { cStruct_limits in
         var cStruct = WGPUSupportedLimits(
-            nextInChain: chainedCStruct, 
+            nextInChain: nil, 
             limits: cStruct_limits.pointee
         )
         return try body(&cStruct)
-        }
         }
     }
 }
