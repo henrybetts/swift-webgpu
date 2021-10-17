@@ -1337,7 +1337,7 @@ public class RenderBundleEncoder: Object {
         }
     }
 
-    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64 = 0, size: UInt64 = 0) {
+    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64 = 0, size: UInt64 = UInt64(WGPU_WHOLE_SIZE)) {
         self.withUnsafeHandle { handle_self in
             buffer.withUnsafeHandle { handle_buffer in
             wgpuRenderBundleEncoderSetVertexBuffer(
@@ -1351,7 +1351,7 @@ public class RenderBundleEncoder: Object {
         }
     }
 
-    public func setIndexBuffer(_ buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
+    public func setIndexBuffer(_ buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = UInt64(WGPU_WHOLE_SIZE)) {
         self.withUnsafeHandle { handle_self in
             buffer.withUnsafeHandle { handle_buffer in
             wgpuRenderBundleEncoderSetIndexBuffer(
@@ -1569,7 +1569,7 @@ public class RenderPassEncoder: Object {
         }
     }
 
-    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64 = 0, size: UInt64 = 0) {
+    public func setVertexBuffer(slot: UInt32, buffer: Buffer, offset: UInt64 = 0, size: UInt64 = UInt64(WGPU_WHOLE_SIZE)) {
         self.withUnsafeHandle { handle_self in
             buffer.withUnsafeHandle { handle_buffer in
             wgpuRenderPassEncoderSetVertexBuffer(
@@ -1583,7 +1583,7 @@ public class RenderPassEncoder: Object {
         }
     }
 
-    public func setIndexBuffer(_ buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = 0) {
+    public func setIndexBuffer(_ buffer: Buffer, format: IndexFormat, offset: UInt64 = 0, size: UInt64 = UInt64(WGPU_WHOLE_SIZE)) {
         self.withUnsafeHandle { handle_self in
             buffer.withUnsafeHandle { handle_buffer in
             wgpuRenderPassEncoderSetIndexBuffer(

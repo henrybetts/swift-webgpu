@@ -41,11 +41,12 @@ func createRenderPipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pi
     )
 }
 
-public typealias DeviceLostCallback = (String) -> ()
+public typealias DeviceLostCallback = (DeviceLostReason, String) -> ()
 
-func deviceLostCallback(message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
+func deviceLostCallback(reason: WGPUDeviceLostReason, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<DeviceLostCallback>.takeValue(userdata)
     swiftCallback(
+        .init(cValue: reason), 
         String(cString: message)
     )
 }

@@ -797,11 +797,11 @@ public struct DeviceProperties: CStructConvertible {
     public var timestampQuery: Bool
     public var multiPlanarFormats: Bool
     public var depthClamping: Bool
-    public var invalidExtension: Bool
+    public var invalidFeature: Bool
     public var dawnInternalUsages: Bool
     public var limits: SupportedLimits
 
-    public init(deviceId: UInt32, vendorId: UInt32, textureCompressionBc: Bool = false, textureCompressionEtc2: Bool = false, textureCompressionAstc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false, invalidExtension: Bool = false, dawnInternalUsages: Bool = false, limits: SupportedLimits = SupportedLimits()) {
+    public init(deviceId: UInt32, vendorId: UInt32, textureCompressionBc: Bool = false, textureCompressionEtc2: Bool = false, textureCompressionAstc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false, invalidFeature: Bool = false, dawnInternalUsages: Bool = false, limits: SupportedLimits = SupportedLimits()) {
         self.deviceId = deviceId
         self.vendorId = vendorId
         self.textureCompressionBc = textureCompressionBc
@@ -812,7 +812,7 @@ public struct DeviceProperties: CStructConvertible {
         self.timestampQuery = timestampQuery
         self.multiPlanarFormats = multiPlanarFormats
         self.depthClamping = depthClamping
-        self.invalidExtension = invalidExtension
+        self.invalidFeature = invalidFeature
         self.dawnInternalUsages = dawnInternalUsages
         self.limits = limits
     }
@@ -831,7 +831,7 @@ public struct DeviceProperties: CStructConvertible {
             timestampQuery: self.timestampQuery, 
             multiPlanarFormats: self.multiPlanarFormats, 
             depthClamping: self.depthClamping, 
-            invalidExtension: self.invalidExtension, 
+            invalidFeature: self.invalidFeature, 
             dawnInternalUsages: self.dawnInternalUsages, 
             limits: cStruct_limits.pointee
         )
@@ -1043,17 +1043,20 @@ public struct Extent3d: CStructConvertible {
 public struct ExternalTextureDescriptor: CStructConvertible, Extensible {
     typealias CStruct = WGPUExternalTextureDescriptor
 
+    public var label: String?
     public var plane0: TextureView
     public var format: TextureFormat
 
     public var nextInChain: Chained?
 
-    public init(plane0: TextureView, format: TextureFormat) {
+    public init(label: String? = nil, plane0: TextureView, format: TextureFormat) {
+        self.label = label
         self.plane0 = plane0
         self.format = format
     }
 
-    public init(plane0: TextureView, format: TextureFormat, nextInChain: Chained?) {
+    public init(label: String?, plane0: TextureView, format: TextureFormat, nextInChain: Chained?) {
+        self.label = label
         self.plane0 = plane0
         self.format = format
         self.nextInChain = nextInChain
@@ -1061,13 +1064,16 @@ public struct ExternalTextureDescriptor: CStructConvertible, Extensible {
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUExternalTextureDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.label.withOptionalCString { cString_label in
         return try self.plane0.withUnsafeHandle { handle_plane0 in
         var cStruct = WGPUExternalTextureDescriptor(
             nextInChain: chainedCStruct, 
+            label: cString_label, 
             plane0: handle_plane0, 
             format: self.format.cValue
         )
         return try body(&cStruct)
+        }
         }
         }
     }
@@ -1305,17 +1311,20 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
+    public var constants: [ConstantEntry]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry]) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
     }
 
-    public init(module: ShaderModule, entryPoint: String, nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.nextInChain = nextInChain
     }
 
@@ -1323,12 +1332,16 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
+        return try self.constants.withCStructBufferPointer { buffer_constants in
         var cStruct = WGPUProgrammableStageDescriptor(
             nextInChain: chainedCStruct, 
             module: handle_module, 
-            entryPoint: cString_entryPoint
+            entryPoint: cString_entryPoint, 
+            constantCount: .init(buffer_constants.count), 
+            constants: buffer_constants.baseAddress
         )
         return try body(&cStruct)
+        }
         }
         }
         }
@@ -1415,21 +1428,27 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible, Extensible {
     public var colorFormats: [TextureFormat]
     public var depthStencilFormat: TextureFormat
     public var sampleCount: UInt32
+    public var depthReadOnly: Bool
+    public var stencilReadOnly: Bool
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, colorFormats: [TextureFormat], depthStencilFormat: TextureFormat = .undefined, sampleCount: UInt32 = 1) {
+    public init(label: String? = nil, colorFormats: [TextureFormat], depthStencilFormat: TextureFormat = .undefined, sampleCount: UInt32 = 1, depthReadOnly: Bool = false, stencilReadOnly: Bool = false) {
         self.label = label
         self.colorFormats = colorFormats
         self.depthStencilFormat = depthStencilFormat
         self.sampleCount = sampleCount
+        self.depthReadOnly = depthReadOnly
+        self.stencilReadOnly = stencilReadOnly
     }
 
-    public init(label: String?, colorFormats: [TextureFormat], depthStencilFormat: TextureFormat, sampleCount: UInt32, nextInChain: Chained?) {
+    public init(label: String?, colorFormats: [TextureFormat], depthStencilFormat: TextureFormat, sampleCount: UInt32, depthReadOnly: Bool, stencilReadOnly: Bool, nextInChain: Chained?) {
         self.label = label
         self.colorFormats = colorFormats
         self.depthStencilFormat = depthStencilFormat
         self.sampleCount = sampleCount
+        self.depthReadOnly = depthReadOnly
+        self.stencilReadOnly = stencilReadOnly
         self.nextInChain = nextInChain
     }
 
@@ -1443,7 +1462,9 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible, Extensible {
             colorFormatsCount: .init(buffer_colorFormats.count), 
             colorFormats: buffer_colorFormats.baseAddress, 
             depthStencilFormat: self.depthStencilFormat.cValue, 
-            sampleCount: self.sampleCount
+            sampleCount: self.sampleCount, 
+            depthReadOnly: self.depthReadOnly, 
+            stencilReadOnly: self.stencilReadOnly
         )
         return try body(&cStruct)
         }
@@ -1603,19 +1624,22 @@ public struct VertexState: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
+    public var constants: [ConstantEntry]
     public var buffers: [VertexBufferLayout]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, buffers: [VertexBufferLayout]) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], buffers: [VertexBufferLayout]) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.buffers = buffers
     }
 
-    public init(module: ShaderModule, entryPoint: String, buffers: [VertexBufferLayout], nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], buffers: [VertexBufferLayout], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.buffers = buffers
         self.nextInChain = nextInChain
     }
@@ -1624,15 +1648,19 @@ public struct VertexState: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
+        return try self.constants.withCStructBufferPointer { buffer_constants in
         return try self.buffers.withCStructBufferPointer { buffer_buffers in
         var cStruct = WGPUVertexState(
             nextInChain: chainedCStruct, 
             module: handle_module, 
             entryPoint: cString_entryPoint, 
+            constantCount: .init(buffer_constants.count), 
+            constants: buffer_constants.baseAddress, 
             bufferCount: .init(buffer_buffers.count), 
             buffers: buffer_buffers.baseAddress
         )
         return try body(&cStruct)
+        }
         }
         }
         }
@@ -1820,19 +1848,22 @@ public struct FragmentState: CStructConvertible, Extensible {
 
     public var module: ShaderModule
     public var entryPoint: String
+    public var constants: [ConstantEntry]
     public var targets: [ColorTargetState]
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, targets: [ColorTargetState]) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], targets: [ColorTargetState]) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.targets = targets
     }
 
-    public init(module: ShaderModule, entryPoint: String, targets: [ColorTargetState], nextInChain: Chained?) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], targets: [ColorTargetState], nextInChain: Chained?) {
         self.module = module
         self.entryPoint = entryPoint
+        self.constants = constants
         self.targets = targets
         self.nextInChain = nextInChain
     }
@@ -1841,15 +1872,19 @@ public struct FragmentState: CStructConvertible, Extensible {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.module.withUnsafeHandle { handle_module in
         return try self.entryPoint.withCString { cString_entryPoint in
+        return try self.constants.withCStructBufferPointer { buffer_constants in
         return try self.targets.withCStructBufferPointer { buffer_targets in
         var cStruct = WGPUFragmentState(
             nextInChain: chainedCStruct, 
             module: handle_module, 
             entryPoint: cString_entryPoint, 
+            constantCount: .init(buffer_constants.count), 
+            constants: buffer_constants.baseAddress, 
             targetCount: .init(buffer_targets.count), 
             targets: buffer_targets.baseAddress
         )
         return try body(&cStruct)
+        }
         }
         }
         }
