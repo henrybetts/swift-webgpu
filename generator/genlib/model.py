@@ -159,10 +159,6 @@ class Member(Base):
             return swift_safe(self.name)
 
     @property
-    def nullable(self) -> bool:
-        return self.optional or self.default == 'nullptr'
-
-    @property
     def c_type(self) -> str:
         if self.type.name == 'void' and self.annotation == 'const*':
             return 'UnsafeRawPointer!'
@@ -204,7 +200,7 @@ class Member(Base):
         if self.type.category == 'callback':
             swift_type = '@escaping ' + swift_type
 
-        if self.nullable:
+        if self.optional:
             swift_type += '?'
 
         return swift_type
@@ -220,7 +216,7 @@ class Member(Base):
             return typeconversion.userdata_conversion
 
         if self.type.name == 'char' and self.annotation == 'const*':
-            return typeconversion.optional_string_conversion if self.nullable else typeconversion.string_conversion
+            return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
 
         if self.annotation == 'const*' and self.length:
             if self.type.name == 'void':
@@ -235,9 +231,6 @@ class Member(Base):
             if self.type.category == 'object':
                 return typeconversion.object_array_conversion
 
-            if self.nullable:
-                return typeconversion.optional_implicit_array_conversion
-
             return typeconversion.implicit_array_conversion
 
         if self.type.category == 'enum':
@@ -247,7 +240,7 @@ class Member(Base):
             return typeconversion.bitmask_conversion
 
         if self.type.category == 'structure':
-            if self.nullable:
+            if self.optional:
                 return typeconversion.optional_struct_conversion
             if self.annotation == 'const*':
                 return typeconversion.struct_pointer_conversion
@@ -255,7 +248,7 @@ class Member(Base):
                 return typeconversion.struct_conversion
 
         if self.type.category == 'object':
-            return typeconversion.optional_object_conversion if self.nullable else typeconversion.object_conversion
+            return typeconversion.optional_object_conversion if self.optional else typeconversion.object_conversion
 
         if isinstance(self.type, CallbackType):
             return typeconversion.Conversion(self.type.function_name)
@@ -268,8 +261,11 @@ class Member(Base):
 
     @property
     def default_swift_value(self) -> Optional[str]:
-        if self.nullable:
+        if self.optional:
             return 'nil'
+
+        if self.length_member and (self.length_member.default == 0 or self.length_member.default == '0'):
+            return '[]'
 
         if self.default:
             return self.type.get_swift_value(self.default)

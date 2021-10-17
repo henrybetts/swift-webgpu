@@ -39,11 +39,6 @@ implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                        ('{{ value }}.withUnsafeBufferPointer { buffer_{{ name }} in', '}'),
                                        'Array(UnsafeBufferPointer(start: {{ value }}), count: Int({{ length }})))')
 
-optional_implicit_array_conversion =\
-    Conversion('buffer_{{ name }}.baseAddress',
-               ('{{ value }}.withOptionalUnsafeBufferPointer { buffer_{{ name }} in', '}'),
-               '{{ value }} != nil ? Array(UnsafeBufferPointer(start: {{ value }}), count: Int({{ length }})))')
-
 enum_conversion = Conversion('{{ value }}.cValue', None, '.init(cValue: {{ value }})')
 
 enum_array_conversion =\

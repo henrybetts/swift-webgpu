@@ -1315,7 +1315,7 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry]) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry] = []) {
         self.module = module
         self.entryPoint = entryPoint
         self.constants = constants
@@ -1358,7 +1358,7 @@ public struct QuerySetDescriptor: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(label: String? = nil, type: QueryType, count: UInt32, pipelineStatistics: [PipelineStatisticName]) {
+    public init(label: String? = nil, type: QueryType, count: UInt32, pipelineStatistics: [PipelineStatisticName] = []) {
         self.label = label
         self.type = type
         self.count = count
@@ -1629,7 +1629,7 @@ public struct VertexState: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], buffers: [VertexBufferLayout]) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry] = [], buffers: [VertexBufferLayout] = []) {
         self.module = module
         self.entryPoint = entryPoint
         self.constants = constants
@@ -1853,7 +1853,7 @@ public struct FragmentState: CStructConvertible, Extensible {
 
     public var nextInChain: Chained?
 
-    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry], targets: [ColorTargetState]) {
+    public init(module: ShaderModule, entryPoint: String, constants: [ConstantEntry] = [], targets: [ColorTargetState]) {
         self.module = module
         self.entryPoint = entryPoint
         self.constants = constants
