@@ -37,7 +37,7 @@ implicit_conversion = Conversion('{{ value }}', None, '{{ value }}')
 
 implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                        ('{{ value }}.withUnsafeBufferPointer { buffer_{{ name }} in', '}'),
-                                       'Array(UnsafeBufferPointer(start: {{ value }}), count: Int({{ length }})))')
+                                       'Array(UnsafeBufferPointer(start: {{ value }}, count: Int({{ length }})))')
 
 enum_conversion = Conversion('{{ value }}.cValue', None, '.init(cValue: {{ value }})')
 
@@ -66,7 +66,7 @@ struct_pointer_conversion = Conversion('cStruct_{{ name }}',
 
 optional_struct_conversion = Conversion('cStruct_{{ name }}',
                                         ('{{ value }}.withOptionalCStruct { cStruct_{{ name }} in', '}'),
-                                        '{{ value }} != nil ? .init(cStruct: {{ value }}) : nil')
+                                        '{{ value }} != nil ? .init(cStruct: {{ value }}.pointee) : nil')
 
 struct_array_conversion =\
     Conversion('buffer_{{ name }}.baseAddress',

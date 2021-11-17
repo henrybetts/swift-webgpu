@@ -20,6 +20,15 @@ public struct AdapterProperties: CStructConvertible {
     }
 
 
+    init(cStruct: WGPUAdapterProperties) {
+        self.vendorId = cStruct.vendorID
+        self.deviceId = cStruct.deviceID
+        self.name = String(cString: cStruct.name)
+        self.driverDescription = String(cString: cStruct.driverDescription)
+        self.adapterType = .init(cValue: cStruct.adapterType)
+        self.backendType = .init(cValue: cStruct.backendType)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUAdapterProperties>) throws -> R) rethrows -> R {
         return try self.name.withCString { cString_name in
         return try self.driverDescription.withCString { cString_driverDescription in
@@ -69,6 +78,15 @@ public struct BindGroupEntry: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUBindGroupEntry) {
+        self.binding = cStruct.binding
+        self.buffer = cStruct.buffer != nil ? .init(handle: cStruct.buffer) : nil
+        self.offset = cStruct.offset
+        self.size = cStruct.size
+        self.sampler = cStruct.sampler != nil ? .init(handle: cStruct.sampler) : nil
+        self.textureView = cStruct.textureView != nil ? .init(handle: cStruct.textureView) : nil
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupEntry>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.buffer.withOptionalHandle { handle_buffer in
@@ -113,6 +131,12 @@ public struct BindGroupDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUBindGroupDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.layout = .init(handle: cStruct.layout)
+        self.entries = UnsafeBufferPointer(start: cStruct.entries, count: Int(cStruct.entryCount)).map { .init(cStruct: $0) }
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -155,6 +179,12 @@ public struct BufferBindingLayout: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUBufferBindingLayout) {
+        self.type = .init(cValue: cStruct.type)
+        self.hasDynamicOffset = cStruct.hasDynamicOffset
+        self.minBindingSize = cStruct.minBindingSize
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBufferBindingLayout>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUBufferBindingLayout(
@@ -182,6 +212,10 @@ public struct SamplerBindingLayout: CStructConvertible, Extensible {
     public init(type: SamplerBindingType, nextInChain: Chained?) {
         self.type = type
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUSamplerBindingLayout) {
+        self.type = .init(cValue: cStruct.type)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSamplerBindingLayout>) throws -> R) rethrows -> R {
@@ -217,6 +251,12 @@ public struct TextureBindingLayout: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUTextureBindingLayout) {
+        self.sampleType = .init(cValue: cStruct.sampleType)
+        self.viewDimension = .init(cValue: cStruct.viewDimension)
+        self.multisampled = cStruct.multisampled
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUTextureBindingLayout>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUTextureBindingLayout(
@@ -244,6 +284,10 @@ public struct ExternalTextureBindingEntry: CStructConvertible, Chained {
     public init(externalTexture: ExternalTexture, nextInChain: Chained?) {
         self.externalTexture = externalTexture
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUExternalTextureBindingEntry) {
+        self.externalTexture = .init(handle: cStruct.externalTexture)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUExternalTextureBindingEntry>) throws -> R) rethrows -> R {
@@ -277,6 +321,9 @@ public struct ExternalTextureBindingLayout: CStructConvertible, Chained {
 
     public init(nextInChain: Chained?) {
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUExternalTextureBindingLayout) {
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUExternalTextureBindingLayout>) throws -> R) rethrows -> R {
@@ -316,6 +363,12 @@ public struct StorageTextureBindingLayout: CStructConvertible, Extensible {
         self.format = format
         self.viewDimension = viewDimension
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUStorageTextureBindingLayout) {
+        self.access = .init(cValue: cStruct.access)
+        self.format = .init(cValue: cStruct.format)
+        self.viewDimension = .init(cValue: cStruct.viewDimension)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUStorageTextureBindingLayout>) throws -> R) rethrows -> R {
@@ -362,6 +415,15 @@ public struct BindGroupLayoutEntry: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUBindGroupLayoutEntry) {
+        self.binding = cStruct.binding
+        self.visibility = .init(rawValue: cStruct.visibility)
+        self.buffer = .init(cStruct: cStruct.buffer)
+        self.sampler = .init(cStruct: cStruct.sampler)
+        self.texture = .init(cStruct: cStruct.texture)
+        self.storageTexture = .init(cStruct: cStruct.storageTexture)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupLayoutEntry>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.buffer.withCStruct { cStruct_buffer in
@@ -405,6 +467,11 @@ public struct BindGroupLayoutDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUBindGroupLayoutDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.entries = UnsafeBufferPointer(start: cStruct.entries, count: Int(cStruct.entryCount)).map { .init(cStruct: $0) }
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBindGroupLayoutDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -434,6 +501,7 @@ public struct BlendComponent: CStructConvertible {
         self.srcFactor = srcFactor
         self.dstFactor = dstFactor
     }
+
 
     init(cStruct: WGPUBlendComponent) {
         self.operation = .init(cValue: cStruct.operation)
@@ -476,6 +544,13 @@ public struct BufferDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUBufferDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.usage = .init(rawValue: cStruct.usage)
+        self.size = cStruct.size
+        self.mappedAtCreation = cStruct.mappedAtCreation
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUBufferDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -506,6 +581,7 @@ public struct Color: CStructConvertible {
         self.b = b
         self.a = a
     }
+
 
     init(cStruct: WGPUColor) {
         self.r = cStruct.r
@@ -544,6 +620,11 @@ public struct ConstantEntry: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUConstantEntry) {
+        self.key = String(cString: cStruct.key)
+        self.value = cStruct.value
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUConstantEntry>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.key.withCString { cString_key in
@@ -572,6 +653,10 @@ public struct CommandBufferDescriptor: CStructConvertible, Extensible {
     public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUCommandBufferDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCommandBufferDescriptor>) throws -> R) rethrows -> R {
@@ -603,6 +688,10 @@ public struct CommandEncoderDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUCommandEncoderDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCommandEncoderDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -630,6 +719,10 @@ public struct CompilationInfo: CStructConvertible, Extensible {
     public init(messages: [CompilationMessage], nextInChain: Chained?) {
         self.messages = messages
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUCompilationInfo) {
+        self.messages = UnsafeBufferPointer(start: cStruct.messages, count: Int(cStruct.messageCount)).map { .init(cStruct: $0) }
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCompilationInfo>) throws -> R) rethrows -> R {
@@ -677,6 +770,15 @@ public struct CompilationMessage: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUCompilationMessage) {
+        self.message = cStruct.message != nil ? String(cString: cStruct.message) : nil
+        self.type = .init(cValue: cStruct.type)
+        self.lineNum = cStruct.lineNum
+        self.linePos = cStruct.linePos
+        self.offset = cStruct.offset
+        self.length = cStruct.length
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCompilationMessage>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.message.withOptionalCString { cString_message in
@@ -709,6 +811,10 @@ public struct ComputePassDescriptor: CStructConvertible, Extensible {
     public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUComputePassDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUComputePassDescriptor>) throws -> R) rethrows -> R {
@@ -744,6 +850,12 @@ public struct ComputePipelineDescriptor: CStructConvertible, Extensible {
         self.layout = layout
         self.compute = compute
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUComputePipelineDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.layout = cStruct.layout != nil ? .init(handle: cStruct.layout) : nil
+        self.compute = .init(cStruct: cStruct.compute)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUComputePipelineDescriptor>) throws -> R) rethrows -> R {
@@ -782,6 +894,11 @@ public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
         self.flipY = flipY
         self.alphaOp = alphaOp
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUCopyTextureForBrowserOptions) {
+        self.flipY = cStruct.flipY
+        self.alphaOp = .init(cValue: cStruct.alphaOp)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCopyTextureForBrowserOptions>) throws -> R) rethrows -> R {
@@ -829,6 +946,22 @@ public struct DeviceProperties: CStructConvertible {
         self.limits = limits
     }
 
+
+    init(cStruct: WGPUDeviceProperties) {
+        self.deviceId = cStruct.deviceID
+        self.vendorId = cStruct.vendorID
+        self.textureCompressionBc = cStruct.textureCompressionBC
+        self.textureCompressionEtc2 = cStruct.textureCompressionETC2
+        self.textureCompressionAstc = cStruct.textureCompressionASTC
+        self.shaderFloat16 = cStruct.shaderFloat16
+        self.pipelineStatisticsQuery = cStruct.pipelineStatisticsQuery
+        self.timestampQuery = cStruct.timestampQuery
+        self.multiPlanarFormats = cStruct.multiPlanarFormats
+        self.depthClamping = cStruct.depthClamping
+        self.invalidFeature = cStruct.invalidFeature
+        self.dawnInternalUsages = cStruct.dawnInternalUsages
+        self.limits = .init(cStruct: cStruct.limits)
+    }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceProperties>) throws -> R) rethrows -> R {
         return try self.limits.withCStruct { cStruct_limits in
@@ -911,6 +1044,7 @@ public struct Limits: CStructConvertible {
         self.maxComputeWorkgroupsPerDimension = maxComputeWorkgroupsPerDimension
     }
 
+
     init(cStruct: WGPULimits) {
         self.maxTextureDimension1d = cStruct.maxTextureDimension1D
         self.maxTextureDimension2d = cStruct.maxTextureDimension2D
@@ -989,6 +1123,10 @@ public struct RequiredLimits: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPURequiredLimits) {
+        self.limits = .init(cStruct: cStruct.limits)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPURequiredLimits>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.limits.withCStruct { cStruct_limits in
@@ -1011,6 +1149,10 @@ public struct SupportedLimits: CStructConvertible {
         self.limits = limits
     }
 
+
+    init(cStruct: WGPUSupportedLimits) {
+        self.limits = .init(cStruct: cStruct.limits)
+    }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSupportedLimits>) throws -> R) rethrows -> R {
         return try self.limits.withCStruct { cStruct_limits in
@@ -1035,6 +1177,7 @@ public struct Extent3d: CStructConvertible {
         self.height = height
         self.depthOrArrayLayers = depthOrArrayLayers
     }
+
 
     init(cStruct: WGPUExtent3D) {
         self.width = cStruct.width
@@ -1074,6 +1217,12 @@ public struct ExternalTextureDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUExternalTextureDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.plane0 = .init(handle: cStruct.plane0)
+        self.format = .init(cValue: cStruct.format)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUExternalTextureDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -1108,6 +1257,11 @@ public struct ImageCopyBuffer: CStructConvertible, Extensible {
         self.layout = layout
         self.buffer = buffer
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUImageCopyBuffer) {
+        self.layout = .init(cStruct: cStruct.layout)
+        self.buffer = .init(handle: cStruct.buffer)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUImageCopyBuffer>) throws -> R) rethrows -> R {
@@ -1151,6 +1305,13 @@ public struct ImageCopyTexture: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUImageCopyTexture) {
+        self.texture = .init(handle: cStruct.texture)
+        self.mipLevel = cStruct.mipLevel
+        self.origin = .init(cStruct: cStruct.origin)
+        self.aspect = .init(cValue: cStruct.aspect)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUImageCopyTexture>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.texture.withUnsafeHandle { handle_texture in
@@ -1182,6 +1343,9 @@ public struct InstanceDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUInstanceDescriptor) {
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUInstanceDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUInstanceDescriptor(
@@ -1204,6 +1368,7 @@ public struct VertexAttribute: CStructConvertible {
         self.offset = offset
         self.shaderLocation = shaderLocation
     }
+
 
     init(cStruct: WGPUVertexAttribute) {
         self.format = .init(cValue: cStruct.format)
@@ -1233,6 +1398,7 @@ public struct VertexBufferLayout: CStructConvertible {
         self.stepMode = stepMode
         self.attributes = attributes
     }
+
 
     init(cStruct: WGPUVertexBufferLayout) {
         self.arrayStride = cStruct.arrayStride
@@ -1265,6 +1431,7 @@ public struct Origin3d: CStructConvertible {
         self.y = y
         self.z = z
     }
+
 
     init(cStruct: WGPUOrigin3D) {
         self.x = cStruct.x
@@ -1299,6 +1466,11 @@ public struct PipelineLayoutDescriptor: CStructConvertible, Extensible {
         self.label = label
         self.bindGroupLayouts = bindGroupLayouts
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUPipelineLayoutDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.bindGroupLayouts = UnsafeBufferPointer(start: cStruct.bindGroupLayouts, count: Int(cStruct.bindGroupLayoutCount)).map { .init(handle: $0) }
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUPipelineLayoutDescriptor>) throws -> R) rethrows -> R {
@@ -1338,6 +1510,12 @@ public struct ProgrammableStageDescriptor: CStructConvertible, Extensible {
         self.entryPoint = entryPoint
         self.constants = constants
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUProgrammableStageDescriptor) {
+        self.module = .init(handle: cStruct.module)
+        self.entryPoint = String(cString: cStruct.entryPoint)
+        self.constants = UnsafeBufferPointer(start: cStruct.constants, count: Int(cStruct.constantCount)).map { .init(cStruct: $0) }
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUProgrammableStageDescriptor>) throws -> R) rethrows -> R {
@@ -1385,6 +1563,13 @@ public struct QuerySetDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUQuerySetDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.type = .init(cValue: cStruct.type)
+        self.count = cStruct.count
+        self.pipelineStatistics = UnsafeBufferPointer(start: cStruct.pipelineStatistics, count: Int(cStruct.pipelineStatisticsCount)).map { .init(cValue: $0) }
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUQuerySetDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -1418,6 +1603,10 @@ public struct RenderBundleDescriptor: CStructConvertible, Extensible {
     public init(label: String?, nextInChain: Chained?) {
         self.label = label
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPURenderBundleDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderBundleDescriptor>) throws -> R) rethrows -> R {
@@ -1464,6 +1653,15 @@ public struct RenderBundleEncoderDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPURenderBundleEncoderDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.colorFormats = UnsafeBufferPointer(start: cStruct.colorFormats, count: Int(cStruct.colorFormatsCount)).map { .init(cValue: $0) }
+        self.depthStencilFormat = .init(cValue: cStruct.depthStencilFormat)
+        self.sampleCount = cStruct.sampleCount
+        self.depthReadOnly = cStruct.depthReadOnly
+        self.stencilReadOnly = cStruct.stencilReadOnly
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderBundleEncoderDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -1501,6 +1699,7 @@ public struct RenderPassColorAttachment: CStructConvertible {
         self.storeOp = storeOp
         self.clearColor = clearColor
     }
+
 
     init(cStruct: WGPURenderPassColorAttachment) {
         self.view = .init(handle: cStruct.view)
@@ -1552,6 +1751,7 @@ public struct RenderPassDepthStencilAttachment: CStructConvertible {
         self.clearStencil = clearStencil
         self.stencilReadOnly = stencilReadOnly
     }
+
 
     init(cStruct: WGPURenderPassDepthStencilAttachment) {
         self.view = .init(handle: cStruct.view)
@@ -1608,6 +1808,13 @@ public struct RenderPassDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPURenderPassDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.colorAttachments = UnsafeBufferPointer(start: cStruct.colorAttachments, count: Int(cStruct.colorAttachmentCount)).map { .init(cStruct: $0) }
+        self.depthStencilAttachment = cStruct.depthStencilAttachment != nil ? .init(cStruct: cStruct.depthStencilAttachment.pointee) : nil
+        self.occlusionQuerySet = cStruct.occlusionQuerySet != nil ? .init(handle: cStruct.occlusionQuerySet) : nil
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPassDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -1654,6 +1861,13 @@ public struct VertexState: CStructConvertible, Extensible {
         self.constants = constants
         self.buffers = buffers
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUVertexState) {
+        self.module = .init(handle: cStruct.module)
+        self.entryPoint = String(cString: cStruct.entryPoint)
+        self.constants = UnsafeBufferPointer(start: cStruct.constants, count: Int(cStruct.constantCount)).map { .init(cStruct: $0) }
+        self.buffers = UnsafeBufferPointer(start: cStruct.buffers, count: Int(cStruct.bufferCount)).map { .init(cStruct: $0) }
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUVertexState>) throws -> R) rethrows -> R {
@@ -1705,6 +1919,13 @@ public struct PrimitiveState: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUPrimitiveState) {
+        self.topology = .init(cValue: cStruct.topology)
+        self.stripIndexFormat = .init(cValue: cStruct.stripIndexFormat)
+        self.frontFace = .init(cValue: cStruct.frontFace)
+        self.cullMode = .init(cValue: cStruct.cullMode)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUPrimitiveState>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUPrimitiveState(
@@ -1733,6 +1954,10 @@ public struct PrimitiveDepthClampingState: CStructConvertible, Chained {
     public init(clampDepth: Bool, nextInChain: Chained?) {
         self.clampDepth = clampDepth
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUPrimitiveDepthClampingState) {
+        self.clampDepth = cStruct.clampDepth
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUPrimitiveDepthClampingState>) throws -> R) rethrows -> R {
@@ -1796,6 +2021,19 @@ public struct DepthStencilState: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUDepthStencilState) {
+        self.format = .init(cValue: cStruct.format)
+        self.depthWriteEnabled = cStruct.depthWriteEnabled
+        self.depthCompare = .init(cValue: cStruct.depthCompare)
+        self.stencilFront = .init(cStruct: cStruct.stencilFront)
+        self.stencilBack = .init(cStruct: cStruct.stencilBack)
+        self.stencilReadMask = cStruct.stencilReadMask
+        self.stencilWriteMask = cStruct.stencilWriteMask
+        self.depthBias = cStruct.depthBias
+        self.depthBiasSlopeScale = cStruct.depthBiasSlopeScale
+        self.depthBiasClamp = cStruct.depthBiasClamp
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDepthStencilState>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.stencilFront.withCStruct { cStruct_stencilFront in
@@ -1842,6 +2080,12 @@ public struct MultisampleState: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUMultisampleState) {
+        self.count = cStruct.count
+        self.mask = cStruct.mask
+        self.alphaToCoverageEnabled = cStruct.alphaToCoverageEnabled
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUMultisampleState>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUMultisampleState(
@@ -1878,6 +2122,13 @@ public struct FragmentState: CStructConvertible, Extensible {
         self.constants = constants
         self.targets = targets
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUFragmentState) {
+        self.module = .init(handle: cStruct.module)
+        self.entryPoint = String(cString: cStruct.entryPoint)
+        self.constants = UnsafeBufferPointer(start: cStruct.constants, count: Int(cStruct.constantCount)).map { .init(cStruct: $0) }
+        self.targets = UnsafeBufferPointer(start: cStruct.targets, count: Int(cStruct.targetCount)).map { .init(cStruct: $0) }
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUFragmentState>) throws -> R) rethrows -> R {
@@ -1926,6 +2177,12 @@ public struct ColorTargetState: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUColorTargetState) {
+        self.format = .init(cValue: cStruct.format)
+        self.blend = cStruct.blend != nil ? .init(cStruct: cStruct.blend.pointee) : nil
+        self.writeMask = .init(rawValue: cStruct.writeMask)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUColorTargetState>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.blend.withOptionalCStruct { cStruct_blend in
@@ -1951,6 +2208,7 @@ public struct BlendState: CStructConvertible {
         self.color = color
         self.alpha = alpha
     }
+
 
     init(cStruct: WGPUBlendState) {
         self.color = .init(cStruct: cStruct.color)
@@ -2002,6 +2260,16 @@ public struct RenderPipelineDescriptor: CStructConvertible, Extensible {
         self.multisample = multisample
         self.fragment = fragment
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPURenderPipelineDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.layout = cStruct.layout != nil ? .init(handle: cStruct.layout) : nil
+        self.vertex = .init(cStruct: cStruct.vertex)
+        self.primitive = .init(cStruct: cStruct.primitive)
+        self.depthStencil = cStruct.depthStencil != nil ? .init(cStruct: cStruct.depthStencil.pointee) : nil
+        self.multisample = .init(cStruct: cStruct.multisample)
+        self.fragment = cStruct.fragment != nil ? .init(cStruct: cStruct.fragment.pointee) : nil
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPURenderPipelineDescriptor>) throws -> R) rethrows -> R {
@@ -2081,6 +2349,20 @@ public struct SamplerDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUSamplerDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.addressModeU = .init(cValue: cStruct.addressModeU)
+        self.addressModeV = .init(cValue: cStruct.addressModeV)
+        self.addressModeW = .init(cValue: cStruct.addressModeW)
+        self.magFilter = .init(cValue: cStruct.magFilter)
+        self.minFilter = .init(cValue: cStruct.minFilter)
+        self.mipmapFilter = .init(cValue: cStruct.mipmapFilter)
+        self.lodMinClamp = cStruct.lodMinClamp
+        self.lodMaxClamp = cStruct.lodMaxClamp
+        self.compare = .init(cValue: cStruct.compare)
+        self.maxAnisotropy = cStruct.maxAnisotropy
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSamplerDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -2120,6 +2402,10 @@ public struct ShaderModuleDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUShaderModuleDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -2147,6 +2433,10 @@ public struct ShaderModuleSpirvDescriptor: CStructConvertible, Chained {
     public init(code: [UInt32], nextInChain: Chained?) {
         self.code = code
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUShaderModuleSPIRVDescriptor) {
+        self.code = Array(UnsafeBufferPointer(start: cStruct.code, count: Int(cStruct.codeSize)))
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleSPIRVDescriptor>) throws -> R) rethrows -> R {
@@ -2186,6 +2476,10 @@ public struct ShaderModuleWgslDescriptor: CStructConvertible, Chained {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUShaderModuleWGSLDescriptor) {
+        self.source = String(cString: cStruct.source)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUShaderModuleWGSLDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.source.withCString { cString_source in
@@ -2221,6 +2515,7 @@ public struct StencilFaceState: CStructConvertible {
         self.passOp = passOp
     }
 
+
     init(cStruct: WGPUStencilFaceState) {
         self.compare = .init(cValue: cStruct.compare)
         self.failOp = .init(cValue: cStruct.failOp)
@@ -2255,6 +2550,10 @@ public struct SurfaceDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUSurfaceDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -2282,6 +2581,10 @@ public struct SurfaceDescriptorFromCanvasHtmlSelector: CStructConvertible, Chain
     public init(selector: String, nextInChain: Chained?) {
         self.selector = selector
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUSurfaceDescriptorFromCanvasHTMLSelector) {
+        self.selector = String(cString: cStruct.selector)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromCanvasHTMLSelector>) throws -> R) rethrows -> R {
@@ -2320,6 +2623,10 @@ public struct SurfaceDescriptorFromMetalLayer: CStructConvertible, Chained {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUSurfaceDescriptorFromMetalLayer) {
+        self.layer = cStruct.layer
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromMetalLayer>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUSurfaceDescriptorFromMetalLayer(
@@ -2355,6 +2662,11 @@ public struct SurfaceDescriptorFromWindowsHwnd: CStructConvertible, Chained {
         self.hinstance = hinstance
         self.hwnd = hwnd
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUSurfaceDescriptorFromWindowsHWND) {
+        self.hinstance = cStruct.hinstance
+        self.hwnd = cStruct.hwnd
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromWindowsHWND>) throws -> R) rethrows -> R {
@@ -2395,6 +2707,11 @@ public struct SurfaceDescriptorFromXlib: CStructConvertible, Chained {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUSurfaceDescriptorFromXlib) {
+        self.display = cStruct.display
+        self.window = cStruct.window
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromXlib>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUSurfaceDescriptorFromXlib(
@@ -2430,6 +2747,10 @@ public struct SurfaceDescriptorFromWindowsCoreWindow: CStructConvertible, Chaine
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUSurfaceDescriptorFromWindowsCoreWindow) {
+        self.coreWindow = cStruct.coreWindow
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromWindowsCoreWindow>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         var cStruct = WGPUSurfaceDescriptorFromWindowsCoreWindow(
@@ -2462,6 +2783,10 @@ public struct SurfaceDescriptorFromWindowsSwapChainPanel: CStructConvertible, Ch
     public init(swapChainPanel: UnsafeMutableRawPointer!, nextInChain: Chained?) {
         self.swapChainPanel = swapChainPanel
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUSurfaceDescriptorFromWindowsSwapChainPanel) {
+        self.swapChainPanel = cStruct.swapChainPanel
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromWindowsSwapChainPanel>) throws -> R) rethrows -> R {
@@ -2516,6 +2841,16 @@ public struct SwapChainDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUSwapChainDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.usage = .init(rawValue: cStruct.usage)
+        self.format = .init(cValue: cStruct.format)
+        self.width = cStruct.width
+        self.height = cStruct.height
+        self.presentMode = .init(cValue: cStruct.presentMode)
+        self.implementation = cStruct.implementation
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUSwapChainDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -2555,6 +2890,12 @@ public struct TextureDataLayout: CStructConvertible, Extensible {
         self.bytesPerRow = bytesPerRow
         self.rowsPerImage = rowsPerImage
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUTextureDataLayout) {
+        self.offset = cStruct.offset
+        self.bytesPerRow = cStruct.bytesPerRow
+        self.rowsPerImage = cStruct.rowsPerImage
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUTextureDataLayout>) throws -> R) rethrows -> R {
@@ -2602,6 +2943,16 @@ public struct TextureDescriptor: CStructConvertible, Extensible {
         self.mipLevelCount = mipLevelCount
         self.sampleCount = sampleCount
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUTextureDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.usage = .init(rawValue: cStruct.usage)
+        self.dimension = .init(cValue: cStruct.dimension)
+        self.size = .init(cStruct: cStruct.size)
+        self.format = .init(cValue: cStruct.format)
+        self.mipLevelCount = cStruct.mipLevelCount
+        self.sampleCount = cStruct.sampleCount
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUTextureDescriptor>) throws -> R) rethrows -> R {
@@ -2662,6 +3013,17 @@ public struct TextureViewDescriptor: CStructConvertible, Extensible {
         self.nextInChain = nextInChain
     }
 
+    init(cStruct: WGPUTextureViewDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.format = .init(cValue: cStruct.format)
+        self.dimension = .init(cValue: cStruct.dimension)
+        self.baseMipLevel = cStruct.baseMipLevel
+        self.mipLevelCount = cStruct.mipLevelCount
+        self.baseArrayLayer = cStruct.baseArrayLayer
+        self.arrayLayerCount = cStruct.arrayLayerCount
+        self.aspect = .init(cValue: cStruct.aspect)
+    }
+
     func withCStruct<R>(_ body: (UnsafePointer<WGPUTextureViewDescriptor>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.label.withOptionalCString { cString_label in
@@ -2696,6 +3058,10 @@ public struct DawnTextureInternalUsageDescriptor: CStructConvertible, Chained {
     public init(internalUsage: TextureUsage, nextInChain: Chained?) {
         self.internalUsage = internalUsage
         self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUDawnTextureInternalUsageDescriptor) {
+        self.internalUsage = .init(rawValue: cStruct.internalUsage)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUDawnTextureInternalUsageDescriptor>) throws -> R) rethrows -> R {

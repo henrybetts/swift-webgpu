@@ -36,13 +36,12 @@ public struct {{ struct.swift_name }}: CStructConvertible
         self.nextInChain = nextInChain
     }
     {% endif %}
-    {% if struct.has_c_struct_initializer %}
+
     init(cStruct: {{ struct.c_name }}) {
         {% for member in struct.swift_members %}
         self.{{ member.swift_name }} = {{ member.conversion.get_swift_value('cStruct.' + member.c_name, member.length_member and 'cStruct.' + member.length_member.c_name) }}
         {% endfor %}
     }
-    {% endif %}
 
     func withCStruct<R>(_ body: (UnsafePointer<{{ struct.c_name }}>) throws -> R) rethrows -> R {
         {% if (struct.extensible or struct.chained) == 'in' %}
