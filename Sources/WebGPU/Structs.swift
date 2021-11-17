@@ -616,31 +616,37 @@ public struct CommandEncoderDescriptor: CStructConvertible, Extensible {
     }
 }
 
-public struct CompilationInfo: CStructConvertible {
+public struct CompilationInfo: CStructConvertible, Extensible {
     typealias CStruct = WGPUCompilationInfo
 
     public var messages: [CompilationMessage]
+
+    public var nextInChain: Chained?
 
     public init(messages: [CompilationMessage]) {
         self.messages = messages
     }
 
-    init(cStruct: WGPUCompilationInfo) {
-        self.messages = UnsafeBufferPointer(start: cStruct.messages, count: Int(cStruct.messageCount)).map { .init(cStruct: $0) }
+    public init(messages: [CompilationMessage], nextInChain: Chained?) {
+        self.messages = messages
+        self.nextInChain = nextInChain
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCompilationInfo>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.messages.withCStructBufferPointer { buffer_messages in
         var cStruct = WGPUCompilationInfo(
+            nextInChain: chainedCStruct, 
             messageCount: .init(buffer_messages.count), 
             messages: buffer_messages.baseAddress
         )
         return try body(&cStruct)
         }
+        }
     }
 }
 
-public struct CompilationMessage: CStructConvertible {
+public struct CompilationMessage: CStructConvertible, Extensible {
     typealias CStruct = WGPUCompilationMessage
 
     public var message: String?
@@ -649,6 +655,8 @@ public struct CompilationMessage: CStructConvertible {
     public var linePos: UInt64
     public var offset: UInt64
     public var length: UInt64
+
+    public var nextInChain: Chained?
 
     public init(message: String? = nil, type: CompilationMessageType, lineNum: UInt64, linePos: UInt64, offset: UInt64, length: UInt64) {
         self.message = message
@@ -659,18 +667,21 @@ public struct CompilationMessage: CStructConvertible {
         self.length = length
     }
 
-    init(cStruct: WGPUCompilationMessage) {
-        self.message = cStruct.message != nil ? String(cString: cStruct.message) : nil
-        self.type = .init(cValue: cStruct.type)
-        self.lineNum = cStruct.lineNum
-        self.linePos = cStruct.linePos
-        self.offset = cStruct.offset
-        self.length = cStruct.length
+    public init(message: String?, type: CompilationMessageType, lineNum: UInt64, linePos: UInt64, offset: UInt64, length: UInt64, nextInChain: Chained?) {
+        self.message = message
+        self.type = type
+        self.lineNum = lineNum
+        self.linePos = linePos
+        self.offset = offset
+        self.length = length
+        self.nextInChain = nextInChain
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCompilationMessage>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
         return try self.message.withOptionalCString { cString_message in
         var cStruct = WGPUCompilationMessage(
+            nextInChain: chainedCStruct, 
             message: cString_message, 
             type: self.type.cValue, 
             lineNum: self.lineNum, 
@@ -679,6 +690,7 @@ public struct CompilationMessage: CStructConvertible {
             length: self.length
         )
         return try body(&cStruct)
+        }
         }
     }
 }
