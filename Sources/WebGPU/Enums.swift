@@ -1,6 +1,6 @@
 import CWebGPU
 
-public enum AdapterType: UInt32 {
+public enum AdapterType: WGPUAdapterType.RawValue {
     case discreteGpu = 0
     case integratedGpu = 1
     case cpu = 2
@@ -15,7 +15,7 @@ public enum AdapterType: UInt32 {
     }
 }
 
-public enum AddressMode: UInt32 {
+public enum AddressMode: WGPUAddressMode.RawValue {
     case `repeat` = 0
     case mirrorRepeat = 1
     case clampToEdge = 2
@@ -29,7 +29,7 @@ public enum AddressMode: UInt32 {
     }
 }
 
-public enum BackendType: UInt32 {
+public enum BackendType: WGPUBackendType.RawValue {
     case null = 0
     case webgpu = 1
     case d3d11 = 2
@@ -48,7 +48,7 @@ public enum BackendType: UInt32 {
     }
 }
 
-public enum BufferBindingType: UInt32 {
+public enum BufferBindingType: WGPUBufferBindingType.RawValue {
     case undefined = 0
     case uniform = 1
     case storage = 2
@@ -63,7 +63,7 @@ public enum BufferBindingType: UInt32 {
     }
 }
 
-public enum SamplerBindingType: UInt32 {
+public enum SamplerBindingType: WGPUSamplerBindingType.RawValue {
     case undefined = 0
     case filtering = 1
     case nonFiltering = 2
@@ -78,7 +78,7 @@ public enum SamplerBindingType: UInt32 {
     }
 }
 
-public enum TextureSampleType: UInt32 {
+public enum TextureSampleType: WGPUTextureSampleType.RawValue {
     case undefined = 0
     case float = 1
     case unfilterableFloat = 2
@@ -95,7 +95,7 @@ public enum TextureSampleType: UInt32 {
     }
 }
 
-public enum StorageTextureAccess: UInt32 {
+public enum StorageTextureAccess: WGPUStorageTextureAccess.RawValue {
     case undefined = 0
     case writeOnly = 1
 
@@ -108,7 +108,7 @@ public enum StorageTextureAccess: UInt32 {
     }
 }
 
-public enum BlendFactor: UInt32 {
+public enum BlendFactor: WGPUBlendFactor.RawValue {
     case zero = 0
     case one = 1
     case src = 2
@@ -132,7 +132,7 @@ public enum BlendFactor: UInt32 {
     }
 }
 
-public enum BlendOperation: UInt32 {
+public enum BlendOperation: WGPUBlendOperation.RawValue {
     case add = 0
     case subtract = 1
     case reverseSubtract = 2
@@ -148,7 +148,7 @@ public enum BlendOperation: UInt32 {
     }
 }
 
-public enum BufferMapAsyncStatus: UInt32 {
+public enum BufferMapAsyncStatus: WGPUBufferMapAsyncStatus.RawValue {
     case success = 0
     case error = 1
     case unknown = 2
@@ -165,7 +165,7 @@ public enum BufferMapAsyncStatus: UInt32 {
     }
 }
 
-public enum CompareFunction: UInt32 {
+public enum CompareFunction: WGPUCompareFunction.RawValue {
     case undefined = 0
     case never = 1
     case less = 2
@@ -185,7 +185,7 @@ public enum CompareFunction: UInt32 {
     }
 }
 
-public enum CompilationInfoRequestStatus: UInt32 {
+public enum CompilationInfoRequestStatus: WGPUCompilationInfoRequestStatus.RawValue {
     case success = 0
     case error = 1
     case deviceLost = 2
@@ -200,7 +200,7 @@ public enum CompilationInfoRequestStatus: UInt32 {
     }
 }
 
-public enum CompilationMessageType: UInt32 {
+public enum CompilationMessageType: WGPUCompilationMessageType.RawValue {
     case error = 0
     case warning = 1
     case info = 2
@@ -214,7 +214,7 @@ public enum CompilationMessageType: UInt32 {
     }
 }
 
-public enum AlphaOp: UInt32 {
+public enum AlphaOp: WGPUAlphaOp.RawValue {
     case dontChange = 0
     case premultiply = 1
     case unpremultiply = 2
@@ -228,7 +228,7 @@ public enum AlphaOp: UInt32 {
     }
 }
 
-public enum CreatePipelineAsyncStatus: UInt32 {
+public enum CreatePipelineAsyncStatus: WGPUCreatePipelineAsyncStatus.RawValue {
     case success = 0
     case error = 1
     case deviceLost = 2
@@ -244,7 +244,7 @@ public enum CreatePipelineAsyncStatus: UInt32 {
     }
 }
 
-public enum CullMode: UInt32 {
+public enum CullMode: WGPUCullMode.RawValue {
     case none = 0
     case front = 1
     case back = 2
@@ -258,7 +258,7 @@ public enum CullMode: UInt32 {
     }
 }
 
-public enum DeviceLostReason: UInt32 {
+public enum DeviceLostReason: WGPUDeviceLostReason.RawValue {
     case undefined = 0
     case destroyed = 1
 
@@ -271,7 +271,7 @@ public enum DeviceLostReason: UInt32 {
     }
 }
 
-public enum ErrorFilter: UInt32 {
+public enum ErrorFilter: WGPUErrorFilter.RawValue {
     case none = 0
     case validation = 1
     case outOfMemory = 2
@@ -285,7 +285,7 @@ public enum ErrorFilter: UInt32 {
     }
 }
 
-public enum ErrorType: UInt32 {
+public enum ErrorType: WGPUErrorType.RawValue {
     case noError = 0
     case validation = 1
     case outOfMemory = 2
@@ -301,7 +301,7 @@ public enum ErrorType: UInt32 {
     }
 }
 
-public enum LoggingType: UInt32 {
+public enum LoggingType: WGPULoggingType.RawValue {
     case verbose = 0
     case info = 1
     case warning = 2
@@ -316,7 +316,7 @@ public enum LoggingType: UInt32 {
     }
 }
 
-public enum FilterMode: UInt32 {
+public enum FilterMode: WGPUFilterMode.RawValue {
     case nearest = 0
     case linear = 1
 
@@ -329,7 +329,7 @@ public enum FilterMode: UInt32 {
     }
 }
 
-public enum FrontFace: UInt32 {
+public enum FrontFace: WGPUFrontFace.RawValue {
     case ccw = 0
     case cw = 1
 
@@ -342,7 +342,7 @@ public enum FrontFace: UInt32 {
     }
 }
 
-public enum IndexFormat: UInt32 {
+public enum IndexFormat: WGPUIndexFormat.RawValue {
     case undefined = 0
     case uint16 = 1
     case uint32 = 2
@@ -356,7 +356,7 @@ public enum IndexFormat: UInt32 {
     }
 }
 
-public enum VertexStepMode: UInt32 {
+public enum VertexStepMode: WGPUVertexStepMode.RawValue {
     case vertex = 0
     case instance = 1
 
@@ -369,7 +369,7 @@ public enum VertexStepMode: UInt32 {
     }
 }
 
-public enum LoadOp: UInt32 {
+public enum LoadOp: WGPULoadOp.RawValue {
     case clear = 0
     case load = 1
 
@@ -382,7 +382,7 @@ public enum LoadOp: UInt32 {
     }
 }
 
-public enum StoreOp: UInt32 {
+public enum StoreOp: WGPUStoreOp.RawValue {
     case store = 0
     case discard = 1
 
@@ -395,7 +395,7 @@ public enum StoreOp: UInt32 {
     }
 }
 
-public enum PipelineStatisticName: UInt32 {
+public enum PipelineStatisticName: WGPUPipelineStatisticName.RawValue {
     case vertexShaderInvocations = 0
     case clipperInvocations = 1
     case clipperPrimitivesOut = 2
@@ -411,7 +411,7 @@ public enum PipelineStatisticName: UInt32 {
     }
 }
 
-public enum PresentMode: UInt32 {
+public enum PresentMode: WGPUPresentMode.RawValue {
     case immediate = 0
     case mailbox = 1
     case fifo = 2
@@ -425,7 +425,7 @@ public enum PresentMode: UInt32 {
     }
 }
 
-public enum PrimitiveTopology: UInt32 {
+public enum PrimitiveTopology: WGPUPrimitiveTopology.RawValue {
     case pointList = 0
     case lineList = 1
     case lineStrip = 2
@@ -441,7 +441,7 @@ public enum PrimitiveTopology: UInt32 {
     }
 }
 
-public enum QueryType: UInt32 {
+public enum QueryType: WGPUQueryType.RawValue {
     case occlusion = 0
     case pipelineStatistics = 1
     case timestamp = 2
@@ -455,7 +455,7 @@ public enum QueryType: UInt32 {
     }
 }
 
-public enum QueueWorkDoneStatus: UInt32 {
+public enum QueueWorkDoneStatus: WGPUQueueWorkDoneStatus.RawValue {
     case success = 0
     case error = 1
     case unknown = 2
@@ -470,7 +470,7 @@ public enum QueueWorkDoneStatus: UInt32 {
     }
 }
 
-public enum RequestDeviceStatus: UInt32 {
+public enum RequestDeviceStatus: WGPURequestDeviceStatus.RawValue {
     case success = 0
     case error = 1
     case unknown = 2
@@ -484,7 +484,7 @@ public enum RequestDeviceStatus: UInt32 {
     }
 }
 
-public enum StencilOperation: UInt32 {
+public enum StencilOperation: WGPUStencilOperation.RawValue {
     case keep = 0
     case zero = 1
     case replace = 2
@@ -503,7 +503,7 @@ public enum StencilOperation: UInt32 {
     }
 }
 
-public enum SType: UInt32 {
+public enum SType: WGPUSType.RawValue {
     case invalid = 0
     case surfaceDescriptorFromMetalLayer = 1
     case surfaceDescriptorFromWindowsHwnd = 2
@@ -527,7 +527,7 @@ public enum SType: UInt32 {
     }
 }
 
-public enum TextureAspect: UInt32 {
+public enum TextureAspect: WGPUTextureAspect.RawValue {
     case all = 0
     case stencilOnly = 1
     case depthOnly = 2
@@ -543,7 +543,7 @@ public enum TextureAspect: UInt32 {
     }
 }
 
-public enum TextureComponentType: UInt32 {
+public enum TextureComponentType: WGPUTextureComponentType.RawValue {
     case float = 0
     case sint = 1
     case uint = 2
@@ -558,7 +558,7 @@ public enum TextureComponentType: UInt32 {
     }
 }
 
-public enum TextureDimension: UInt32 {
+public enum TextureDimension: WGPUTextureDimension.RawValue {
     case type1d = 0
     case type2d = 1
     case type3d = 2
@@ -572,7 +572,7 @@ public enum TextureDimension: UInt32 {
     }
 }
 
-public enum TextureFormat: UInt32 {
+public enum TextureFormat: WGPUTextureFormat.RawValue {
     case undefined = 0
     case r8Unorm = 1
     case r8Snorm = 2
@@ -678,7 +678,7 @@ public enum TextureFormat: UInt32 {
     }
 }
 
-public enum TextureViewDimension: UInt32 {
+public enum TextureViewDimension: WGPUTextureViewDimension.RawValue {
     case typeUndefined = 0
     case type1d = 1
     case type2d = 2
@@ -696,7 +696,7 @@ public enum TextureViewDimension: UInt32 {
     }
 }
 
-public enum VertexFormat: UInt32 {
+public enum VertexFormat: WGPUVertexFormat.RawValue {
     case undefined = 0
     case uint8x2 = 1
     case uint8x4 = 2

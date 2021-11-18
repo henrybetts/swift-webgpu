@@ -1,7 +1,7 @@
 import CWebGPU
 
 {% for enum in model.types_by_category('enum') %}
-public enum {{ enum.swift_name }}: UInt32 {
+public enum {{ enum.swift_name }}: {{ enum.c_name }}.RawValue {
     {% for value in enum.values %}
     case {{ value.swift_name }} = {{ value.value }}
     {% endfor %}

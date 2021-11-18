@@ -2,9 +2,9 @@ import CWebGPU
 
 {% for bitmask in model.types_by_category('bitmask') %}
 public struct {{ bitmask.swift_name }}: OptionSet {
-    public let rawValue: UInt32
+    public let rawValue: {{ bitmask.c_name }}
 
-    public init(rawValue: UInt32) {
+    public init(rawValue: {{ bitmask.c_name }}) {
         self.rawValue = rawValue
     }
 

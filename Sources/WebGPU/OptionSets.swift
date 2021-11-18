@@ -1,9 +1,9 @@
 import CWebGPU
 
 public struct BufferUsage: OptionSet {
-    public let rawValue: UInt32
+    public let rawValue: WGPUBufferUsageFlags
 
-    public init(rawValue: UInt32) {
+    public init(rawValue: WGPUBufferUsageFlags) {
         self.rawValue = rawValue
     }
 
@@ -21,9 +21,9 @@ public struct BufferUsage: OptionSet {
 }
 
 public struct ColorWriteMask: OptionSet {
-    public let rawValue: UInt32
+    public let rawValue: WGPUColorWriteMaskFlags
 
-    public init(rawValue: UInt32) {
+    public init(rawValue: WGPUColorWriteMaskFlags) {
         self.rawValue = rawValue
     }
 
@@ -36,9 +36,9 @@ public struct ColorWriteMask: OptionSet {
 }
 
 public struct MapMode: OptionSet {
-    public let rawValue: UInt32
+    public let rawValue: WGPUMapModeFlags
 
-    public init(rawValue: UInt32) {
+    public init(rawValue: WGPUMapModeFlags) {
         self.rawValue = rawValue
     }
 
@@ -48,9 +48,9 @@ public struct MapMode: OptionSet {
 }
 
 public struct ShaderStage: OptionSet {
-    public let rawValue: UInt32
+    public let rawValue: WGPUShaderStageFlags
 
-    public init(rawValue: UInt32) {
+    public init(rawValue: WGPUShaderStageFlags) {
         self.rawValue = rawValue
     }
 
@@ -61,9 +61,9 @@ public struct ShaderStage: OptionSet {
 }
 
 public struct TextureUsage: OptionSet {
-    public let rawValue: UInt32
+    public let rawValue: WGPUTextureUsageFlags
 
-    public init(rawValue: UInt32) {
+    public init(rawValue: WGPUTextureUsageFlags) {
         self.rawValue = rawValue
     }
 
