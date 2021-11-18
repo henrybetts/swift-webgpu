@@ -1,4 +1,4 @@
-import SGLMath
+import SwiftMath
 
 struct Vertex {
     var position: vec3

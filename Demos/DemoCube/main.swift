@@ -1,17 +1,11 @@
 import WebGPU
 import DawnNative
 import WindowUtils
-import SGLMath
-
-#if canImport(Darwin)
-import Darwin.C
-#else
-import Glibc
-#endif
+import SwiftMath
 
 struct Camera {
-    var view: mat4
-    var projection: mat4
+    var view: Matrix4x4f
+    var projection: Matrix4x4f
 }
 
 let instance = DawnNative.Instance()
@@ -141,7 +135,9 @@ withGLFW {
         return indexBuffer
     }
     
-    var camera = Camera(view: mat4(), projection: SGLMath.perspective(45, 800/600, 1, 100))
+    var camera = Camera(
+        view: Matrix4x4f(),
+        projection: Matrix4x4f.proj(fovy: Angle(degrees: 45), aspect: 800/600, near: 1, far: 100))
 
     let cameraBuffer = device.createBuffer(descriptor: BufferDescriptor(
         usage: [.uniform, .copyDst],
@@ -160,14 +156,13 @@ withGLFW {
         format: .depth24Plus)
     ).createView()
     
-    var rotation: Float = 0.0
+    var rotation = Angle(degrees: 0)
     
     repeat {
-        rotation = (rotation + 0.5).truncatingRemainder(dividingBy: 360)
-        camera.view = SGLMath.lookAt(
-            vec3(6 * sin(radians(rotation)), 2, 6 * cos(radians(rotation))),
-            vec3(0, 0, 0),
-            vec3(0, 1, 0))
+        rotation = (rotation + Angle(degrees: 0.5)) % Angle(degrees: 360)
+        camera.view = Matrix4x4f.lookAt(
+            eye: vec3(6 * sin(rotation), 2, 6 * cos(rotation)),
+            at: vec3(0, 0, 0))
         
         withUnsafeBytes(of: &camera) { cameraBytes in
             device.queue.writeBuffer(cameraBuffer, bufferOffset: 0, data: cameraBytes)

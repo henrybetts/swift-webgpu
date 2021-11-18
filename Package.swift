@@ -14,7 +14,7 @@ let package = Package(
             targets: ["DawnNative", "WebGPU"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/SwiftGL/Math.git", .branch("master")) // for demos only
+        .package(url: "https://github.com/SwiftGFX/SwiftMath", from: "3.3.0") // for demos only
     ],
     targets: [
         .systemLibrary(
@@ -57,7 +57,7 @@ let package = Package(
             path: "Demos/DemoTriangle"),
         .target(
             name: "DemoCube",
-            dependencies: ["DawnNative", "WindowUtils", "SGLMath"],
+            dependencies: ["DawnNative", "WindowUtils", "SwiftMath"],
             path: "Demos/DemoCube"),
     ],
     cxxLanguageStandard: .cxx11
