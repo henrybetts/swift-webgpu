@@ -3,6 +3,8 @@ import WebGPU
 
 #if os(macOS)
     import AppKit
+#elseif os(Windows)
+    import WinSDK
 #endif
 
 public func withGLFW<R>(_ body: () throws -> R) rethrows -> R {
@@ -40,8 +42,14 @@ public class Window {
             )
         #elseif os(Linux)
             surfaceDescriptor.nextInChain = SurfaceDescriptorFromXlib(
-                    display: UnsafeMutableRawPointer(glfwGetX11Display()),
-                    window: UInt32(glfwGetX11Window(handle)))
+                display: UnsafeMutableRawPointer(glfwGetX11Display()),
+                window: UInt32(glfwGetX11Window(handle))
+            )
+        #elseif os(Windows)
+            surfaceDescriptor.nextInChain = SurfaceDescriptorFromWindowsHwnd(
+                hinstance: GetModuleHandleW(nil),
+                hwnd: glfwGetWin32Window(handle)
+            )
         #endif
         
         return surfaceDescriptor
