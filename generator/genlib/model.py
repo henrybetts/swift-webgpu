@@ -160,19 +160,19 @@ class Member(Base):
 
     @property
     def c_type(self) -> str:
-        if self.type.name == 'void' and self.annotation == 'const*':
-            return 'UnsafeRawPointer!'
-
-        if self.type.name == 'void' and self.annotation == '*':
-            return 'UnsafeMutableRawPointer!'
-
-        if self.annotation == 'const*' and self.type.category == 'object':
-            return f'UnsafePointer<{self.type.c_name}?>!'
-
         if self.annotation == 'const*':
+            if self.type.name == 'void':
+                return 'UnsafeRawPointer!'
+
+            if self.type.category == 'object':
+                return f'UnsafePointer<{self.type.c_name}?>!'
+
             return f'UnsafePointer<{self.type.c_name}>!'
 
         if self.annotation == '*':
+            if self.type.name == 'void':
+                return 'UnsafeMutableRawPointer!'
+
             return f'UnsafeMutablePointer<{self.type.c_name}>!'
 
         if self.type.category == 'object':
@@ -183,6 +183,7 @@ class Member(Base):
     @property
     def swift_type(self) -> str:
         if self.type.name == 'char' and self.annotation == 'const*':
+            # TODO: Should check that length == 'strlen', but this is not yet consistent in dawn.json
             swift_type = 'String'
 
         elif self.annotation == 'const*' and self.length:
@@ -216,6 +217,7 @@ class Member(Base):
             return typeconversion.userdata_conversion
 
         if self.type.name == 'char' and self.annotation == 'const*':
+            # TODO: Should check that length == 'strlen', but this is not yet consistent in dawn.json
             return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
 
         if self.annotation == 'const*' and self.length:
@@ -233,6 +235,17 @@ class Member(Base):
 
             return typeconversion.implicit_array_conversion
 
+        if self.annotation == 'const*':
+            if self.type.category == 'structure':
+                if self.optional:
+                    return typeconversion.optional_struct_conversion
+                return typeconversion.struct_pointer_conversion
+
+            return typeconversion.implicit_conversion
+
+        if self.annotation == '*':
+            return typeconversion.implicit_conversion
+
         if self.type.category == 'enum':
             return typeconversion.enum_conversion
 
@@ -240,12 +253,7 @@ class Member(Base):
             return typeconversion.bitmask_conversion
 
         if self.type.category == 'structure':
-            if self.optional:
-                return typeconversion.optional_struct_conversion
-            if self.annotation == 'const*':
-                return typeconversion.struct_pointer_conversion
-            if not self.annotation:
-                return typeconversion.struct_conversion
+            return typeconversion.struct_conversion
 
         if self.type.category == 'object':
             return typeconversion.optional_object_conversion if self.optional else typeconversion.object_conversion

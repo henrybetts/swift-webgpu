@@ -60,7 +60,7 @@ public class Adapter: Object {
         self.withUnsafeHandle { handle_self in
             let result = wgpuAdapterEnumerateFeatures(
                 handle_self, 
-                features.cValue
+                features
             )
             return result
         }
@@ -1002,7 +1002,7 @@ public class Device: Object {
         self.withUnsafeHandle { handle_self in
             let result = wgpuDeviceEnumerateFeatures(
                 handle_self, 
-                features.cValue
+                features
             )
             return result
         }
