@@ -1,5 +1,20 @@
 import CWebGPU
 
+public enum RequestAdapterStatus: WGPURequestAdapterStatus.RawValue {
+    case success = 0
+    case unavailable = 1
+    case error = 2
+    case unknown = 3
+
+    init(cValue: WGPURequestAdapterStatus) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPURequestAdapterStatus {
+        return WGPURequestAdapterStatus(rawValue: self.rawValue)
+    }
+}
+
 public enum AdapterType: WGPUAdapterType.RawValue {
     case discreteGpu = 0
     case integratedGpu = 1
@@ -214,17 +229,16 @@ public enum CompilationMessageType: WGPUCompilationMessageType.RawValue {
     }
 }
 
-public enum AlphaOp: WGPUAlphaOp.RawValue {
-    case dontChange = 0
-    case premultiply = 1
-    case unpremultiply = 2
+public enum AlphaMode: WGPUAlphaMode.RawValue {
+    case premultiplied = 0
+    case unpremultiplied = 1
 
-    init(cValue: WGPUAlphaOp) {
+    init(cValue: WGPUAlphaMode) {
         self.init(rawValue: cValue.rawValue)!
     }
 
-    var cValue: WGPUAlphaOp {
-        return WGPUAlphaOp(rawValue: self.rawValue)
+    var cValue: WGPUAlphaMode {
+        return WGPUAlphaMode(rawValue: self.rawValue)
     }
 }
 
@@ -272,9 +286,8 @@ public enum DeviceLostReason: WGPUDeviceLostReason.RawValue {
 }
 
 public enum ErrorFilter: WGPUErrorFilter.RawValue {
-    case none = 0
-    case validation = 1
-    case outOfMemory = 2
+    case validation = 0
+    case outOfMemory = 1
 
     init(cValue: WGPUErrorFilter) {
         self.init(rawValue: cValue.rawValue)!
@@ -313,6 +326,30 @@ public enum LoggingType: WGPULoggingType.RawValue {
 
     var cValue: WGPULoggingType {
         return WGPULoggingType(rawValue: self.rawValue)
+    }
+}
+
+public enum FeatureName: WGPUFeatureName.RawValue {
+    case undefined = 0
+    case depth24UnormStencil8 = 2
+    case depth32FloatStencil8 = 3
+    case timestampQuery = 4
+    case pipelineStatisticsQuery = 5
+    case textureCompressionBc = 6
+    case textureCompressionEtc2 = 7
+    case textureCompressionAstc = 8
+    case indirectFirstInstance = 9
+    case depthClamping = 1000
+    case dawnShaderFloat16 = 1001
+    case dawnInternalUsages = 1002
+    case dawnMultiPlanarFormats = 1003
+
+    init(cValue: WGPUFeatureName) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUFeatureName {
+        return WGPUFeatureName(rawValue: self.rawValue)
     }
 }
 
@@ -408,6 +445,20 @@ public enum PipelineStatisticName: WGPUPipelineStatisticName.RawValue {
 
     var cValue: WGPUPipelineStatisticName {
         return WGPUPipelineStatisticName(rawValue: self.rawValue)
+    }
+}
+
+public enum PowerPreference: WGPUPowerPreference.RawValue {
+    case undefined = 0
+    case lowPower = 1
+    case highPerformance = 2
+
+    init(cValue: WGPUPowerPreference) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUPowerPreference {
+        return WGPUPowerPreference(rawValue: self.rawValue)
     }
 }
 
@@ -511,12 +562,12 @@ public enum SType: WGPUSType.RawValue {
     case surfaceDescriptorFromCanvasHtmlSelector = 4
     case shaderModuleSpirvDescriptor = 5
     case shaderModuleWgslDescriptor = 6
-    case primitiveDepthClampingState = 7
     case surfaceDescriptorFromWindowsCoreWindow = 8
     case externalTextureBindingEntry = 9
     case externalTextureBindingLayout = 10
     case surfaceDescriptorFromWindowsSwapChainPanel = 11
     case dawnTextureInternalUsageDescriptor = 1000
+    case primitiveDepthClampingState = 1001
 
     init(cValue: WGPUSType) {
         self.init(rawValue: cValue.rawValue)!
@@ -614,60 +665,62 @@ public enum TextureFormat: WGPUTextureFormat.RawValue {
     case depth16Unorm = 38
     case depth24Plus = 39
     case depth24PlusStencil8 = 40
-    case depth32Float = 41
-    case bc1RgbaUnorm = 42
-    case bc1RgbaUnormSrgb = 43
-    case bc2RgbaUnorm = 44
-    case bc2RgbaUnormSrgb = 45
-    case bc3RgbaUnorm = 46
-    case bc3RgbaUnormSrgb = 47
-    case bc4RUnorm = 48
-    case bc4RSnorm = 49
-    case bc5RgUnorm = 50
-    case bc5RgSnorm = 51
-    case bc6hRgbUfloat = 52
-    case bc6hRgbFloat = 53
-    case bc7RgbaUnorm = 54
-    case bc7RgbaUnormSrgb = 55
-    case etc2Rgb8Unorm = 56
-    case etc2Rgb8UnormSrgb = 57
-    case etc2Rgb8a1Unorm = 58
-    case etc2Rgb8a1UnormSrgb = 59
-    case etc2Rgba8Unorm = 60
-    case etc2Rgba8UnormSrgb = 61
-    case eacR11Unorm = 62
-    case eacR11Snorm = 63
-    case eacRg11Unorm = 64
-    case eacRg11Snorm = 65
-    case astc4x4Unorm = 66
-    case astc4x4UnormSrgb = 67
-    case astc5x4Unorm = 68
-    case astc5x4UnormSrgb = 69
-    case astc5x5Unorm = 70
-    case astc5x5UnormSrgb = 71
-    case astc6x5Unorm = 72
-    case astc6x5UnormSrgb = 73
-    case astc6x6Unorm = 74
-    case astc6x6UnormSrgb = 75
-    case astc8x5Unorm = 76
-    case astc8x5UnormSrgb = 77
-    case astc8x6Unorm = 78
-    case astc8x6UnormSrgb = 79
-    case astc8x8Unorm = 80
-    case astc8x8UnormSrgb = 81
-    case astc10x5Unorm = 82
-    case astc10x5UnormSrgb = 83
-    case astc10x6Unorm = 84
-    case astc10x6UnormSrgb = 85
-    case astc10x8Unorm = 86
-    case astc10x8UnormSrgb = 87
-    case astc10x10Unorm = 88
-    case astc10x10UnormSrgb = 89
-    case astc12x10Unorm = 90
-    case astc12x10UnormSrgb = 91
-    case astc12x12Unorm = 92
-    case astc12x12UnormSrgb = 93
-    case r8Bg8Biplanar420Unorm = 94
+    case depth24UnormStencil8 = 41
+    case depth32Float = 42
+    case depth32FloatStencil8 = 43
+    case bc1RgbaUnorm = 44
+    case bc1RgbaUnormSrgb = 45
+    case bc2RgbaUnorm = 46
+    case bc2RgbaUnormSrgb = 47
+    case bc3RgbaUnorm = 48
+    case bc3RgbaUnormSrgb = 49
+    case bc4RUnorm = 50
+    case bc4RSnorm = 51
+    case bc5RgUnorm = 52
+    case bc5RgSnorm = 53
+    case bc6hRgbUfloat = 54
+    case bc6hRgbFloat = 55
+    case bc7RgbaUnorm = 56
+    case bc7RgbaUnormSrgb = 57
+    case etc2Rgb8Unorm = 58
+    case etc2Rgb8UnormSrgb = 59
+    case etc2Rgb8a1Unorm = 60
+    case etc2Rgb8a1UnormSrgb = 61
+    case etc2Rgba8Unorm = 62
+    case etc2Rgba8UnormSrgb = 63
+    case eacR11Unorm = 64
+    case eacR11Snorm = 65
+    case eacRg11Unorm = 66
+    case eacRg11Snorm = 67
+    case astc4x4Unorm = 68
+    case astc4x4UnormSrgb = 69
+    case astc5x4Unorm = 70
+    case astc5x4UnormSrgb = 71
+    case astc5x5Unorm = 72
+    case astc5x5UnormSrgb = 73
+    case astc6x5Unorm = 74
+    case astc6x5UnormSrgb = 75
+    case astc6x6Unorm = 76
+    case astc6x6UnormSrgb = 77
+    case astc8x5Unorm = 78
+    case astc8x5UnormSrgb = 79
+    case astc8x6Unorm = 80
+    case astc8x6UnormSrgb = 81
+    case astc8x8Unorm = 82
+    case astc8x8UnormSrgb = 83
+    case astc10x5Unorm = 84
+    case astc10x5UnormSrgb = 85
+    case astc10x6Unorm = 86
+    case astc10x6UnormSrgb = 87
+    case astc10x8Unorm = 88
+    case astc10x8UnormSrgb = 89
+    case astc10x10Unorm = 90
+    case astc10x10UnormSrgb = 91
+    case astc12x10Unorm = 92
+    case astc12x10UnormSrgb = 93
+    case astc12x12Unorm = 94
+    case astc12x12UnormSrgb = 95
+    case r8Bg8Biplanar420Unorm = 96
 
     init(cValue: WGPUTextureFormat) {
         self.init(rawValue: cValue.rawValue)!

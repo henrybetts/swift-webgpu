@@ -1,13 +1,14 @@
 import CWebGPU
 
-{% for callback in model.types_by_category('callback') %}
+{% for callback in model.types_by_category('function pointer') %}
+{% if callback.is_callback %}
 public typealias {{ callback.swift_name }} = (
 {%- for arg in callback.swift_args -%}
 {{ arg.swift_type }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
 ) -> ()
 
-func {{ callback.function_name }}(
+func {{ callback.callback_function_name }}(
 {%- for arg in callback.args -%}
 {{ arg.swift_name }}: {{ arg.c_type }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
@@ -21,4 +22,5 @@ func {{ callback.function_name }}(
     )
 }
 
+{% endif %}
 {% endfor %}

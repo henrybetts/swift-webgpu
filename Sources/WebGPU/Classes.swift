@@ -1,5 +1,85 @@
 import CWebGPU
 
+public class Adapter: Object {
+    private let handle: WGPUAdapter!
+
+    /// Create a wrapper around an existing handle.
+    ///
+    /// The ownership of the handle is transferred to this class.
+    ///
+    /// - Parameter handle: The handle to wrap.
+    public init(handle: WGPUAdapter!) {
+        self.handle = handle
+    }
+
+    deinit {
+        wgpuAdapterRelease(self.handle)
+    }
+
+    /// Calls the given closure with the underlying handle.
+    ///
+    /// The underlying handle is guaranteed not to be released before the closure returns.
+    ///
+    /// - Parameter body: A closure to call with the underlying handle.
+    public func withUnsafeHandle<R>(_ body: (WGPUAdapter) throws -> R) rethrows -> R {
+        return try withExtendedLifetime(self) {
+            return try body(self.handle)
+        }
+    }
+
+    public func getLimits(_ limits: UnsafeMutablePointer<WGPUSupportedLimits>!) -> Bool {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuAdapterGetLimits(
+                handle_self, 
+                limits
+            )
+            return result
+        }
+    }
+
+    public func getProperties(_ properties: UnsafeMutablePointer<WGPUAdapterProperties>!) {
+        self.withUnsafeHandle { handle_self in
+            wgpuAdapterGetProperties(
+                handle_self, 
+                properties
+            )
+        }
+    }
+
+    public func hasFeature(_ feature: FeatureName) -> Bool {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuAdapterHasFeature(
+                handle_self, 
+                feature.cValue
+            )
+            return result
+        }
+    }
+
+    public func enumerateFeatures(_ features: UnsafeMutablePointer<WGPUFeatureName>!) -> UInt32 {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuAdapterEnumerateFeatures(
+                handle_self, 
+                features.cValue
+            )
+            return result
+        }
+    }
+
+    public func requestDevice(descriptor: DeviceDescriptor, callback: @escaping RequestDeviceCallback) {
+        self.withUnsafeHandle { handle_self in
+            descriptor.withCStruct { cStruct_descriptor in
+            wgpuAdapterRequestDevice(
+                handle_self, 
+                cStruct_descriptor, 
+                requestDeviceCallback, 
+                UserData.passRetained(callback)
+            )
+            }
+        }
+    }
+}
+
 public class BindGroup: Object {
     private let handle: WGPUBindGroup!
 
@@ -24,6 +104,17 @@ public class BindGroup: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUBindGroup) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuBindGroupSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
         }
     }
 }
@@ -52,6 +143,17 @@ public class BindGroupLayout: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUBindGroupLayout) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuBindGroupLayoutSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
         }
     }
 }
@@ -170,6 +272,17 @@ public class CommandBuffer: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUCommandBuffer) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuCommandBufferSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
         }
     }
 }
@@ -322,6 +435,19 @@ public class CommandEncoder: Object {
         }
     }
 
+    public func clearBuffer(_ buffer: Buffer, offset: UInt64, size: UInt64 = UInt64(WGPU_WHOLE_SIZE)) {
+        self.withUnsafeHandle { handle_self in
+            buffer.withUnsafeHandle { handle_buffer in
+            wgpuCommandEncoderClearBuffer(
+                handle_self, 
+                handle_buffer, 
+                offset, 
+                size
+            )
+            }
+        }
+    }
+
     public func injectValidationError(message: String) {
         self.withUnsafeHandle { handle_self in
             message.withCString { cString_message in
@@ -403,6 +529,17 @@ public class CommandEncoder: Object {
                 handle_self, 
                 handle_querySet, 
                 queryIndex
+            )
+            }
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuCommandEncoderSetLabel(
+                handle_self, 
+                cString_label
             )
             }
         }
@@ -533,6 +670,17 @@ public class ComputePassEncoder: Object {
             wgpuComputePassEncoderEndPass(
                 handle_self
             )
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuComputePassEncoderSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
         }
     }
 }
@@ -822,11 +970,39 @@ public class Device: Object {
         }
     }
 
+    public func destroy() {
+        self.withUnsafeHandle { handle_self in
+            wgpuDeviceDestroy(
+                handle_self
+            )
+        }
+    }
+
     public func getLimits(_ limits: UnsafeMutablePointer<WGPUSupportedLimits>!) -> Bool {
         self.withUnsafeHandle { handle_self in
             let result = wgpuDeviceGetLimits(
                 handle_self, 
                 limits
+            )
+            return result
+        }
+    }
+
+    public func hasFeature(_ feature: FeatureName) -> Bool {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuDeviceHasFeature(
+                handle_self, 
+                feature.cValue
+            )
+            return result
+        }
+    }
+
+    public func enumerateFeatures(_ features: UnsafeMutablePointer<WGPUFeatureName>!) -> UInt32 {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuDeviceEnumerateFeatures(
+                handle_self, 
+                features.cValue
             )
             return result
         }
@@ -959,6 +1135,17 @@ public class ExternalTexture: Object {
         }
     }
 
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuExternalTextureSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
+        }
+    }
+
     public func destroy() {
         self.withUnsafeHandle { handle_self in
             wgpuExternalTextureDestroy(
@@ -1006,6 +1193,19 @@ open class Instance: Object {
             }
         }
     }
+
+    public func requestAdapter(options: RequestAdapterOptions, callback: @escaping RequestAdapterCallback) {
+        self.withUnsafeHandle { handle_self in
+            options.withCStruct { cStruct_options in
+            wgpuInstanceRequestAdapter(
+                handle_self, 
+                cStruct_options, 
+                requestAdapterCallback, 
+                UserData.passRetained(callback)
+            )
+            }
+        }
+    }
 }
 
 public class PipelineLayout: Object {
@@ -1034,6 +1234,17 @@ public class PipelineLayout: Object {
             return try body(self.handle)
         }
     }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuPipelineLayoutSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
+        }
+    }
 }
 
 public class QuerySet: Object {
@@ -1060,6 +1271,17 @@ public class QuerySet: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUQuerySet) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuQuerySetSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
         }
     }
 
@@ -1376,6 +1598,17 @@ public class RenderBundleEncoder: Object {
             }
         }
     }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuRenderBundleEncoderSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
+        }
+    }
 }
 
 public class RenderPassEncoder: Object {
@@ -1633,6 +1866,17 @@ public class RenderPassEncoder: Object {
             )
         }
     }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuRenderPassEncoderSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
+        }
+    }
 }
 
 public class RenderPipeline: Object {
@@ -1708,6 +1952,17 @@ public class Sampler: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUSampler) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuSamplerSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
         }
     }
 }
@@ -1929,6 +2184,17 @@ public class TextureView: Object {
     public func withUnsafeHandle<R>(_ body: (WGPUTextureView) throws -> R) rethrows -> R {
         return try withExtendedLifetime(self) {
             return try body(self.handle)
+        }
+    }
+
+    public func setLabel(_ label: String) {
+        self.withUnsafeHandle { handle_self in
+            label.withCString { cString_label in
+            wgpuTextureViewSetLabel(
+                handle_self, 
+                cString_label
+            )
+            }
         }
     }
 }

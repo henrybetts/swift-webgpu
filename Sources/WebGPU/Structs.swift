@@ -1,5 +1,48 @@
 import CWebGPU
 
+public struct RequestAdapterOptions: CStructConvertible, Extensible {
+    typealias CStruct = WGPURequestAdapterOptions
+
+    public var compatibleSurface: Surface?
+    public var powerPreference: PowerPreference
+    public var forceFallbackAdapter: Bool
+
+    public var nextInChain: Chained?
+
+    public init(compatibleSurface: Surface? = nil, powerPreference: PowerPreference = .undefined, forceFallbackAdapter: Bool = false) {
+        self.compatibleSurface = compatibleSurface
+        self.powerPreference = powerPreference
+        self.forceFallbackAdapter = forceFallbackAdapter
+    }
+
+    public init(compatibleSurface: Surface?, powerPreference: PowerPreference, forceFallbackAdapter: Bool, nextInChain: Chained?) {
+        self.compatibleSurface = compatibleSurface
+        self.powerPreference = powerPreference
+        self.forceFallbackAdapter = forceFallbackAdapter
+        self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPURequestAdapterOptions) {
+        self.compatibleSurface = cStruct.compatibleSurface != nil ? .init(handle: cStruct.compatibleSurface) : nil
+        self.powerPreference = .init(cValue: cStruct.powerPreference)
+        self.forceFallbackAdapter = cStruct.forceFallbackAdapter
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPURequestAdapterOptions>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.compatibleSurface.withOptionalHandle { handle_compatibleSurface in
+        var cStruct = WGPURequestAdapterOptions(
+            nextInChain: chainedCStruct, 
+            compatibleSurface: handle_compatibleSurface, 
+            powerPreference: self.powerPreference.cValue, 
+            forceFallbackAdapter: self.forceFallbackAdapter
+        )
+        return try body(&cStruct)
+        }
+        }
+    }
+}
+
 public struct AdapterProperties: CStructConvertible {
     typealias CStruct = WGPUAdapterProperties
 
@@ -42,6 +85,54 @@ public struct AdapterProperties: CStructConvertible {
             backendType: self.backendType.cValue
         )
         return try body(&cStruct)
+        }
+        }
+    }
+}
+
+public struct DeviceDescriptor: CStructConvertible, Extensible {
+    typealias CStruct = WGPUDeviceDescriptor
+
+    public var label: String?
+    public var requiredFeatures: [FeatureName]
+    public var requiredLimits: RequiredLimits?
+
+    public var nextInChain: Chained?
+
+    public init(label: String? = nil, requiredFeatures: [FeatureName] = [], requiredLimits: RequiredLimits? = nil) {
+        self.label = label
+        self.requiredFeatures = requiredFeatures
+        self.requiredLimits = requiredLimits
+    }
+
+    public init(label: String?, requiredFeatures: [FeatureName], requiredLimits: RequiredLimits?, nextInChain: Chained?) {
+        self.label = label
+        self.requiredFeatures = requiredFeatures
+        self.requiredLimits = requiredLimits
+        self.nextInChain = nextInChain
+    }
+
+    init(cStruct: WGPUDeviceDescriptor) {
+        self.label = cStruct.label != nil ? String(cString: cStruct.label) : nil
+        self.requiredFeatures = UnsafeBufferPointer(start: cStruct.requiredFeatures, count: Int(cStruct.requiredFeaturesCount)).map { .init(cValue: $0) }
+        self.requiredLimits = cStruct.requiredLimits != nil ? .init(cStruct: cStruct.requiredLimits.pointee) : nil
+    }
+
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUDeviceDescriptor>) throws -> R) rethrows -> R {
+        return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.label.withOptionalCString { cString_label in
+        return try self.requiredFeatures.map { $0.cValue }.withUnsafeBufferPointer { buffer_requiredFeatures in
+        return try self.requiredLimits.withOptionalCStruct { cStruct_requiredLimits in
+        var cStruct = WGPUDeviceDescriptor(
+            nextInChain: chainedCStruct, 
+            label: cString_label, 
+            requiredFeaturesCount: .init(buffer_requiredFeatures.count), 
+            requiredFeatures: buffer_requiredFeatures.baseAddress, 
+            requiredLimits: cStruct_requiredLimits
+        )
+        return try body(&cStruct)
+        }
+        }
         }
         }
     }
@@ -881,34 +972,65 @@ public struct CopyTextureForBrowserOptions: CStructConvertible, Extensible {
     typealias CStruct = WGPUCopyTextureForBrowserOptions
 
     public var flipY: Bool
-    public var alphaOp: AlphaOp
+    public var needsColorSpaceConversion: Bool
+    public var srcAlphaMode: AlphaMode
+    public var srcTransferFunctionParameters: [Float]?
+    public var conversionMatrix: [Float]?
+    public var dstTransferFunctionParameters: [Float]?
+    public var dstAlphaMode: AlphaMode
 
     public var nextInChain: Chained?
 
-    public init(flipY: Bool = false, alphaOp: AlphaOp = .dontChange) {
+    public init(flipY: Bool = false, needsColorSpaceConversion: Bool = false, srcAlphaMode: AlphaMode = .unpremultiplied, srcTransferFunctionParameters: [Float]? = nil, conversionMatrix: [Float]? = nil, dstTransferFunctionParameters: [Float]? = nil, dstAlphaMode: AlphaMode = .unpremultiplied) {
         self.flipY = flipY
-        self.alphaOp = alphaOp
+        self.needsColorSpaceConversion = needsColorSpaceConversion
+        self.srcAlphaMode = srcAlphaMode
+        self.srcTransferFunctionParameters = srcTransferFunctionParameters
+        self.conversionMatrix = conversionMatrix
+        self.dstTransferFunctionParameters = dstTransferFunctionParameters
+        self.dstAlphaMode = dstAlphaMode
     }
 
-    public init(flipY: Bool, alphaOp: AlphaOp, nextInChain: Chained?) {
+    public init(flipY: Bool, needsColorSpaceConversion: Bool, srcAlphaMode: AlphaMode, srcTransferFunctionParameters: [Float]?, conversionMatrix: [Float]?, dstTransferFunctionParameters: [Float]?, dstAlphaMode: AlphaMode, nextInChain: Chained?) {
         self.flipY = flipY
-        self.alphaOp = alphaOp
+        self.needsColorSpaceConversion = needsColorSpaceConversion
+        self.srcAlphaMode = srcAlphaMode
+        self.srcTransferFunctionParameters = srcTransferFunctionParameters
+        self.conversionMatrix = conversionMatrix
+        self.dstTransferFunctionParameters = dstTransferFunctionParameters
+        self.dstAlphaMode = dstAlphaMode
         self.nextInChain = nextInChain
     }
 
     init(cStruct: WGPUCopyTextureForBrowserOptions) {
         self.flipY = cStruct.flipY
-        self.alphaOp = .init(cValue: cStruct.alphaOp)
+        self.needsColorSpaceConversion = cStruct.needsColorSpaceConversion
+        self.srcAlphaMode = .init(cValue: cStruct.srcAlphaMode)
+        self.srcTransferFunctionParameters = Array(UnsafeBufferPointer(start: cStruct.srcTransferFunctionParameters, count: Int(None)))
+        self.conversionMatrix = Array(UnsafeBufferPointer(start: cStruct.conversionMatrix, count: Int(None)))
+        self.dstTransferFunctionParameters = Array(UnsafeBufferPointer(start: cStruct.dstTransferFunctionParameters, count: Int(None)))
+        self.dstAlphaMode = .init(cValue: cStruct.dstAlphaMode)
     }
 
     func withCStruct<R>(_ body: (UnsafePointer<WGPUCopyTextureForBrowserOptions>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
+        return try self.srcTransferFunctionParameters.withUnsafeBufferPointer { buffer_srcTransferFunctionParameters in
+        return try self.conversionMatrix.withUnsafeBufferPointer { buffer_conversionMatrix in
+        return try self.dstTransferFunctionParameters.withUnsafeBufferPointer { buffer_dstTransferFunctionParameters in
         var cStruct = WGPUCopyTextureForBrowserOptions(
             nextInChain: chainedCStruct, 
             flipY: self.flipY, 
-            alphaOp: self.alphaOp.cValue
+            needsColorSpaceConversion: self.needsColorSpaceConversion, 
+            srcAlphaMode: self.srcAlphaMode.cValue, 
+            srcTransferFunctionParameters: buffer_srcTransferFunctionParameters.baseAddress, 
+            conversionMatrix: buffer_conversionMatrix.baseAddress, 
+            dstTransferFunctionParameters: buffer_dstTransferFunctionParameters.baseAddress, 
+            dstAlphaMode: self.dstAlphaMode.cValue
         )
         return try body(&cStruct)
+        }
+        }
+        }
         }
     }
 }
@@ -918,6 +1040,7 @@ public struct DeviceProperties: CStructConvertible {
 
     public var deviceId: UInt32
     public var vendorId: UInt32
+    public var adapterType: AdapterType
     public var textureCompressionBc: Bool
     public var textureCompressionEtc2: Bool
     public var textureCompressionAstc: Bool
@@ -926,13 +1049,16 @@ public struct DeviceProperties: CStructConvertible {
     public var timestampQuery: Bool
     public var multiPlanarFormats: Bool
     public var depthClamping: Bool
+    public var depth24UnormStencil8: Bool
+    public var depth32FloatStencil8: Bool
     public var invalidFeature: Bool
     public var dawnInternalUsages: Bool
     public var limits: SupportedLimits
 
-    public init(deviceId: UInt32, vendorId: UInt32, textureCompressionBc: Bool = false, textureCompressionEtc2: Bool = false, textureCompressionAstc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false, invalidFeature: Bool = false, dawnInternalUsages: Bool = false, limits: SupportedLimits = SupportedLimits()) {
+    public init(deviceId: UInt32, vendorId: UInt32, adapterType: AdapterType, textureCompressionBc: Bool = false, textureCompressionEtc2: Bool = false, textureCompressionAstc: Bool = false, shaderFloat16: Bool = false, pipelineStatisticsQuery: Bool = false, timestampQuery: Bool = false, multiPlanarFormats: Bool = false, depthClamping: Bool = false, depth24UnormStencil8: Bool = false, depth32FloatStencil8: Bool = false, invalidFeature: Bool = false, dawnInternalUsages: Bool = false, limits: SupportedLimits = SupportedLimits()) {
         self.deviceId = deviceId
         self.vendorId = vendorId
+        self.adapterType = adapterType
         self.textureCompressionBc = textureCompressionBc
         self.textureCompressionEtc2 = textureCompressionEtc2
         self.textureCompressionAstc = textureCompressionAstc
@@ -941,6 +1067,8 @@ public struct DeviceProperties: CStructConvertible {
         self.timestampQuery = timestampQuery
         self.multiPlanarFormats = multiPlanarFormats
         self.depthClamping = depthClamping
+        self.depth24UnormStencil8 = depth24UnormStencil8
+        self.depth32FloatStencil8 = depth32FloatStencil8
         self.invalidFeature = invalidFeature
         self.dawnInternalUsages = dawnInternalUsages
         self.limits = limits
@@ -950,6 +1078,7 @@ public struct DeviceProperties: CStructConvertible {
     init(cStruct: WGPUDeviceProperties) {
         self.deviceId = cStruct.deviceID
         self.vendorId = cStruct.vendorID
+        self.adapterType = .init(cValue: cStruct.adapterType)
         self.textureCompressionBc = cStruct.textureCompressionBC
         self.textureCompressionEtc2 = cStruct.textureCompressionETC2
         self.textureCompressionAstc = cStruct.textureCompressionASTC
@@ -958,6 +1087,8 @@ public struct DeviceProperties: CStructConvertible {
         self.timestampQuery = cStruct.timestampQuery
         self.multiPlanarFormats = cStruct.multiPlanarFormats
         self.depthClamping = cStruct.depthClamping
+        self.depth24UnormStencil8 = cStruct.depth24UnormStencil8
+        self.depth32FloatStencil8 = cStruct.depth32FloatStencil8
         self.invalidFeature = cStruct.invalidFeature
         self.dawnInternalUsages = cStruct.dawnInternalUsages
         self.limits = .init(cStruct: cStruct.limits)
@@ -968,6 +1099,7 @@ public struct DeviceProperties: CStructConvertible {
         var cStruct = WGPUDeviceProperties(
             deviceID: self.deviceId, 
             vendorID: self.vendorId, 
+            adapterType: self.adapterType.cValue, 
             textureCompressionBC: self.textureCompressionBc, 
             textureCompressionETC2: self.textureCompressionEtc2, 
             textureCompressionASTC: self.textureCompressionAstc, 
@@ -976,6 +1108,8 @@ public struct DeviceProperties: CStructConvertible {
             timestampQuery: self.timestampQuery, 
             multiPlanarFormats: self.multiPlanarFormats, 
             depthClamping: self.depthClamping, 
+            depth24UnormStencil8: self.depth24UnormStencil8, 
+            depth32FloatStencil8: self.depth32FloatStencil8, 
             invalidFeature: self.invalidFeature, 
             dawnInternalUsages: self.dawnInternalUsages, 
             limits: cStruct_limits.pointee

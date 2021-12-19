@@ -39,7 +39,7 @@ import CWebGPU
             if let callback = callback {
                 let userData = UserData(callback)
                 self._{{ method.swift_name }} = userData
-                {{ method.c_name }}(handle_self, {{ method.args[0].type.function_name }}, userData.toOpaque())
+                {{ method.c_name }}(handle_self, {{ method.args[0].type.callback_function_name }}, userData.toOpaque())
             } else {
                 self._{{ method.swift_name }} = nil
                 {{ method.c_name }}(handle_self, nil, nil)

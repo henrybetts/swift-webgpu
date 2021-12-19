@@ -197,7 +197,7 @@ class Member(Base):
         else:
             return self.c_type
 
-        if self.type.category == 'callback':
+        if self.type.category == 'function pointer':
             swift_type = '@escaping ' + swift_type
 
         if self.optional:
@@ -250,8 +250,8 @@ class Member(Base):
         if self.type.category == 'object':
             return typeconversion.optional_object_conversion if self.optional else typeconversion.object_conversion
 
-        if isinstance(self.type, CallbackType):
-            return typeconversion.Conversion(self.type.function_name)
+        if isinstance(self.type, FunctionPointerType) and self.type.is_callback:
+            return typeconversion.Conversion(self.type.callback_function_name)
 
         return typeconversion.implicit_conversion
 
@@ -399,7 +399,7 @@ class ObjectType(Type):
             method.link(types)
 
 
-class CallbackType(Type):
+class FunctionPointerType(Type):
     def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
 
@@ -409,7 +409,11 @@ class CallbackType(Type):
             arg.length_of = args_by_length.get(arg.name)
 
     @property
-    def function_name(self) -> str:
+    def is_callback(self):
+        return any(arg.name == 'userdata' for arg in self.args)
+
+    @property
+    def callback_function_name(self) -> str:
         return camel_case(self.name.lower())
 
     @property
@@ -443,7 +447,7 @@ class Model:
             'bitmask': needs_tags(BitmaskType),
             'structure': needs_tags(StructureType),
             'object': needs_tags(ObjectType),
-            'callback': needs_tags(CallbackType),
+            'function pointer': needs_tags(FunctionPointerType),
             'typedef': TypedefType,
         }
 
