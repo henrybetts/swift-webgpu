@@ -7,7 +7,7 @@ from jinja2 import Template
 
 if __name__ == '__main__':
     with open('dawn.json') as f:
-        model = Model(json.load(f), enabled_tags=['dawn', 'native', 'deprecated'])
+        model = Model(json.load(f), enabled_tags=['native', 'deprecated'])
 
     template_dir = 'templates'
     output_dir = '../Sources/WebGPU'

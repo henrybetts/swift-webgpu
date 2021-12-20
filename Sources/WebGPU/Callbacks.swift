@@ -72,16 +72,6 @@ func errorCallback(type: WGPUErrorType, message: UnsafePointer<CChar>!, userdata
     )
 }
 
-public typealias LoggingCallback = (LoggingType, String) -> ()
-
-func loggingCallback(type: WGPULoggingType, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
-    let swiftCallback = UserData<LoggingCallback>.takeValue(userdata)
-    swiftCallback(
-        .init(cValue: type), 
-        String(cString: message)
-    )
-}
-
 public typealias QueueWorkDoneCallback = (QueueWorkDoneStatus) -> ()
 
 func queueWorkDoneCallback(status: WGPUQueueWorkDoneStatus, userdata: UnsafeMutableRawPointer!) {

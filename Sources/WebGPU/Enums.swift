@@ -229,19 +229,6 @@ public enum CompilationMessageType: WGPUCompilationMessageType.RawValue {
     }
 }
 
-public enum AlphaMode: WGPUAlphaMode.RawValue {
-    case premultiplied = 0
-    case unpremultiplied = 1
-
-    init(cValue: WGPUAlphaMode) {
-        self.init(rawValue: cValue.rawValue)!
-    }
-
-    var cValue: WGPUAlphaMode {
-        return WGPUAlphaMode(rawValue: self.rawValue)
-    }
-}
-
 public enum CreatePipelineAsyncStatus: WGPUCreatePipelineAsyncStatus.RawValue {
     case success = 0
     case error = 1
@@ -314,21 +301,6 @@ public enum ErrorType: WGPUErrorType.RawValue {
     }
 }
 
-public enum LoggingType: WGPULoggingType.RawValue {
-    case verbose = 0
-    case info = 1
-    case warning = 2
-    case error = 3
-
-    init(cValue: WGPULoggingType) {
-        self.init(rawValue: cValue.rawValue)!
-    }
-
-    var cValue: WGPULoggingType {
-        return WGPULoggingType(rawValue: self.rawValue)
-    }
-}
-
 public enum FeatureName: WGPUFeatureName.RawValue {
     case undefined = 0
     case depth24UnormStencil8 = 2
@@ -339,10 +311,6 @@ public enum FeatureName: WGPUFeatureName.RawValue {
     case textureCompressionEtc2 = 7
     case textureCompressionAstc = 8
     case indirectFirstInstance = 9
-    case depthClamping = 1000
-    case dawnShaderFloat16 = 1001
-    case dawnInternalUsages = 1002
-    case dawnMultiPlanarFormats = 1003
 
     init(cValue: WGPUFeatureName) {
         self.init(rawValue: cValue.rawValue)!
@@ -562,12 +530,6 @@ public enum SType: WGPUSType.RawValue {
     case surfaceDescriptorFromCanvasHtmlSelector = 4
     case shaderModuleSpirvDescriptor = 5
     case shaderModuleWgslDescriptor = 6
-    case surfaceDescriptorFromWindowsCoreWindow = 8
-    case externalTextureBindingEntry = 9
-    case externalTextureBindingLayout = 10
-    case surfaceDescriptorFromWindowsSwapChainPanel = 11
-    case dawnTextureInternalUsageDescriptor = 1000
-    case primitiveDepthClampingState = 1001
 
     init(cValue: WGPUSType) {
         self.init(rawValue: cValue.rawValue)!
@@ -582,8 +544,6 @@ public enum TextureAspect: WGPUTextureAspect.RawValue {
     case all = 0
     case stencilOnly = 1
     case depthOnly = 2
-    case plane0Only = 3
-    case plane1Only = 4
 
     init(cValue: WGPUTextureAspect) {
         self.init(rawValue: cValue.rawValue)!
@@ -720,7 +680,6 @@ public enum TextureFormat: WGPUTextureFormat.RawValue {
     case astc12x10UnormSrgb = 93
     case astc12x12Unorm = 94
     case astc12x12UnormSrgb = 95
-    case r8Bg8Biplanar420Unorm = 96
 
     init(cValue: WGPUTextureFormat) {
         self.init(rawValue: cValue.rawValue)!

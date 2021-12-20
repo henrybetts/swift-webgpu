@@ -12,6 +12,11 @@ def _is_enabled(data: Dict, enabled_tags: Optional[List[str]]):
     return any(tag in enabled_tags for tag in tags)
 
 
+def _is_member_enabled(data: Dict):
+    tags = data.get('tags')
+    return not (tags and 'upstream' in tags)
+
+
 class Base:
     def __init__(self, data: Dict):
         self.data = data
@@ -289,7 +294,7 @@ class StructureType(Type):
     def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
 
-        self.members = [Member(m) for m in data['members'] if _is_enabled(m, enabled_tags)]
+        self.members = [Member(m) for m in data['members'] if _is_member_enabled(m)]
         members_by_name = {member.name: member for member in self.members}
         members_by_length = {member.length: member for member in self.members if member.length}
         for member in self.members:
@@ -327,7 +332,7 @@ class Method(Base):
         self.object_name = object_name
         self.return_type: Optional[Type] = None
 
-        self.args = [Member(arg) for arg in data.get('args', []) if _is_enabled(arg, enabled_tags)]
+        self.args = [Member(arg) for arg in data.get('args', []) if _is_member_enabled(arg)]
         args_by_name = {arg.name: arg for arg in self.args}
         args_by_length = {arg.length: arg for arg in self.args if arg.length}
         for arg in self.args:
@@ -411,7 +416,7 @@ class FunctionPointerType(Type):
     def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
 
-        self.args = [Member(m) for m in data['args'] if _is_enabled(m, enabled_tags)]
+        self.args = [Member(m) for m in data['args'] if _is_member_enabled(m)]
         args_by_length = {arg.length: arg for arg in self.args if arg.length}
         for arg in self.args:
             arg.length_of = args_by_length.get(arg.name)

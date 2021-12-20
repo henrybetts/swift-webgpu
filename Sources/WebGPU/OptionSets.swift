@@ -73,6 +73,5 @@ public struct TextureUsage: OptionSet {
     public static let textureBinding = TextureUsage(rawValue: 4)
     public static let storageBinding = TextureUsage(rawValue: 8)
     public static let renderAttachment = TextureUsage(rawValue: 16)
-    public static let present = TextureUsage(rawValue: 32)
 }
 
