@@ -11,7 +11,7 @@ struct Camera {
 let instance = DawnNative.Instance()
 
 instance.discoverDefaultAdapters()
-guard let adapter = instance.adapters.first else {
+guard let adapter = instance.adapters.first(where: { $0.properties.backendType != .null }) else {
     fatalError("No adapters found")
 }
 print("Using adapter: \(adapter.properties.name)")
