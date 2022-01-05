@@ -32,7 +32,7 @@ withGLFW {
     
     var hue = 0.0
         
-    repeat {
+    window.loop {
         let encoder = device.createCommandEncoder()
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
@@ -48,9 +48,7 @@ withGLFW {
         device.queue.submit(commands: [commandBuffer])
         
         swapchain.present()
-        pollEvents()
         
         hue = (hue + 0.5).truncatingRemainder(dividingBy: 360)
-        
-    } while !window.shouldClose
+    }
 }

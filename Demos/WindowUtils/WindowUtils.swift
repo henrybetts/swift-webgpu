@@ -62,9 +62,28 @@ public class Window {
     public var shouldClose: Bool {
         return glfwWindowShouldClose(handle) == GLFW_TRUE
     }
+    
+    public func loop(body: () -> ()) {
+        repeat {
+            _autoreleasepool {
+                body()
+                pollEvents()
+            }
+        } while !shouldClose
+    }
 }
 
 public func pollEvents() {
     glfwPollEvents()
+}
+
+func _autoreleasepool(invoking body: () -> ()) {
+    #if os(macOS)
+        autoreleasepool {
+            body()
+        }
+    #else
+        body()
+    #endif
 }
 

@@ -158,7 +158,7 @@ withGLFW {
     
     var rotation = Angle(degrees: 0)
     
-    repeat {
+    window.loop {
         rotation = (rotation + Angle(degrees: 0.5)) % Angle(degrees: 360)
         camera.view = Matrix4x4f.lookAt(
             eye: vec3(6 * sin(rotation), 2, 6 * cos(rotation)),
@@ -195,8 +195,5 @@ withGLFW {
         device.queue.submit(commands: [commandBuffer])
         
         swapchain.present()
-        pollEvents()
-        
-    } while !window.shouldClose
-
+    }
 }

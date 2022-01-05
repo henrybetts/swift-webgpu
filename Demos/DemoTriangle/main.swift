@@ -107,7 +107,7 @@ withGLFW {
         return vertexBuffer
     }
     
-    repeat {
+    window.loop {
         let encoder = device.createCommandEncoder()
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
@@ -126,8 +126,5 @@ withGLFW {
         device.queue.submit(commands: [commandBuffer])
         
         swapchain.present()
-        pollEvents()
-        
-    } while !window.shouldClose
-
+    }
 }
