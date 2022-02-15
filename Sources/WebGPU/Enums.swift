@@ -375,8 +375,9 @@ public enum VertexStepMode: WGPUVertexStepMode.RawValue {
 }
 
 public enum LoadOp: WGPULoadOp.RawValue {
-    case clear = 0
-    case load = 1
+    case undefined = 0
+    case clear = 1
+    case load = 2
 
     init(cValue: WGPULoadOp) {
         self.init(rawValue: cValue.rawValue)!
@@ -388,8 +389,9 @@ public enum LoadOp: WGPULoadOp.RawValue {
 }
 
 public enum StoreOp: WGPUStoreOp.RawValue {
-    case store = 0
-    case discard = 1
+    case undefined = 0
+    case store = 1
+    case discard = 2
 
     init(cValue: WGPUStoreOp) {
         self.init(rawValue: cValue.rawValue)!
@@ -427,6 +429,19 @@ public enum PowerPreference: WGPUPowerPreference.RawValue {
 
     var cValue: WGPUPowerPreference {
         return WGPUPowerPreference(rawValue: self.rawValue)
+    }
+}
+
+public enum PredefinedColorSpace: WGPUPredefinedColorSpace.RawValue {
+    case undefined = 0
+    case srgb = 1
+
+    init(cValue: WGPUPredefinedColorSpace) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUPredefinedColorSpace {
+        return WGPUPredefinedColorSpace(rawValue: self.rawValue)
     }
 }
 
@@ -526,7 +541,7 @@ public enum SType: WGPUSType.RawValue {
     case invalid = 0
     case surfaceDescriptorFromMetalLayer = 1
     case surfaceDescriptorFromWindowsHwnd = 2
-    case surfaceDescriptorFromXlib = 3
+    case surfaceDescriptorFromXlibWindow = 3
     case surfaceDescriptorFromCanvasHtmlSelector = 4
     case shaderModuleSpirvDescriptor = 5
     case shaderModuleWgslDescriptor = 6

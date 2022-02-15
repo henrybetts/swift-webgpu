@@ -1605,7 +1605,7 @@ public struct RenderPassDepthStencilAttachment: CStructConvertible {
     public var clearStencil: UInt32
     public var stencilReadOnly: Bool
 
-    public init(view: TextureView, depthLoadOp: LoadOp, depthStoreOp: StoreOp, clearDepth: Float, depthReadOnly: Bool = false, stencilLoadOp: LoadOp, stencilStoreOp: StoreOp, clearStencil: UInt32 = 0, stencilReadOnly: Bool = false) {
+    public init(view: TextureView, depthLoadOp: LoadOp = .undefined, depthStoreOp: StoreOp = .undefined, clearDepth: Float = 0, depthReadOnly: Bool = false, stencilLoadOp: LoadOp = .undefined, stencilStoreOp: StoreOp = .undefined, clearStencil: UInt32 = 0, stencilReadOnly: Bool = false) {
         self.view = view
         self.depthLoadOp = depthLoadOp
         self.depthStoreOp = depthStoreOp
@@ -2515,8 +2515,8 @@ public struct SurfaceDescriptorFromWindowsHwnd: CStructConvertible, Chained {
     }
 }
 
-public struct SurfaceDescriptorFromXlib: CStructConvertible, Chained {
-    typealias CStruct = WGPUSurfaceDescriptorFromXlib
+public struct SurfaceDescriptorFromXlibWindow: CStructConvertible, Chained {
+    typealias CStruct = WGPUSurfaceDescriptorFromXlibWindow
 
     public var display: UnsafeMutableRawPointer!
     public var window: UInt32
@@ -2534,15 +2534,15 @@ public struct SurfaceDescriptorFromXlib: CStructConvertible, Chained {
         self.nextInChain = nextInChain
     }
 
-    init(cStruct: WGPUSurfaceDescriptorFromXlib) {
+    init(cStruct: WGPUSurfaceDescriptorFromXlibWindow) {
         self.display = cStruct.display
         self.window = cStruct.window
     }
 
-    func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromXlib>) throws -> R) rethrows -> R {
+    func withCStruct<R>(_ body: (UnsafePointer<WGPUSurfaceDescriptorFromXlibWindow>) throws -> R) rethrows -> R {
         return try self.nextInChain.withOptionalChainedCStruct { chainedCStruct in
-        var cStruct = WGPUSurfaceDescriptorFromXlib(
-            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_SurfaceDescriptorFromXlib), 
+        var cStruct = WGPUSurfaceDescriptorFromXlibWindow(
+            chain: WGPUChainedStruct(next: chainedCStruct, sType: WGPUSType_SurfaceDescriptorFromXlibWindow), 
             display: self.display, 
             window: self.window
         )

@@ -521,13 +521,13 @@ public class ComputePassEncoder: Object {
         }
     }
 
-    public func dispatch(x: UInt32, y: UInt32 = 1, z: UInt32 = 1) {
+    public func dispatch(workgroupCountX: UInt32, workgroupCountY: UInt32 = 1, workgroupCountZ: UInt32 = 1) {
         self.withUnsafeHandle { handle_self in
             wgpuComputePassEncoderDispatch(
                 handle_self, 
-                x, 
-                y, 
-                z
+                workgroupCountX, 
+                workgroupCountY, 
+                workgroupCountZ
             )
         }
     }
@@ -541,6 +541,14 @@ public class ComputePassEncoder: Object {
                 indirectOffset
             )
             }
+        }
+    }
+
+    public func end() {
+        self.withUnsafeHandle { handle_self in
+            wgpuComputePassEncoderEnd(
+                handle_self
+            )
         }
     }
 
@@ -1526,6 +1534,14 @@ public class RenderPassEncoder: Object {
     public func endOcclusionQuery() {
         self.withUnsafeHandle { handle_self in
             wgpuRenderPassEncoderEndOcclusionQuery(
+                handle_self
+            )
+        }
+    }
+
+    public func end() {
+        self.withUnsafeHandle { handle_self in
+            wgpuRenderPassEncoderEnd(
                 handle_self
             )
         }

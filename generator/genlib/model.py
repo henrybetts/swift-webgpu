@@ -9,7 +9,7 @@ def _is_enabled(data: Dict, enabled_tags: Optional[List[str]]):
     if not tags or enabled_tags is None:
         return True
 
-    return any(tag in enabled_tags for tag in tags)
+    return all(tag in enabled_tags for tag in tags)
 
 
 def _is_member_enabled(data: Dict):
