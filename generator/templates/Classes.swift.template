@@ -15,7 +15,7 @@ import CWebGPU
 
     deinit {
         {% for method in object.methods %}{% if method.is_callback_setter %}
-        {{ method.swift_name }}(nil)
+        {{ method.swift_function_name }}(nil)
         {% endif %}{% endfor %}
         {{ object.release_method_name }}(self.handle)
     }
@@ -33,24 +33,24 @@ import CWebGPU
     {% for method in object.methods %}
 
     {% if method.is_callback_setter %}
-    var _{{ method.swift_name }}: UserData<{{ method.args[0].type.swift_name }}>? = nil
-    public func {{ method.swift_name }}(_ callback: {{ method.args[0].type.swift_name }}?) {
+    var _{{ method.swift_function_name }}: UserData<{{ method.args[0].type.swift_name }}>? = nil
+    public func {{ method.swift_function_name }}(_ callback: {{ method.args[0].type.swift_name }}?) {
         self.withUnsafeHandle { handle_self in
             if let callback = callback {
                 let userData = UserData(callback)
-                self._{{ method.swift_name }} = userData
-                {{ method.c_name }}(handle_self, {{ method.args[0].type.callback_function_name }}, userData.toOpaque())
+                self._{{ method.swift_function_name }} = userData
+                {{ method.c_function_name }}(handle_self, {{ method.args[0].type.callback_function_name }}, userData.toOpaque())
             } else {
-                self._{{ method.swift_name }} = nil
-                {{ method.c_name }}(handle_self, nil, nil)
+                self._{{ method.swift_function_name }} = nil
+                {{ method.c_function_name }}(handle_self, nil, nil)
             }
         }
     }
     {% else %}
     {% if method.is_getter %}
-    public var {{ method.swift_name }}: {{ method.return_type.swift_name }} {
+    public var {{ method.swift_function_name }}: {{ method.return_type.swift_name }} {
     {% else %}
-    public func {{ method.swift_name }}(
+    public func {{ method.swift_function_name }}(
     {%- if method.hide_first_arg_label %}_ {% endif -%}
     {%- for arg in method.swift_args -%}
     {{ arg.swift_name }}: {{ arg.swift_type }}
@@ -65,7 +65,7 @@ import CWebGPU
             {{ arg.conversion.get_closure_head(arg.target_swift_name) }}
             {% endif %}
             {% endfor %}
-            {%+ if method.return_type %}let result = {% endif %}{{ method.c_name }}(
+            {%+ if method.return_type %}let result = {% endif %}{{ method.c_function_name }}(
                 handle_self{% if method.args %}, {% endif %}
 
                 {% for arg in method.args %}

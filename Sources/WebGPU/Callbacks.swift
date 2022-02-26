@@ -1,7 +1,5 @@
 import CWebGPU
 
-public typealias RequestAdapterCallback = (RequestAdapterStatus, Adapter, String?) -> ()
-
 func requestAdapterCallback(status: WGPURequestAdapterStatus, adapter: WGPUAdapter!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<RequestAdapterCallback>.takeValue(userdata)
     swiftCallback(
@@ -11,16 +9,12 @@ func requestAdapterCallback(status: WGPURequestAdapterStatus, adapter: WGPUAdapt
     )
 }
 
-public typealias BufferMapCallback = (BufferMapAsyncStatus) -> ()
-
 func bufferMapCallback(status: WGPUBufferMapAsyncStatus, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<BufferMapCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status)
     )
 }
-
-public typealias CompilationInfoCallback = (CompilationInfoRequestStatus, CompilationInfo) -> ()
 
 func compilationInfoCallback(status: WGPUCompilationInfoRequestStatus, compilationInfo: UnsafePointer<WGPUCompilationInfo>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<CompilationInfoCallback>.takeValue(userdata)
@@ -29,8 +23,6 @@ func compilationInfoCallback(status: WGPUCompilationInfoRequestStatus, compilati
         .init(cStruct: compilationInfo.pointee)
     )
 }
-
-public typealias CreateComputePipelineAsyncCallback = (CreatePipelineAsyncStatus, ComputePipeline, String) -> ()
 
 func createComputePipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pipeline: WGPUComputePipeline!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<CreateComputePipelineAsyncCallback>.takeValue(userdata)
@@ -41,8 +33,6 @@ func createComputePipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, p
     )
 }
 
-public typealias CreateRenderPipelineAsyncCallback = (CreatePipelineAsyncStatus, RenderPipeline, String) -> ()
-
 func createRenderPipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pipeline: WGPURenderPipeline!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<CreateRenderPipelineAsyncCallback>.takeValue(userdata)
     swiftCallback(
@@ -52,8 +42,6 @@ func createRenderPipelineAsyncCallback(status: WGPUCreatePipelineAsyncStatus, pi
     )
 }
 
-public typealias DeviceLostCallback = (DeviceLostReason, String) -> ()
-
 func deviceLostCallback(reason: WGPUDeviceLostReason, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<DeviceLostCallback>.takeValue(userdata)
     swiftCallback(
@@ -61,8 +49,6 @@ func deviceLostCallback(reason: WGPUDeviceLostReason, message: UnsafePointer<CCh
         String(cString: message)
     )
 }
-
-public typealias ErrorCallback = (ErrorType, String) -> ()
 
 func errorCallback(type: WGPUErrorType, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<ErrorCallback>.takeValue(userdata)
@@ -72,16 +58,12 @@ func errorCallback(type: WGPUErrorType, message: UnsafePointer<CChar>!, userdata
     )
 }
 
-public typealias QueueWorkDoneCallback = (QueueWorkDoneStatus) -> ()
-
 func queueWorkDoneCallback(status: WGPUQueueWorkDoneStatus, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<QueueWorkDoneCallback>.takeValue(userdata)
     swiftCallback(
         .init(cValue: status)
     )
 }
-
-public typealias RequestDeviceCallback = (RequestDeviceStatus, Device, String?) -> ()
 
 func requestDeviceCallback(status: WGPURequestDeviceStatus, device: WGPUDevice!, message: UnsafePointer<CChar>!, userdata: UnsafeMutableRawPointer!) {
     let swiftCallback = UserData<RequestDeviceCallback>.takeValue(userdata)

@@ -291,7 +291,7 @@ class Member(Base):
 
 
 class StructureType(Type):
-    def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
+    def __init__(self, name: str, data: Dict):
         super().__init__(name, data)
 
         self.members = [Member(m) for m in data['members'] if _is_member_enabled(m)]
@@ -326,10 +326,9 @@ class StructureType(Type):
             member.link(types)
 
 
-class Method(Base):
-    def __init__(self, data: Dict, object_name: str, enabled_tags: List[str]):
-        super().__init__(data)
-        self.object_name = object_name
+class FunctionPointerType(Type):
+    def __init__(self, name: str, data: Dict):
+        super().__init__(name, data)
         self.return_type: Optional[Type] = None
 
         self.args = [Member(arg) for arg in data.get('args', []) if _is_member_enabled(arg)]
@@ -340,27 +339,24 @@ class Method(Base):
             arg.length_of = args_by_length.get(arg.name)
 
     @property
-    def name(self) -> str:
-        return self.data['name']
+    def is_callback(self):
+        return any(arg.name == 'userdata' for arg in self.args)
 
     @property
-    def is_getter(self) -> bool:
-        return self.return_type and not self.args and self.name.startswith('get ')
-
-    @property
-    def c_name(self) -> str:
-        return 'wgpu' + pascal_case(self.object_name) + pascal_case(self.name)
-
-    @property
-    def swift_name(self) -> str:
-        name = self.name
-        if self.is_getter:
-            name = name[4:]
-        return camel_case(name.lower())
+    def callback_function_name(self) -> str:
+        return camel_case(self.name.lower())
 
     @property
     def swift_args(self) -> List[Member]:
         return [arg for arg in self.args if not arg.length_of and arg.name != 'userdata']
+
+    @property
+    def swift_return_type(self) -> Optional[str]:
+        # hack for now, to get getProcAddress to return optional Proc
+        if self.return_type:
+            if isinstance(self.return_type, FunctionPointerType):
+                return self.return_type.swift_name + '?'
+            return self.return_type.swift_name
 
     @property
     def return_conversion(self) -> Optional[typeconversion.Conversion]:
@@ -372,26 +368,66 @@ class Method(Base):
 
         return typeconversion.implicit_conversion
 
-    @property
-    def hide_first_arg_label(self) -> bool:
-        return self.args and self.name.endswith(' ' + self.args[0].name)
-
-    @property
-    def is_callback_setter(self) -> bool:
-        return self.name.startswith('set ') and self.name.endswith(' callback')
-
     def link(self, types: Dict[str, Type]):
         returns = self.data.get('returns')
-        self.return_type = types[returns] if returns and returns != 'void' else None
+        if returns and returns != 'void':
+            self.return_type = types[returns] if returns and returns != 'void' else None
 
         for arg in self.args:
             arg.link(types)
 
 
+class FunctionType(FunctionPointerType):
+    @property
+    def c_name(self) -> str:
+        return 'WGPUProc' + pascal_case(self.name)
+
+    @property
+    def c_function_name(self) -> str:
+        return 'wgpu' + pascal_case(self.name)
+
+    @property
+    def swift_function_name(self) -> str:
+        return camel_case(self.name.lower())
+
+    @property
+    def hide_first_arg_label(self) -> bool:
+        return self.args and self.name.endswith(' ' + self.args[0].name)
+
+
+class MethodType(FunctionType):
+    def __init__(self, object_name: str, data: Dict):
+        super().__init__(data['name'], data)
+        self.object_name = object_name
+
+    @property
+    def is_getter(self) -> bool:
+        return self.return_type and not self.args and self.name.startswith('get ')
+
+    @property
+    def c_name(self) -> str:
+        return 'WGPUProc' + pascal_case(self.object_name) + pascal_case(self.name)
+
+    @property
+    def c_function_name(self) -> str:
+        return 'wgpu' + pascal_case(self.object_name) + pascal_case(self.name)
+
+    @property
+    def swift_function_name(self) -> str:
+        name = self.name
+        if self.is_getter:
+            name = name[4:]
+        return camel_case(name.lower())
+
+    @property
+    def is_callback_setter(self) -> bool:
+        return self.name.startswith('set ') and self.name.endswith(' callback')
+
+
 class ObjectType(Type):
     def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
         super().__init__(name, data)
-        self.methods = [Method(m, name, enabled_tags) for m in data.get('methods', []) if _is_enabled(m, enabled_tags)]
+        self.methods = [MethodType(name, m) for m in data.get('methods', []) if _is_enabled(m, enabled_tags)]
 
     @property
     def access_level(self) -> str:
@@ -410,32 +446,6 @@ class ObjectType(Type):
     def link(self, types: Dict[str, Type]):
         for method in self.methods:
             method.link(types)
-
-
-class FunctionPointerType(Type):
-    def __init__(self, name: str, data: Dict, enabled_tags: List[str]):
-        super().__init__(name, data)
-
-        self.args = [Member(m) for m in data['args'] if _is_member_enabled(m)]
-        args_by_length = {arg.length: arg for arg in self.args if arg.length}
-        for arg in self.args:
-            arg.length_of = args_by_length.get(arg.name)
-
-    @property
-    def is_callback(self):
-        return any(arg.name == 'userdata' for arg in self.args)
-
-    @property
-    def callback_function_name(self) -> str:
-        return camel_case(self.name.lower())
-
-    @property
-    def swift_args(self) -> List[Member]:
-        return [arg for arg in self.args if not arg.length_of and arg.name != 'userdata']
-
-    def link(self, types: Dict[str, Type]):
-        for arg in self.args:
-            arg.link(types)
 
 
 class TypedefType(Type):
@@ -458,9 +468,10 @@ class Model:
             'native': NativeType,
             'enum': needs_tags(EnumType),
             'bitmask': needs_tags(BitmaskType),
-            'structure': needs_tags(StructureType),
+            'structure': StructureType,
+            'function pointer': FunctionPointerType,
+            'function': FunctionType,
             'object': needs_tags(ObjectType),
-            'function pointer': needs_tags(FunctionPointerType),
             'typedef': TypedefType,
         }
 
