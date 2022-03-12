@@ -82,6 +82,9 @@ class NativeType(Type):
         if isinstance(value, str) and value.startswith('WGPU_'):
             return f'{self.swift_name}({value})'
 
+        if value == 'NAN':
+            return '.nan'
+
         if self.name == 'float' and isinstance(value, str):
             return value.rstrip('f')
 
@@ -320,6 +323,12 @@ class StructureType(Type):
     @property
     def has_default_swift_initializer(self) -> bool:
         return all(member.default_swift_value for member in self.swift_members)
+
+    def get_swift_value(self, value: Any) -> str:
+        values = value.strip('{}').split(',')
+        args = [f'{member.swift_name}: {member.type.get_swift_value(value.strip())}'
+                for member, value in zip(self.members, values)]
+        return f'.init({", ".join(args)})'
 
     def link(self, types: Dict[str, Type]):
         for member in self.members:

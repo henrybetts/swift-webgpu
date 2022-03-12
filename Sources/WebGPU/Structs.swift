@@ -1598,7 +1598,7 @@ public struct RenderPassColorAttachment: CStructConvertible {
     public var clearColor: Color
     public var clearValue: Color
 
-    public init(view: TextureView? = nil, resolveTarget: TextureView? = nil, loadOp: LoadOp, storeOp: StoreOp, clearColor: Color = { NAN, NAN, NAN, NAN }, clearValue: Color) {
+    public init(view: TextureView? = nil, resolveTarget: TextureView? = nil, loadOp: LoadOp, storeOp: StoreOp, clearColor: Color = .init(r: .nan, g: .nan, b: .nan, a: .nan), clearValue: Color) {
         self.view = view
         self.resolveTarget = resolveTarget
         self.loadOp = loadOp
@@ -1653,7 +1653,7 @@ public struct RenderPassDepthStencilAttachment: CStructConvertible {
     public var stencilClearValue: UInt32
     public var stencilReadOnly: Bool
 
-    public init(view: TextureView, depthLoadOp: LoadOp = .undefined, depthStoreOp: StoreOp = .undefined, clearDepth: Float = NAN, depthClearValue: Float = 0, depthReadOnly: Bool = false, stencilLoadOp: LoadOp = .undefined, stencilStoreOp: StoreOp = .undefined, clearStencil: UInt32 = 0, stencilClearValue: UInt32 = 0, stencilReadOnly: Bool = false) {
+    public init(view: TextureView, depthLoadOp: LoadOp = .undefined, depthStoreOp: StoreOp = .undefined, clearDepth: Float = .nan, depthClearValue: Float = 0, depthReadOnly: Bool = false, stencilLoadOp: LoadOp = .undefined, stencilStoreOp: StoreOp = .undefined, clearStencil: UInt32 = 0, stencilClearValue: UInt32 = 0, stencilReadOnly: Bool = false) {
         self.view = view
         self.depthLoadOp = depthLoadOp
         self.depthStoreOp = depthStoreOp
