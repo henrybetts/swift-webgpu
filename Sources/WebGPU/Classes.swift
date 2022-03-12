@@ -56,6 +56,16 @@ public class Adapter: Object {
         }
     }
 
+    public func enumerateFeatures(_ features: UnsafeMutablePointer<WGPUFeatureName>!) -> Int {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuAdapterEnumerateFeatures(
+                handle_self, 
+                features
+            )
+            return result
+        }
+    }
+
     public func requestDevice(descriptor: DeviceDescriptor, callback: @escaping RequestDeviceCallback) {
         self.withUnsafeHandle { handle_self in
             descriptor.withCStruct { cStruct_descriptor in
@@ -837,6 +847,26 @@ public class Device: Object {
             let result = wgpuDeviceGetLimits(
                 handle_self, 
                 limits
+            )
+            return result
+        }
+    }
+
+    public func hasFeature(_ feature: FeatureName) -> Bool {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuDeviceHasFeature(
+                handle_self, 
+                feature.cValue
+            )
+            return result
+        }
+    }
+
+    public func enumerateFeatures(_ features: UnsafeMutablePointer<WGPUFeatureName>!) -> Int {
+        self.withUnsafeHandle { handle_self in
+            let result = wgpuDeviceEnumerateFeatures(
+                handle_self, 
+                features
             )
             return result
         }

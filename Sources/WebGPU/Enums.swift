@@ -229,6 +229,19 @@ public enum CompilationMessageType: WGPUCompilationMessageType.RawValue {
     }
 }
 
+public enum ComputePassTimestampLocation: WGPUComputePassTimestampLocation.RawValue {
+    case beginning = 0
+    case end = 1
+
+    init(cValue: WGPUComputePassTimestampLocation) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPUComputePassTimestampLocation {
+        return WGPUComputePassTimestampLocation(rawValue: self.rawValue)
+    }
+}
+
 public enum CreatePipelineAsyncStatus: WGPUCreatePipelineAsyncStatus.RawValue {
     case success = 0
     case error = 1
@@ -504,6 +517,19 @@ public enum QueueWorkDoneStatus: WGPUQueueWorkDoneStatus.RawValue {
     }
 }
 
+public enum RenderPassTimestampLocation: WGPURenderPassTimestampLocation.RawValue {
+    case beginning = 0
+    case end = 1
+
+    init(cValue: WGPURenderPassTimestampLocation) {
+        self.init(rawValue: cValue.rawValue)!
+    }
+
+    var cValue: WGPURenderPassTimestampLocation {
+        return WGPURenderPassTimestampLocation(rawValue: self.rawValue)
+    }
+}
+
 public enum RequestDeviceStatus: WGPURequestDeviceStatus.RawValue {
     case success = 0
     case error = 1
@@ -545,6 +571,8 @@ public enum SType: WGPUSType.RawValue {
     case surfaceDescriptorFromCanvasHtmlSelector = 4
     case shaderModuleSpirvDescriptor = 5
     case shaderModuleWgslDescriptor = 6
+    case surfaceDescriptorFromWaylandSurface = 8
+    case surfaceDescriptorFromAndroidNativeWindow = 9
 
     init(cValue: WGPUSType) {
         self.init(rawValue: cValue.rawValue)!
