@@ -41,7 +41,7 @@ withGLFW {
                     view: swapchain.currentTextureView,
                     loadOp: .clear,
                     storeOp: .store,
-                    clearColor: Color(h: hue, s: 0.9, v: 0.9, a: 1.0))]))
+                    clearValue: Color(h: hue, s: 0.9, v: 0.9, a: 1.0))]))
         renderPass.endPass()
         
         let commandBuffer = encoder.finish()

@@ -116,7 +116,7 @@ withGLFW {
                     view: swapchain.currentTextureView,
                     loadOp: .clear,
                     storeOp: .store,
-                    clearColor: Color(r: 0, g: 0, b: 0, a: 1))]))
+                    clearValue: Color(r: 0, g: 0, b: 0, a: 1))]))
         renderPass.setPipeline(pipeline)
         renderPass.setVertexBuffer(slot: 0, buffer: vertexBuffer)
         renderPass.draw(vertexCount: 3)
