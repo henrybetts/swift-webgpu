@@ -18,7 +18,13 @@ To use swift-webgpu, you'll first need to build Dawn. See Dawn's [documentation]
 swift-webgpu depends on the `libdawn_native` and `libdawn_proc` shared libraries, which can be built with the following command;
 
 ```sh
-ninja -C out/Release/ dawn_native_shared dawn_proc_shared
+ninja -C out/Release/ src/dawn/native:shared src/dawn:proc_shared
+```
+
+Currently, the built libraries seem to have incorrect install names (i.e. running `otool -L out/Release/libdawn_native.dylib` shows `@rpath/libnative.dylib` rather than the expected `@rpath/libdawn_native.dylib`). This can be fixed with the following commands;
+```sh
+install_name_tool -id @rpath/libdawn_native.dylib out/Release/libdawn_native.dylib
+install_name_tool -id @rpath/libdawn_proc.dylib out/Release/libdawn_proc.dylib
 ```
 
 
@@ -35,8 +41,8 @@ Then, build it;
 
 ```sh
 swift build -c release \
--Xcc -I/path/to/dawn/src/include \
--Xcc -I/path/to/dawn/out/Release/gen/src/include \
+-Xcc -I/path/to/dawn/include \
+-Xcc -I/path/to/dawn/out/Release/gen/include \
 -Xlinker -L/path/to/dawn/out/Release \
 -Xlinker -rpath -Xlinker /path/to/dawn/out/Release
 ```
