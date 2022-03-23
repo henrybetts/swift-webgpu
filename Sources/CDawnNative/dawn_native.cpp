@@ -12,17 +12,17 @@ DawnNativeInstance dawnNativeCreateInstance() {
     return reinterpret_cast<DawnNativeInstance>(instance);
 }
 
-WGPUInstance dawnNativeInstanceGetObject(DawnNativeInstance cInstance) {
+WGPUInstance dawnNativeInstanceGet(DawnNativeInstance cInstance) {
     auto instance = reinterpret_cast<dawn_native::Instance*>(cInstance);
     return instance->Get();
 }
 
-void dawnNativeInstanceDiscoverDefaultAdapters(WGPUInstance cInstance) {
+void dawnNativeInstanceDiscoverDefaultAdapters(DawnNativeInstance cInstance) {
     auto instance = reinterpret_cast<dawn_native::Instance*>(cInstance);
     instance->DiscoverDefaultAdapters();
 }
 
-void dawnNativeInstanceEnumerateAdapters(WGPUInstance cInstance, size_t* adaptersCount, DawnNativeAdapter* cAdapters) {
+void dawnNativeInstanceEnumerateAdapters(DawnNativeInstance cInstance, size_t* adaptersCount, DawnNativeAdapter* cAdapters) {
     auto instance = reinterpret_cast<dawn_native::Instance*>(cInstance);
     auto adapters = instance->GetAdapters();
     if (cAdapters == NULL) {
@@ -39,6 +39,11 @@ void dawnNativeInstanceEnumerateAdapters(WGPUInstance cInstance, size_t* adapter
 void dawnNativeInstanceRelease(DawnNativeInstance cInstance) {
     auto instance = reinterpret_cast<dawn_native::Instance*>(cInstance);
     delete instance;
+}
+
+WGPUAdapter dawnNativeAdapterGet(DawnNativeAdapter cAdapter) {
+    auto adapter = reinterpret_cast<dawn_native::Adapter*>(cAdapter);
+    return adapter->Get();
 }
 
 void dawnNativeAdapterGetProperties(DawnNativeAdapter cAdapter, WGPUAdapterProperties* properties) {

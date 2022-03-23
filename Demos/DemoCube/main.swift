@@ -18,7 +18,7 @@ print("Using adapter: \(adapter.properties.name)")
 
 withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoCube")
-    let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
+    let surface = instance.webGpuInstance.createSurface(descriptor: window.surfaceDescriptor)
         
     guard let device = adapter.createDevice() else {
         fatalError("Failed to create device")

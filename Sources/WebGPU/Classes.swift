@@ -930,7 +930,7 @@ public class Device: Object {
     }
 }
 
-open class Instance: Object {
+public class Instance: Object {
     private let handle: WGPUInstance!
 
     /// Create a wrapper around an existing handle.

@@ -4,7 +4,7 @@ import CDawnNative
 
 var dawnInitialized = false
 
-public class Instance: WebGPU.Instance {
+public class Instance {
     let instance: DawnNativeInstance!
     
     public init() {
@@ -14,14 +14,16 @@ public class Instance: WebGPU.Instance {
         }
         
         self.instance = dawnNativeCreateInstance()
-        
-        let object = dawnNativeInstanceGetObject(self.instance)
-        wgpuInstanceReference(object)
-        super.init(handle: object)
     }
     
     deinit {
         dawnNativeInstanceRelease(self.instance)
+    }
+    
+    public var webGpuInstance: WebGPU.Instance {
+        let object = dawnNativeInstanceGet(self.instance)
+        wgpuInstanceReference(object)
+        return WebGPU.Instance(handle: object)
     }
     
     public func discoverDefaultAdapters() {
@@ -37,21 +39,25 @@ public class Instance: WebGPU.Instance {
             initializedCount = count
         }
         
-        return adapters.map { Adapter(instance: self, adapter: $0) }
+        return adapters.map { Adapter(adapter: $0) }
     }
 }
 
 public class Adapter {
-    let instance: Instance
     let adapter: DawnNativeAdapter!
     
-    init(instance: Instance, adapter: DawnNativeAdapter!) {
-        self.instance = instance
+    init(adapter: DawnNativeAdapter!) {
         self.adapter = adapter
     }
     
     deinit {
         dawnNativeAdapterRelease(self.adapter)
+    }
+    
+    public var webGpuAdapter: WebGPU.Adapter {
+        let object = dawnNativeAdapterGet(self.adapter)
+        wgpuAdapterReference(object)
+        return WebGPU.Adapter(handle: object)
     }
     
     public var properties: AdapterProperties {

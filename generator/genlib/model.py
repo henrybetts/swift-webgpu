@@ -439,12 +439,6 @@ class ObjectType(Type):
         self.methods = [MethodType(name, m) for m in data.get('methods', []) if _is_enabled(m, enabled_tags)]
 
     @property
-    def access_level(self) -> str:
-        if self.name == 'instance':
-            return 'open'
-        return 'public'
-
-    @property
     def reference_method_name(self) -> str:
         return 'wgpu' + pascal_case(self.name) + 'Reference'
 
