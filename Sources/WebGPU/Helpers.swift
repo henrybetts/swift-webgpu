@@ -9,6 +9,28 @@ extension Optional where Wrapped == String {
     }
 }
 
+func _withCStringBufferPointer<I: IteratorProtocol, R>(to array: inout [UnsafePointer<CChar>?], appending iterator: inout I, _ body: (UnsafeBufferPointer<UnsafePointer<CChar>?>) throws -> R) rethrows -> R where I.Element == String {
+    if let string = iterator.next() {
+        return try string.withCString { cString in
+            array.append(cString)
+            return try _withCStringBufferPointer(to: &array, appending: &iterator, body)
+        }
+    }else{
+        return try array.withUnsafeBufferPointer { ptr in
+            try body(ptr)
+        }
+    }
+}
+
+extension Array where Element == String {
+    func withCStringBufferPointer<R>(_ body: (UnsafeBufferPointer<UnsafePointer<CChar>?>) throws -> R) rethrows -> R {
+        var cStrings: [UnsafePointer<CChar>?] = []
+        cStrings.reserveCapacity(self.count)
+        var iterator = makeIterator()
+        return try _withCStringBufferPointer(to: &cStrings, appending: &iterator, body)
+    }
+}
+
 
 // MARK: Struct
 protocol CStructConvertible {

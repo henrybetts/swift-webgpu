@@ -56,6 +56,11 @@ optional_string_conversion = Conversion('cString_{{ name }}',
                                         ('{{ value }}.withOptionalCString { cString_{{ name }} in', '}'),
                                         '{{ value }} != nil ? String(cString: {{ value }}) : nil')
 
+string_array_conversion =\
+    Conversion('buffer_{{ name }}.baseAddress',
+               ('{{ value }}.withCStringBufferPointer { buffer_{{ name }} in', '}'),
+               'UnsafeBufferPointer(start: {{ value }}, count: Int({{ length }})).map { String(cString: $0!) }')
+
 struct_conversion = Conversion('cStruct_{{ name }}.pointee',
                                ('{{ value }}.withCStruct { cStruct_{{ name }} in', '}'),
                                '.init(cStruct: {{ value }})')

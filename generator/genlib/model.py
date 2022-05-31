@@ -194,6 +194,9 @@ class Member(Base):
             # TODO: Should check that length == 'strlen', but this is not yet consistent in dawn.json
             swift_type = 'String'
 
+        elif self.type.name == 'char' and self.annotation == 'const*const*' and self.length:
+            swift_type = '[String]'
+
         elif self.annotation == 'const*' and self.length:
             if self.type.name == 'void':
                 swift_type = 'UnsafeRawBufferPointer'
@@ -224,9 +227,13 @@ class Member(Base):
         if self.name == 'userdata':
             return typeconversion.userdata_conversion
 
-        if self.type.name == 'char' and self.annotation == 'const*':
-            # TODO: Should check that length == 'strlen', but this is not yet consistent in dawn.json
-            return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
+        if self.type.name == 'char':
+            if self.annotation == 'const*':
+                # TODO: Should check that length == 'strlen', but this is not yet consistent in dawn.json
+                return typeconversion.optional_string_conversion if self.optional else typeconversion.string_conversion
+
+            if self.annotation == 'const*const*' and self.length:
+                return typeconversion.string_array_conversion
 
         if self.annotation == 'const*' and self.length:
             if self.type.name == 'void':
