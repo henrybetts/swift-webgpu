@@ -39,7 +39,7 @@ public struct {{ struct.swift_name }}: CStructConvertible
 
     init(cStruct: {{ struct.c_name }}) {
         {% for member in struct.swift_members %}
-        self.{{ member.swift_name }} = {{ member.conversion.get_swift_value('cStruct.' + member.c_name, member.length_member and 'cStruct.' + member.length_member.c_name) }}
+        self.{{ member.swift_name }} = {{ member.conversion.get_swift_value('cStruct.' + member.c_name, (member.length_member and 'cStruct.' + member.length_member.c_name) or member.length) }}
         {% endfor %}
     }
 

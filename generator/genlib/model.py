@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, Optional, List, Any
+from typing import Dict, Iterable, Optional, List, Any, Union
 from .nameutils import camel_case, pascal_case, swift_safe
 from . import typeconversion
 
@@ -144,7 +144,7 @@ class Member(Base):
         return self.data.get('annotation')
 
     @property
-    def length(self) -> Optional[str]:
+    def length(self) -> Optional[Union[str, int]]:
         return self.data.get('length')
 
     @property
@@ -247,6 +247,9 @@ class Member(Base):
 
             if self.type.category == 'object':
                 return typeconversion.object_array_conversion
+
+            if self.optional:
+                return typeconversion.optional_implicit_array_conversion
 
             return typeconversion.implicit_array_conversion
 

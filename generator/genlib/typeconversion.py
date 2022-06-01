@@ -1,5 +1,5 @@
 from jinja2 import Template
-from typing import Tuple
+from typing import Tuple, Union
 
 
 class Conversion:
@@ -29,7 +29,7 @@ class Conversion:
     def requires_closure(self) -> bool:
         return self.closure_template is not None
 
-    def get_swift_value(self, value: str, length: str = None) -> str:
+    def get_swift_value(self, value: str, length: Union[str, int] = None) -> str:
         return self.swift_value_template.render(value=value, length=length)
 
 
@@ -38,6 +38,11 @@ implicit_conversion = Conversion('{{ value }}', None, '{{ value }}')
 implicit_array_conversion = Conversion('buffer_{{ name }}.baseAddress',
                                        ('{{ value }}.withUnsafeBufferPointer { buffer_{{ name }} in', '}'),
                                        'Array(UnsafeBufferPointer(start: {{ value }}, count: Int({{ length }})))')
+
+optional_implicit_array_conversion =\
+    Conversion('buffer_{{ name }}.baseAddress',
+               ('{{ value }}.withOptionalUnsafeBufferPointer { buffer_{{ name }} in', '}'),
+               '{{ value }} != nil ? Array(UnsafeBufferPointer(start: {{ value }}, count: Int({{ length }}))) : nil')
 
 enum_conversion = Conversion('{{ value }}.cValue', None, '.init(cValue: {{ value }})')
 
