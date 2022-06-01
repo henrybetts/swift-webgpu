@@ -65,6 +65,8 @@ public class Adapter {
         dawnNativeAdapterGetProperties(self.adapter, &cProps)
         return AdapterProperties(
             vendorId: cProps.vendorID,
+            vendorName: String(cString: cProps.vendorName),
+            architecture: String(cString: cProps.architecture),
             deviceId: cProps.deviceID,
             name: String(cString: cProps.name),
             driverDescription: String(cString: cProps.driverDescription),
