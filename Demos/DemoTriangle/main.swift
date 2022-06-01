@@ -37,13 +37,13 @@ withGLFW {
     
     let vertexShaderSource = """
         struct VertexOut {
-            [[builtin(position)]] position : vec4<f32>;
-            [[location(0)]] color: vec4<f32>;
+            @builtin(position) position : vec4<f32>;
+            @location(0) color: vec4<f32>;
         };
 
-        [[stage(vertex)]] fn main(
-            [[location(0)]] position : vec4<f32>,
-            [[location(1)]] color : vec4<f32>) -> VertexOut {
+        @stage(vertex) fn main(
+            @location(0) position : vec4<f32>,
+            @location(1) color : vec4<f32>) -> VertexOut {
             var output : VertexOut;
             output.position = position;
             output.color = color;
@@ -52,8 +52,8 @@ withGLFW {
     """
     
     let fragmentShaderSource = """
-        [[stage(fragment)]] fn main(
-            [[location(0)]] color : vec4<f32>) -> [[location(0)]] vec4<f32> {
+        @stage(fragment) fn main(
+            @location(0) color : vec4<f32>) -> @location(0) vec4<f32> {
             return color;
         }
     """
@@ -120,7 +120,7 @@ withGLFW {
         renderPass.setPipeline(pipeline)
         renderPass.setVertexBuffer(slot: 0, buffer: vertexBuffer)
         renderPass.draw(vertexCount: 3)
-        renderPass.endPass()
+        renderPass.end()
         
         let commandBuffer = encoder.finish()
         device.queue.submit(commands: [commandBuffer])

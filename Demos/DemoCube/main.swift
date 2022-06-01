@@ -37,20 +37,20 @@ withGLFW {
         implementation: 0))
     
     let vertexShaderSource = """
-        [[block]] struct Camera {
+        struct Camera {
             view : mat4x4<f32>;
             projection: mat4x4<f32>;
         };
-        [[group(0), binding(0)]] var<uniform> camera : Camera;
+        @group(0) @binding(0) var<uniform> camera : Camera;
 
         struct VertexOut {
-            [[builtin(position)]] position : vec4<f32>;
-            [[location(0)]] color : vec4<f32>;
+            @builtin(position) position : vec4<f32>;
+            @location(0) color : vec4<f32>;
         };
 
-        [[stage(vertex)]] fn main(
-            [[location(0)]] position : vec4<f32>,
-            [[location(1)]] color : vec4<f32>) -> VertexOut {
+        @stage(vertex) fn main(
+            @location(0) position : vec4<f32>,
+            @location(1) color : vec4<f32>) -> VertexOut {
             var output : VertexOut;
             output.position = camera.projection * camera.view * position;
             output.color = color;
@@ -59,8 +59,8 @@ withGLFW {
     """
     
     let fragmentShaderSource = """
-        [[stage(fragment)]] fn main(
-            [[location(0)]] color : vec4<f32>) -> [[location(0)]] vec4<f32> {
+        @stage(fragment) fn main(
+            @location(0) color : vec4<f32>) -> @location(0) vec4<f32> {
             return color;
         }
     """
@@ -181,13 +181,13 @@ withGLFW {
                 view: depthStencilView,
                 depthLoadOp: .clear,
                 depthStoreOp: .store,
-                clearDepth: 1)))
+                depthClearValue: 1)))
         renderPass.setPipeline(pipeline)
         renderPass.setBindGroup(groupIndex: 0, group: bindGroup)
         renderPass.setVertexBuffer(slot: 0, buffer: vertexBuffer)
         renderPass.setIndexBuffer(indexBuffer, format: .uint32)
         renderPass.drawIndexed(indexCount: UInt32(cubeIndices.count))
-        renderPass.endPass()
+        renderPass.end()
         
         let commandBuffer = encoder.finish()
         device.queue.submit(commands: [commandBuffer])

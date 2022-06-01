@@ -42,7 +42,7 @@ withGLFW {
                     loadOp: .clear,
                     storeOp: .store,
                     clearValue: Color(h: hue, s: 0.9, v: 0.9, a: 1.0))]))
-        renderPass.endPass()
+        renderPass.end()
         
         let commandBuffer = encoder.finish()
         device.queue.submit(commands: [commandBuffer])
