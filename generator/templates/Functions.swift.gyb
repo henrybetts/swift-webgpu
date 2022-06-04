@@ -1,0 +1,40 @@
+%{
+from genlib.templateutils import Loop, swift_function_params
+}%
+import CWebGPU
+
+% for function in model.types_by_category('function'):
+public func ${function.swift_function_name}(
+    % for arg, loop in Loop(swift_function_params(function.swift_args, function.hide_first_arg_label)):
+    ${arg}${loop.sep()}
+    % end
+% if function.return_type:
+) -> ${function.swift_return_type} {
+% else:
+) {
+% end
+    % for arg in function.args:
+    % if arg.conversion.requires_closure:
+    ${arg.conversion.get_closure_head(arg.target_swift_name)}
+    % end
+    % end
+    % if function.return_type:
+    let result = ${function.c_function_name}(
+    % else:
+    ${function.c_function_name}(
+    % end
+        % for arg, loop in Loop(function.args):
+        ${arg.conversion.get_c_value(arg.target_swift_name)}${loop.sep()}
+        % end
+    )
+    % if function.return_type:
+    return ${function.return_conversion.get_swift_value('result')}
+    % end
+    % for arg in function.args:
+    % if arg.conversion.requires_closure:
+    ${arg.conversion.get_closure_tail(arg.target_swift_name)}
+    % end
+    % end
+}
+
+% end

@@ -1,0 +1,6 @@
+import CWebGPU
+
+% for pointer in model.types_by_category('function pointer'):
+public typealias ${pointer.swift_name} = (${', '.join(arg.swift_type for arg in pointer.swift_args)}) -> ()
+
+% end

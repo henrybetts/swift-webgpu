@@ -1,0 +1,20 @@
+import CWebGPU
+
+% for bitmask in model.types_by_category('bitmask'):
+public struct ${bitmask.swift_name}: OptionSet {
+    public let rawValue: ${bitmask.c_name}
+
+    public init(rawValue: ${bitmask.c_name}) {
+        self.rawValue = rawValue
+    }
+
+    % for value in bitmask.values:
+    % if value.value:
+    public static let ${value.swift_name} = ${bitmask.swift_name}(rawValue: ${value.value})
+    % else:
+    public static let ${value.swift_name} = ${bitmask.swift_name}([])
+    % end
+    % end
+}
+
+% end

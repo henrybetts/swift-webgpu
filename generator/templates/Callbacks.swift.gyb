@@ -1,0 +1,22 @@
+%{
+from genlib.templateutils import Loop
+}%
+import CWebGPU
+
+% for callback in model.types_by_category('function pointer'):
+% if callback.is_callback:
+func ${callback.callback_function_name}(
+    % for arg, loop in Loop(callback.args):
+    ${arg.swift_name}: ${arg.c_type}${loop.sep()}
+    % end
+) {
+    let swiftCallback = UserData<${callback.swift_name}>.takeValue(userdata)
+    swiftCallback(
+        % for arg, loop in Loop(callback.swift_args):
+        ${arg.conversion.get_swift_value(arg.swift_name)}${loop.sep()}
+    % end
+    )
+}
+
+% end
+% end
