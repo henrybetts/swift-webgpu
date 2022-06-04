@@ -37,7 +37,13 @@ git clone https://github.com/henrybetts/swift-webgpu.git
 cd swift-webgpu
 ```
 
-Then, build it;
+Then, generate the swift source code from dawn.json;
+
+```sh
+./Utils/generate.py --dawn-json /path/to/dawn/dawn.json
+```
+
+Build the package;
 
 ```sh
 swift build -c release \
@@ -69,6 +75,13 @@ To use swift-webgpu with Swift Package Manager, add it to your `Package.swift` f
 ```
 
 Then add `WebGPU` and `DawnNative` as dependencies of your target.
+
+A manual step is still required to generate the swift source code from dawn.json;
+
+```sh
+swift package resolve
+./.build/checkouts/swift-webgpu/Utils/generate.py --dawn-json /path/to/dawn/dawn.json
+```
 
 
 ## Basic Usage
