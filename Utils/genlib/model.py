@@ -124,8 +124,12 @@ class EnumType(Type):
 
 class BitmaskType(EnumType):
     @property
+    def c_enum_name(self) -> str:
+        return super().c_name
+
+    @property
     def c_name(self) -> str:
-        return super().c_name + 'Flags'
+        return self.c_enum_name + 'Flags'
 
 
 class Member(Base):
@@ -381,6 +385,15 @@ class FunctionPointerType(Type):
     def return_conversion(self) -> Optional[typeconversion.Conversion]:
         if not self.return_type:
             return None
+
+        if self.return_type.category == 'enum':
+            return typeconversion.enum_conversion
+
+        if self.return_type.category == 'bitmask':
+            return typeconversion.bitmask_conversion
+
+        if self.return_type.category == 'structure':
+            return typeconversion.struct_conversion
 
         if self.return_type.category == 'object':
             return typeconversion.object_conversion

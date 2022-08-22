@@ -8,6 +8,11 @@ public struct ${bitmask.swift_name}: OptionSet {
         self.rawValue = rawValue
     }
 
+    %# TODO: Shouldn't really be needed, but solves some inconsistencies in dawn.json for now
+    init(rawValue: ${bitmask.c_enum_name}) {
+        self.rawValue = rawValue.rawValue
+    }
+
     % for value in bitmask.values:
     % if value.value:
     public static let ${value.swift_name} = ${bitmask.swift_name}(rawValue: ${value.value})
