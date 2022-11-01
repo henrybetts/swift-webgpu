@@ -67,7 +67,7 @@ public struct ${struct.swift_name}: ${', '.join(adoptions(struct))} {
             nextInChain: ${cond(struct.extensible == 'in', 'chainedCStruct', 'nil')}${cond(struct.members, ',')}
             % end
             % if struct.chained:
-            chain: ${cond(struct.chained == 'in', f'WGPUChainedStruct(next: chainedCStruct, sType: {struct.s_type})', 'nil')}${cond(struct.members, ',')}
+            chain: ${cond(struct.chained == 'in', f'WGPUChainedStruct(next: chainedCStruct, sType: {struct.s_type})', f'WGPUChainedStructOut(next: nil, sType: {struct.s_type})')}${cond(struct.members, ',')}
             % end
             % for member, loop in Loop(struct.members):
             ${member.c_name}: ${member.conversion.get_c_value(member.target_swift_name, prefix='self.')}${loop.sep()}
