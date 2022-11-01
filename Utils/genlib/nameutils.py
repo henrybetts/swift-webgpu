@@ -9,6 +9,6 @@ def pascal_case(name: str) -> str:
 
 
 def swift_safe(name: str) -> str:
-    if name in ('repeat',):
+    if name in ('repeat', 'internal'):
         return f'`{name}`'
     return name
