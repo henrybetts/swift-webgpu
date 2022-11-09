@@ -32,6 +32,8 @@ let package = Package(
         .target(
             name: "DawnNative",
             dependencies: ["WebGPU", "CDawnProc", "CDawnNative"]),
+        .target(
+            name: "GenerateWebGPU"),
         
         .systemLibrary(
             name: "CGLFW",
