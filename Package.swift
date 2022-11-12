@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.4
 
 import PackageDescription
 
@@ -14,6 +14,7 @@ let package = Package(
             targets: ["DawnNative", "WebGPU"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
         .package(url: "https://github.com/SwiftGFX/SwiftMath", from: "3.3.0") // for demos only
     ],
     targets: [
@@ -32,8 +33,9 @@ let package = Package(
         .target(
             name: "DawnNative",
             dependencies: ["WebGPU", "CDawnProc", "CDawnNative"]),
-        .target(
-            name: "GenerateWebGPU"),
+        .executableTarget(
+            name: "generate-webgpu",
+            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]),
         
         .systemLibrary(
             name: "CGLFW",
@@ -45,19 +47,19 @@ let package = Package(
             name: "WindowUtils",
             dependencies: ["WebGPU", "CGLFW"],
             path: "Demos/WindowUtils"),
-        .target(
+        .executableTarget(
             name: "DemoInfo",
             dependencies: ["DawnNative"],
             path: "Demos/DemoInfo"),
-        .target(
+        .executableTarget(
             name: "DemoClearColor",
             dependencies: ["DawnNative", "WindowUtils"],
             path: "Demos/DemoClearColor"),
-        .target(
+        .executableTarget(
             name: "DemoTriangle",
             dependencies: ["DawnNative", "WindowUtils"],
             path: "Demos/DemoTriangle"),
-        .target(
+        .executableTarget(
             name: "DemoCube",
             dependencies: ["DawnNative", "WindowUtils", "SwiftMath"],
             path: "Demos/DemoCube"),
