@@ -11,9 +11,9 @@ struct GenerateWebGPU: ParsableCommand {
     mutating func run() throws {
         let jsonData = try Data(contentsOf: dawnJson)
         let dawnData = try DawnData(from: jsonData)
-        
-        for name in dawnData.types.keys {
-            print(name)
+        let model = Model(data: dawnData)
+        for enumType in model.types(of: EnumType.self) {
+            print(enumType.swiftName)
         }
     }
 }
