@@ -9,13 +9,15 @@ struct Model {
             
             if data.category == .enum, let data = data as? EnumTypeData {
                 types[name] = EnumType(name: name, data: data)
+            } else if data.category == .bitmask, let data = data as? EnumTypeData {
+                types[name] = BitmaskType(name: name, data: data)
             }
         }
         
         self.types = types
     }
     
-    func types<T: Type>(of type: T.Type) -> [T] {
-        return types.values.compactMap { $0 as? T }
+    func types<T: Type>(of _: T.Type) -> [T] {
+        return types.values.compactMap { type(of: $0) == T.self ? ($0 as! T) : nil }
     }
 }

@@ -17,5 +17,6 @@ struct GenerateWebGPU: ParsableCommand {
         let model = Model(data: dawnData)
         
         try generateEnums(model: model).write(to: outputDir.appendingPathComponent("Enums.swift"), atomically: true, encoding: .utf8)
+        try generateOptionSets(model: model).write(to: outputDir.appendingPathComponent("OptionSets.swift"), atomically: true, encoding: .utf8)
     }
 }
