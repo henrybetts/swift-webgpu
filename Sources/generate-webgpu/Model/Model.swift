@@ -5,7 +5,9 @@ struct Model {
         var types = [String: Type]()
         
         for (name, data) in data.types {
-            if let data = data as? EnumTypeData {
+            if data.tags.contains("upstream") { continue }
+            
+            if data.category == .enum, let data = data as? EnumTypeData {
                 types[name] = EnumType(name: name, data: data)
             }
         }

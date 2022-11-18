@@ -15,9 +15,12 @@ class EnumType: Type {
     let values: [EnumValue]
     
     init(name: String, data: EnumTypeData) {
-        let requiresPrefix = data.values.contains { $0.name.first!.isNumber }
+        let values = data.values.filter { !$0.tags.contains("upstream") }
+        
+        let requiresPrefix = values.contains { $0.name.first!.isNumber }
         self.requiresPrefix = requiresPrefix
-        values = data.values.map { EnumValue(name: $0.name, value: $0.value, requiresPrefix: requiresPrefix) }
+        
+        self.values = values.map { EnumValue(name: $0.name, value: $0.value, requiresPrefix: requiresPrefix) }
         super.init(name: name, data: data)
     }
     
