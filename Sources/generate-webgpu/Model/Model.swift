@@ -7,7 +7,9 @@ struct Model {
         for (name, data) in data.types {
             if data.tags.contains("upstream") { continue }
             
-            if data.category == .enum, let data = data as? EnumTypeData {
+            if data.category == .native, let data = data as? NativeTypeData {
+                types[name] = NativeType(name: name, data: data)
+            } else if data.category == .enum, let data = data as? EnumTypeData {
                 types[name] = EnumType(name: name, data: data)
             } else if data.category == .bitmask, let data = data as? EnumTypeData {
                 types[name] = BitmaskType(name: name, data: data)
