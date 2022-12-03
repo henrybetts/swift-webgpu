@@ -15,7 +15,7 @@ enum Category: String, Decodable {
     case functionPointer = "function pointer"
 }
 
-enum Length {
+enum Length: Equatable {
     case fixed(Int)
     case string
     case member(String)
@@ -45,7 +45,7 @@ extension Length: Decodable {
     }
 }
 
-struct Annotation: RawRepresentable, Decodable {
+struct Annotation: RawRepresentable, Decodable, Equatable {
     var rawValue: String
     
     static let pointer = Annotation(rawValue: "const*")

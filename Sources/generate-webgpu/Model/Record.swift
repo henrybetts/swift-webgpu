@@ -31,12 +31,43 @@ class RecordMember {
     
     var cType: String {
         guard let type = self.type else { return typeName }
+        
+        if annotation == .pointer {
+            return type.name == "void" ? "UnsafeRawPointer!" : "UnsafePointer<\(type.cName)>!"
+        }
+        
+        if annotation == .mutablePointer {
+            return type.name == "void" ? "UnsafeMutableRawPointer!" : "UnsafeMutablePointer<\(type.cName)>!"
+        }
+        
         return type.cName
     }
     
     var swiftType: String {
         guard let type = self.type else { return typeName }
-        return type.swiftName
+        
+        var swiftType: String
+        
+        if annotation == .pointer && length != .single {
+            if type.name == "char" && length == .string {
+                swiftType = "String"
+            } else {
+                swiftType = type.name == "void" ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
+            }
+        
+        } else if annotation == nil || (annotation == .pointer && type.category == .structure) {
+            swiftType = type.swiftName
+        
+        } else {
+            return cType
+        }
+        
+        if isOptional {
+            swiftType += "?"
+        }
+        
+        return swiftType
+        
     }
     
     var defaultSwiftValue: String? {
