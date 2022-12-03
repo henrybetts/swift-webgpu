@@ -1,19 +1,28 @@
 @resultBuilder
 struct CodeBuilder {
-    static func buildBlock(_ components: String...) -> String {
-        return components.joined(separator: "\n")
+    static func buildBlock(_ components: String?...) -> String? {
+        return components.compactMap{$0}.joined(separator: "\n")
     }
     
-    static func buildEither(first component: String) -> String {
+    static func buildOptional(_ component: String??) -> String? {
+        return component ?? nil
+    }
+    
+    static func buildEither(first component: String?) -> String? {
         return component
     }
     
-    static func buildEither(second component: String) -> String {
+    static func buildEither(second component: String?) -> String? {
         return component
     }
     
-    static func buildArray(_ components: [String]) -> String {
-        return components.joined(separator: "\n")
+    static func buildArray(_ components: [String?]) -> String? {
+        if components.isEmpty { return nil }
+        return components.compactMap{$0}.joined(separator: "\n")
+    }
+    
+    static func buildFinalResult(_ component: String?) -> String {
+        return component ?? ""
     }
 }
 

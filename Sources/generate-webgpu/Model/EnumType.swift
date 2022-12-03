@@ -27,7 +27,7 @@ class EnumType: Type {
     override func swiftValue(from value: Any) -> String {
         if let value = value as? String {
             let name = requiresPrefix ? "type " + value : value
-            return name.camelCased()
+            return "." + name.camelCased()
         }
         return super.swiftValue(from: value)
     }

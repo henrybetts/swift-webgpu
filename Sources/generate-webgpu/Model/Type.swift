@@ -9,6 +9,8 @@ class Type {
         self.tags = data.tags
     }
     
+    func link(model: Model) {}
+    
     var cName: String {
         return "WGPU" + name.pascalCased(preservingCasing: true)
     }

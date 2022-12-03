@@ -13,10 +13,16 @@ struct Model {
                 types[name] = EnumType(name: name, data: data)
             } else if data.category == .bitmask, let data = data as? EnumTypeData {
                 types[name] = BitmaskType(name: name, data: data)
+            } else if data.category == .structure, let data = data as? StructureTypeData {
+                types[name] = StructureType(name: name, data: data)
             }
         }
         
         self.types = types
+        
+        for type in types.values {
+            type.link(model: self)
+        }
     }
     
     func types<T: Type>(of _: T.Type) -> [T] {

@@ -114,7 +114,7 @@ struct EnumValueData: Decodable {
     var value: Int
 }
 
-struct RecordData: Decodable {
+struct RecordMemberData: Decodable {
     @DefaultFallback var tags: [String]
     var name: String
     var type: String
@@ -124,11 +124,13 @@ struct RecordData: Decodable {
     @DefaultValueDecoder var `default`: String?
 }
 
+typealias RecordData = [RecordMemberData]
+
 struct MethodData: Decodable {
     @DefaultFallback var tags: [String]
     var name: String
     var returnType: String?
-    @DefaultFallback var arguments: [RecordData]
+    @DefaultFallback var arguments: RecordData
 }
 
 
@@ -159,7 +161,7 @@ struct EnumTypeData: TypeData, Decodable {
 struct StructureTypeData: TypeData, Decodable {
     var category: Category
     @DefaultFallback var tags: [String]
-    var members: [RecordData]
+    var members: RecordData
     @DefaultFallback var extensible: Extensibility
     @DefaultFallback var chained: Extensibility
 }
@@ -181,7 +183,7 @@ struct FunctionTypeData: TypeData, Decodable {
     var category: Category
     @DefaultFallback var tags: [String]
     var returns: String?
-    @DefaultFallback var args: [RecordData]
+    @DefaultFallback var args: RecordData
 }
 
 
