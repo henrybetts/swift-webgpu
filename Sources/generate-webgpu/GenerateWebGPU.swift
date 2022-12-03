@@ -19,5 +19,6 @@ struct GenerateWebGPU: ParsableCommand {
         try generateEnums(model: model).write(to: outputDir.appendingPathComponent("Enums.swift"), atomically: true, encoding: .utf8)
         try generateOptionSets(model: model).write(to: outputDir.appendingPathComponent("OptionSets.swift"), atomically: true, encoding: .utf8)
         try generateStructs(model: model).write(to: outputDir.appendingPathComponent("Structs.swift"), atomically: true, encoding: .utf8)
+        try generateClasses(model: model).write(to: outputDir.appendingPathComponent("Classes.swift"), atomically: true, encoding: .utf8)
     }
 }

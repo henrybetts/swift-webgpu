@@ -15,6 +15,8 @@ struct Model {
                 types[name] = BitmaskType(name: name, data: data)
             } else if data.category == .structure, let data = data as? StructureTypeData {
                 types[name] = StructureType(name: name, data: data)
+            } else if data.category == .object, let data = data as? ObjectTypeData {
+                types[name] = ObjectType(name: name, data: data)
             }
         }
         
