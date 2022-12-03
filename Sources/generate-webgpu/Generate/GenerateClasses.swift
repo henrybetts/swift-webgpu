@@ -4,7 +4,9 @@ func generateClasses(model: Model) -> String {
         ""
         
         for type in model.types(of: ObjectType.self) {
-            block("public class \(type.swiftName)") {
+            block("public class \(type.swiftName): ConvertibleFromC") {
+                "typealias CType = \(type.cName)"
+                
                 "private let handle: \(type.cName)"
                 ""
                 
@@ -15,6 +17,11 @@ func generateClasses(model: Model) -> String {
                 "/// - Parameter handle: The handle to wrap."
                 block("public init(handle: \(type.cName)!)") {
                     "self.handle = handle"
+                }
+                ""
+                
+                block("required convenience init(cValue: \(type.cName))") {
+                    "self.init(handle: cValue)"
                 }
                 ""
                 

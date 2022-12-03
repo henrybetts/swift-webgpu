@@ -5,7 +5,7 @@ func generateStructs(model: Model) -> String {
         
         for type in model.types(of: StructureType.self) {
             block("public struct \(type.swiftName): \(getAdoptions(type: type).joined(separator: ", "))") {
-                "typealias CStruct = \(type.cName)"
+                "typealias CValue = \(type.cName)"
                 ""
                 
                 for member in type.members {
@@ -26,6 +26,18 @@ func generateStructs(model: Model) -> String {
                         }
                     }
                 }
+                ""
+                
+                block("init(cValue: \(type.cName))") {
+                    for member in type.members {
+                        switch member.typeConversion {
+                        case .implicit:
+                            "self.\(member.swiftName) = cValue.\(member.cName)"
+                        case .explicit:
+                            "self.\(member.swiftName) = .init(cValue: cValue.\(member.cName))"
+                        }
+                    }
+                }
             }
             ""
         }
@@ -33,7 +45,7 @@ func generateStructs(model: Model) -> String {
 }
 
 func getAdoptions(type: StructureType) -> [String] {
-    var adoptions = ["CStructConvertible"]
+    var adoptions = ["ConvertibleFromC"]
     if type.extensible == .in {
         adoptions.append("Extensible")
     }

@@ -4,7 +4,10 @@ func generateOptionSets(model: Model) -> String {
         ""
         
         for type in model.types(of: BitmaskType.self) {
-            block("public struct \(type.swiftName): OptionSet") {
+            block("public struct \(type.swiftName): OptionSet, ConvertibleFromC") {
+                "typealias CType = \(type.cName)"
+                ""
+                
                 "public let rawValue: \(type.cName)"
                 ""
                 
@@ -13,8 +16,13 @@ func generateOptionSets(model: Model) -> String {
                 }
                 ""
                 
-                block("init(rawValue: \(type.cEnumName))") {
-                    "self.rawValue = rawValue.rawValue"
+                block("init(cValue: \(type.cName))") {
+                    "self.init(rawValue: cValue)"
+                }
+                ""
+                
+                block("init(cValue: \(type.cEnumName))") {
+                    "self.init(rawValue: cValue.rawValue)"
                 }
                 ""
                 

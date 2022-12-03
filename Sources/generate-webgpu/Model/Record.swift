@@ -1,3 +1,8 @@
+enum TypeConversion {
+    case implicit
+    case explicit
+}
+
 class RecordMember {
     let name: String
     let typeName: String
@@ -68,6 +73,20 @@ class RecordMember {
         
         return swiftType
         
+    }
+    
+    var typeConversion: TypeConversion {
+        guard let type = self.type else { return .implicit }
+        
+        if annotation == .pointer && (length != .single || type.category == .structure) {
+            return .explicit
+        }
+        
+        if annotation == nil && type.category != .native {
+            return .explicit
+        }
+        
+        return .implicit
     }
     
     var defaultSwiftValue: String? {
