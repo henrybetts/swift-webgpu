@@ -41,15 +41,26 @@ class RecordMember {
     var cType: String {
         guard let type = self.type else { return typeName }
         
-        if annotation == .pointer {
-            return type.name == "void" ? "UnsafeRawPointer!" : "UnsafePointer<\(type.cName)>!"
-        }
-        
-        if annotation == .mutablePointer {
-            return type.name == "void" ? "UnsafeMutableRawPointer!" : "UnsafeMutablePointer<\(type.cName)>!"
+        if let annotation = annotation {
+            switch annotation {
+            case .pointer:
+                return type.name == "void" ? "UnsafeRawPointer!" : "UnsafePointer<\(type.cName)>!"
+            case .mutablePointer:
+                return type.name == "void" ? "UnsafeMutableRawPointer!" : "UnsafeMutablePointer<\(type.cName)>!"
+            case .pointerToPointer:
+                return type.name == "void" ? "UnsafePointer<UnsafeRawPointer?>!" : "UnsafePointer<UnsafePointer<\(type.cName)>?>!"
+            }
         }
         
         return type.cName
+    }
+    
+    var isSwiftString: Bool {
+        return annotation == .pointer && length == .string && typeName == "char"
+    }
+    
+    var isSwiftArray: Bool {
+        return annotation == .pointer && length != .single && length != .string
     }
     
     var swiftType: String {
@@ -57,12 +68,11 @@ class RecordMember {
         
         var swiftType: String
         
-        if annotation == .pointer && length != .single {
-            if type.name == "char" && length == .string {
-                swiftType = "String"
-            } else {
-                swiftType = type.name == "void" ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
-            }
+        if isSwiftString {
+            swiftType = "String"
+        
+        } else if isSwiftArray {
+            swiftType = type.name == "void" ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
         
         } else if annotation == nil || (annotation == .pointer && type.category == .structure) {
             swiftType = type.swiftName
@@ -82,12 +92,12 @@ class RecordMember {
     var typeConversion: TypeConversion {
         guard let type = self.type else { return .implicit }
         
-        if annotation == .pointer && length != .single {
-            if type.name == "char" && length == .string {
-                return .explicit
-            } else {
-                return .array
-            }
+        if isSwiftString {
+            return .explicit
+        }
+        
+        if isSwiftArray {
+            return .array
         }
         
         if annotation == .pointer && type.category == .structure {
@@ -102,9 +112,18 @@ class RecordMember {
     }
     
     var defaultSwiftValue: String? {
-        if let defaultValue = self.defaultValue {
+        if let defaultValue = defaultValue, defaultValue != "nullptr" {
             return type?.swiftValue(from: defaultValue)
         }
+        
+        if isSwiftArray && lengthMember?.defaultValue == "0" {
+            return "[]"
+        }
+        
+        if isOptional {
+            return "nil"
+        }
+        
         return nil
     }
 }

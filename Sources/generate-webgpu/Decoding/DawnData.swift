@@ -45,11 +45,10 @@ extension Length: Decodable {
     }
 }
 
-struct Annotation: RawRepresentable, Decodable, Equatable {
-    var rawValue: String
-    
-    static let pointer = Annotation(rawValue: "const*")
-    static let mutablePointer = Annotation(rawValue: "*")
+enum Annotation: String, Decodable {
+    case pointer = "const*"
+    case mutablePointer = "*"
+    case pointerToPointer = "const*const*"
 }
 
 enum Extensibility: String {

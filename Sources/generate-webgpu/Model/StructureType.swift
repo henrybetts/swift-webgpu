@@ -19,7 +19,7 @@ class StructureType: Type {
     }
     
     var swiftMembers: Record {
-        return members.filter { $0.parentMember == nil }
+        return members.filter { !($0.parentMember?.isSwiftArray ?? false) }
     }
     
     override func swiftValue(from value: Any) -> String {
