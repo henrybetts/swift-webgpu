@@ -8,7 +8,7 @@ func generateStructs(model: Model) -> String {
                 "typealias CValue = \(type.cName)"
                 ""
                 
-                for member in type.members {
+                for member in type.swiftMembers {
                     "public var \(member.swiftName): \(member.swiftType)"
                 }
                 
@@ -19,7 +19,7 @@ func generateStructs(model: Model) -> String {
                 ""
                 
                 block("public init(\(getInitParams(strucure: type).joined(separator: ", ")))") {
-                    for member in type.members {
+                    for member in type.swiftMembers {
                         "self.\(member.swiftName) = \(member.swiftName)"
                         if type.extensible == .in || type.chained == .in {
                             "self.nextInChain = nextInChain"
@@ -29,12 +29,18 @@ func generateStructs(model: Model) -> String {
                 ""
                 
                 block("init(cValue: \(type.cName))") {
-                    for member in type.members {
+                    for member in type.swiftMembers {
                         switch member.typeConversion {
                         case .implicit:
                             "self.\(member.swiftName) = cValue.\(member.cName)"
                         case .explicit:
-                            "self.\(member.swiftName) = .init(cValue: cValue.\(member.cName))"
+                            "self.\(member.swiftName) = \(member.swiftType)(cValue: cValue.\(member.cName))"
+                        case .array:
+                            if let lengthMember = member.lengthMember {
+                                "self.\(member.swiftName) = \(member.swiftType)(cValue: UnsafeBufferPointer(start: cValue.\(member.cName), count: Int(cValue.\(lengthMember.cName))))"
+                            } else if case .fixed(let length) = member.length {
+                                "self.\(member.swiftName) = \(member.swiftType)(cValue: UnsafeBufferPointer(start: cValue.\(member.cName), count: \(length)))"
+                            }
                         }
                     }
                 }
@@ -56,7 +62,7 @@ func getAdoptions(type: StructureType) -> [String] {
 }
 
 func getInitParams(strucure: StructureType) -> [String] {
-    var params = strucure.members.map { member -> String in
+    var params = strucure.swiftMembers.map { member -> String in
         var param = "\(member.swiftName): \(member.swiftType)"
         if let defaultValue = member.defaultSwiftValue {
             param += " = \(defaultValue)"

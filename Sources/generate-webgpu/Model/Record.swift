@@ -1,6 +1,7 @@
 enum TypeConversion {
     case implicit
     case explicit
+    case array
 }
 
 class RecordMember {
@@ -12,6 +13,9 @@ class RecordMember {
     let isOptional: Bool
     
     weak var type: Type?
+    
+    weak var lengthMember: RecordMember?
+    weak var parentMember: RecordMember?
     
     init(data: RecordMemberData) {
         name = data.name
@@ -78,7 +82,15 @@ class RecordMember {
     var typeConversion: TypeConversion {
         guard let type = self.type else { return .implicit }
         
-        if annotation == .pointer && (length != .single || type.category == .structure) {
+        if annotation == .pointer && length != .single {
+            if type.name == "char" && length == .string {
+                return .explicit
+            } else {
+                return .array
+            }
+        }
+        
+        if annotation == .pointer && type.category == .structure {
             return .explicit
         }
         
@@ -103,6 +115,15 @@ typealias Record = [RecordMember]
 extension Record {
     init(data: RecordData) {
         self = data.map { RecordMember(data: $0) }
+        
+        for member in self {
+            if case .member(let length) = member.length {
+                if let lengthMember = self.first(where: { $0.name == length }) {
+                    member.lengthMember = lengthMember
+                    lengthMember.parentMember = member
+                }
+            }
+        }
     }
     
     func link(model: Model) {

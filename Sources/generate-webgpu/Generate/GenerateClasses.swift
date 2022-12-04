@@ -15,7 +15,7 @@ func generateClasses(model: Model) -> String {
                 "/// The ownership of the handle is transferred to this class."
                 "///"
                 "/// - Parameter handle: The handle to wrap."
-                block("public init(handle: \(type.cName)!)") {
+                block("public init(handle: \(type.cName))") {
                     "self.handle = handle"
                 }
                 ""
