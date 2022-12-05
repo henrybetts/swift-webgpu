@@ -1,53 +1,58 @@
 @resultBuilder
 struct CodeBuilder {
-    static func buildBlock(_ components: String?...) -> String? {
-        return components.compactMap{$0}.joined(separator: "\n")
+    static func buildExpression(_ expression: String) -> [String] {
+        return [expression]
     }
     
-    static func buildOptional(_ component: String??) -> String? {
-        return component ?? nil
+    static func buildBlock(_ components: [String]...) -> [String] {
+        return components.flatMap { $0 }
     }
     
-    static func buildEither(first component: String?) -> String? {
-        return component
+    static func buildOptional(_ component: [String]?) -> [String] {
+        return component ?? []
     }
     
-    static func buildEither(second component: String?) -> String? {
-        return component
+    static func buildEither(first component: [String]?) -> [String] {
+        return component ?? []
     }
     
-    static func buildArray(_ components: [String?]) -> String? {
-        if components.isEmpty { return nil }
-        return components.compactMap{$0}.joined(separator: "\n")
+    static func buildEither(second component: [String]?) -> [String] {
+        return component ?? []
     }
     
-    static func buildFinalResult(_ component: String?) -> String {
-        return component ?? ""
+    static func buildArray(_ components: [[String]]) -> [String] {
+        return components.flatMap { $0 }
     }
 }
 
-func code(@CodeBuilder builder: () -> String) -> String {
+func code(@CodeBuilder builder: () -> [String]) -> String {
+    return builder().joined(separator: "\n")
+}
+
+func indented(@CodeBuilder builder: () -> [String]) -> String {
     return builder()
+        .flatMap { $0.split(separator: "\n", omittingEmptySubsequences: false).map { "    " + $0 } }
+        .joined(separator: "\n")
 }
 
-func indented(@CodeBuilder builder: () -> String) -> String {
-    let code = builder()
-    let lines = code.split(separator: "\n", omittingEmptySubsequences: false).map { "    " + $0 }
-    return lines.joined(separator: "\n")
-}
-
-func block(_ prefix: String? = nil, @CodeBuilder builder: () -> String) -> String {
+func block(_ prefix: String? = nil, @CodeBuilder builder: () -> [String]) -> String {
     code {
         if let prefix = prefix {
             "\(prefix) {"
         } else {
             "{"
         }
-        indented {
-            builder()
-        }
+        indented(builder: builder)
         "}"
     }
+}
+
+func commaSeparated(@CodeBuilder builder: () -> [String]) -> String {
+    return builder().joined(separator: ", ")
+}
+
+func line(@CodeBuilder builder: () -> [String]) -> String {
+    return builder().joined()
 }
 
 extension String {

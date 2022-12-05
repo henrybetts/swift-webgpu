@@ -4,7 +4,19 @@ func generateStructs(model: Model) -> String {
         ""
         
         for type in model.types(of: StructureType.self) {
-            block("public struct \(type.swiftName): \(getAdoptions(type: type).joined(separator: ", "))") {
+            
+            let adoptions = commaSeparated {
+                "ConvertibleFromC"
+                "ConvertibleToCWithClosure"
+                if type.extensible == .in {
+                    "Exensible"
+                }
+                if type.chained == .in {
+                    "Chained"
+                }
+            }
+            
+            block("public struct \(type.swiftName): \(adoptions)") {
                 "typealias CValue = \(type.cName)"
                 ""
                 
@@ -18,12 +30,26 @@ func generateStructs(model: Model) -> String {
                 
                 ""
                 
-                block("public init(\(getInitParams(strucure: type).joined(separator: ", ")))") {
+                let initParams = commaSeparated {
+                    for member in type.swiftMembers {
+                        line {
+                            "\(member.swiftName): \(member.swiftType)"
+                            if let defaultValue = member.defaultSwiftValue {
+                                " = \(defaultValue)"
+                            }
+                        }
+                    }
+                    if type.extensible == .in || type.chained == .in {
+                        "nextInChain: Chained? = nil"
+                    }
+                }
+                
+                block("public init(\(initParams))") {
                     for member in type.swiftMembers {
                         "self.\(member.swiftName) = \(member.swiftName)"
-                        if type.extensible == .in || type.chained == .in {
-                            "self.nextInChain = nextInChain"
-                        }
+                    }
+                    if type.extensible == .in || type.chained == .in {
+                        "self.nextInChain = nextInChain"
                     }
                 }
                 ""
@@ -48,31 +74,4 @@ func generateStructs(model: Model) -> String {
             ""
         }
     }
-}
-
-func getAdoptions(type: StructureType) -> [String] {
-    var adoptions = ["ConvertibleFromC"]
-    if type.extensible == .in {
-        adoptions.append("Extensible")
-    }
-    if type.chained == .in {
-        adoptions.append("Chained")
-    }
-    return adoptions
-}
-
-func getInitParams(strucure: StructureType) -> [String] {
-    var params = strucure.swiftMembers.map { member -> String in
-        var param = "\(member.swiftName): \(member.swiftType)"
-        if let defaultValue = member.defaultSwiftValue {
-            param += " = \(defaultValue)"
-        }
-        return param
-    }
-    
-    if strucure.extensible == .in || strucure.chained == .in {
-        params.append("nextInChain: Chained? = nil")
-    }
-    
-    return params
 }
