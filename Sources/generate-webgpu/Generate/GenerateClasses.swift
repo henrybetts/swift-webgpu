@@ -4,8 +4,8 @@ func generateClasses(model: Model) -> String {
         ""
         
         for type in model.types(of: ObjectType.self) {
-            block("public class \(type.swiftName): ConvertibleFromC") {
-                "typealias CType = \(type.cName)"
+            block("public class \(type.swiftName): ConvertibleFromC, ConvertibleToCWithClosure") {
+                "typealias CType = \(type.cName)?"
                 
                 "private let handle: \(type.cName)"
                 ""
@@ -20,8 +20,8 @@ func generateClasses(model: Model) -> String {
                 }
                 ""
                 
-                block("required convenience init(cValue: \(type.cName))") {
-                    "self.init(handle: cValue)"
+                block("required convenience init(cValue: \(type.cName)?)") {
+                    "self.init(handle: cValue!)"
                 }
                 ""
                 
@@ -39,6 +39,11 @@ func generateClasses(model: Model) -> String {
                     block("return try withExtendedLifetime(self)") {
                         "return try body(handle)"
                     }
+                }
+                ""
+                
+                block("func withCValue<R>(_ body: (\(type.cName)?) throws -> R) rethrows -> R") {
+                    "return try withUnsafeHandle(body)"
                 }
             }
             ""

@@ -1,7 +1,11 @@
 enum TypeConversion {
-    case implicit
-    case explicit
+    case native
+    case value
+    case valueWithClosure
+    case pointerWithClosure
     case array
+    case nativeArray
+    case length
 }
 
 class RecordMember {
@@ -90,25 +94,37 @@ class RecordMember {
     }
     
     var typeConversion: TypeConversion {
-        guard let type = self.type else { return .implicit }
+        guard let type = self.type else { return .native }
         
         if isSwiftString {
-            return .explicit
+            return .valueWithClosure
         }
         
         if isSwiftArray {
-            return .array
+            return type.category == .native ? .nativeArray : .array
         }
         
-        if annotation == .pointer && type.category == .structure {
-            return .explicit
+        if parentMember?.isSwiftArray == true {
+            return .length
+        }
+        
+        if type.category == .structure && annotation == .pointer {
+            return .pointerWithClosure
+        }
+        
+        if type.category == .structure && annotation == nil {
+            return .valueWithClosure
+        }
+        
+        if type.category == .object && annotation == nil {
+            return .valueWithClosure
         }
         
         if annotation == nil && type.category != .native {
-            return .explicit
+            return .value
         }
         
-        return .implicit
+        return .native
     }
     
     var defaultSwiftValue: String? {

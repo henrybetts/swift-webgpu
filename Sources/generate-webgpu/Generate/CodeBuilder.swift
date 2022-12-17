@@ -1,6 +1,7 @@
 @resultBuilder
 struct CodeBuilder {
-    static func buildExpression(_ expression: String) -> [String] {
+    static func buildExpression(_ expression: String?) -> [String] {
+        guard let expression = expression else { return [] }
         return [expression]
     }
     

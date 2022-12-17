@@ -4,7 +4,7 @@ func generateEnums(model: Model) -> String {
         ""
         
         for type in model.types(of: EnumType.self) {
-            block("public enum \(type.swiftName): \(type.cName).RawValue, ConvertibleFromC") {
+            block("public enum \(type.swiftName): \(type.cName).RawValue, ConvertibleFromC, ConvertibleToC") {
                 "typealias CType = \(type.cName)"
                 ""
                 
