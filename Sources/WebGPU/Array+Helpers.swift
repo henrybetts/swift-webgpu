@@ -31,3 +31,10 @@ func _withCValues<I: IteratorProtocol, R>(_ cValues: inout [I.Element.CType], ap
         }
     }
 }
+
+// UnsafeRawBufferPointer is treated like an array
+extension UnsafeRawBufferPointer {
+    func withUnsafeBufferPointer<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
+        return try body(self)
+    }
+}

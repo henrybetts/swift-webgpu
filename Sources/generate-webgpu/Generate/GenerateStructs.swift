@@ -88,14 +88,17 @@ func generateStructs(model: Model) -> String {
                     }
                     
                     for member in type.swiftMembers {
-                        if member.typeConversion == .valueWithClosure {
+                        switch member.typeConversion {
+                        case .valueWithClosure:
                             "return try self.\(member.swiftName).withCValue { cValue_\(member.swiftName) in"
-                        } else if member.typeConversion == .pointerWithClosure {
+                        case .pointerWithClosure:
                                 "return try self.\(member.swiftName).withCPointer { cPointer_\(member.swiftName) in"
-                        } else if member.typeConversion == .array {
+                        case .array:
                             "return try self.\(member.swiftName).withCValues { cValues_\(member.swiftName) in"
-                        } else if member.typeConversion == .nativeArray {
+                        case .nativeArray:
                             "return try self.\(member.swiftName).withUnsafeBufferPointer { cValues_\(member.swiftName) in"
+                        default:
+                            nil
                         }
                     }
                     

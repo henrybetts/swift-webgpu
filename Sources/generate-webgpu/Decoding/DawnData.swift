@@ -128,8 +128,8 @@ typealias RecordData = [RecordMemberData]
 struct MethodData: Decodable {
     @DefaultFallback var tags: [String]
     var name: String
-    var returnType: String?
-    @DefaultFallback var arguments: RecordData
+    var returns: String?
+    @DefaultFallback var args: RecordData
 }
 
 

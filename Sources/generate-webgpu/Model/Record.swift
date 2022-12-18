@@ -59,11 +59,11 @@ class RecordMember {
         return type.cName
     }
     
-    var isSwiftString: Bool {
+    var isString: Bool {
         return annotation == .pointer && length == .string && typeName == "char"
     }
     
-    var isSwiftArray: Bool {
+    var isArray: Bool {
         return annotation == .pointer && length != .single && length != .string
     }
     
@@ -72,10 +72,10 @@ class RecordMember {
         
         var swiftType: String
         
-        if isSwiftString {
+        if isString {
             swiftType = "String"
         
-        } else if isSwiftArray {
+        } else if isArray {
             swiftType = type.name == "void" ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
         
         } else if annotation == nil || (annotation == .pointer && type.category == .structure) {
@@ -96,15 +96,15 @@ class RecordMember {
     var typeConversion: TypeConversion {
         guard let type = self.type else { return .native }
         
-        if isSwiftString {
+        if isString {
             return .valueWithClosure
         }
         
-        if isSwiftArray {
+        if isArray {
             return type.category == .native ? .nativeArray : .array
         }
         
-        if parentMember?.isSwiftArray == true {
+        if parentMember?.isArray == true {
             return .length
         }
         
@@ -120,7 +120,7 @@ class RecordMember {
             return .valueWithClosure
         }
         
-        if annotation == nil && type.category != .native {
+        if annotation == nil && (type.category == .enum || type.category == .bitmask) {
             return .value
         }
         
@@ -132,7 +132,7 @@ class RecordMember {
             return type?.swiftValue(from: defaultValue)
         }
         
-        if isSwiftArray && lengthMember?.defaultValue == "0" {
+        if isArray && lengthMember?.defaultValue == "0" {
             return "[]"
         }
         

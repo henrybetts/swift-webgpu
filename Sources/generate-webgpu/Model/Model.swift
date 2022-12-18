@@ -17,6 +17,10 @@ struct Model {
                 types[name] = StructureType(name: name, data: data)
             } else if data.category == .object, let data = data as? ObjectTypeData {
                 types[name] = ObjectType(name: name, data: data)
+            } else if data.category == .functionPointer, let data = data as? FunctionTypeData {
+                types[name] = FunctionPointerType(name: name, data: data)
+            } else if data.category == .function, let data = data as? FunctionTypeData {
+                types[name] = FunctionType(name: name, data: data)
             }
         }
         
