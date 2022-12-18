@@ -36,12 +36,18 @@ func indented(@CodeBuilder builder: () -> [String]) -> String {
         .joined(separator: "\n")
 }
 
-func block(_ prefix: String? = nil, @CodeBuilder builder: () -> [String]) -> String {
+func block(_ prefix: String? = nil, _ suffix: String? = nil, @CodeBuilder builder: () -> [String]) -> String {
     code {
-        if let prefix = prefix {
-            "\(prefix) {"
-        } else {
+        line {
+            if let prefix = prefix {
+                prefix
+                " "
+            }
             "{"
+            if let suffix = suffix {
+                " "
+                suffix
+            }
         }
         indented(builder: builder)
         "}"

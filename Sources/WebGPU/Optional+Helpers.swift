@@ -1,3 +1,5 @@
+import CWebGPU
+
 extension Optional {
     init<T>(_ buffer: UnsafeBufferPointer<T>) where Wrapped == Array<T> {
         if !buffer.isEmpty {
@@ -56,6 +58,16 @@ extension Optional where Wrapped: ConvertibleToCWithClosure {
     func withCPointer<R>(_ body: (UnsafePointer<Wrapped.CType>?) throws -> R) rethrows -> R {
         if let value = self {
             return try value.withCPointer(body)
+        } else {
+            return try body(nil)
+        }
+    }
+}
+
+extension Optional where Wrapped == Chained {
+    func withChainedStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>?) throws -> R) rethrows -> R {
+        if let chainedStruct = self {
+            return try chainedStruct.withChainedStruct(body)
         } else {
             return try body(nil)
         }

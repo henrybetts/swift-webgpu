@@ -83,6 +83,10 @@ func generateStructs(model: Model) -> String {
                 ""
                 
                 block("func withCValue<R>(_ body: (\(type.cName)) throws -> R) rethrows -> R") {
+                    if type.extensible == .in || type.chained == .in {
+                        "return try self.nextInChain.withChainedStruct { chainedStruct in"
+                    }
+                    
                     for member in type.swiftMembers {
                         if member.typeConversion == .valueWithClosure {
                             "return try self.\(member.swiftName).withCValue { cValue_\(member.swiftName) in"
@@ -96,12 +100,22 @@ func generateStructs(model: Model) -> String {
                     }
                     
                     let structArgs = commaSeparated {
-                        if type.extensible != .none {
+                        switch type.extensible {
+                        case .in:
+                            "nextInChain: chainedStruct"
+                        case .out:
                             "nextInChain: nil"
+                        case .none:
+                            nil
                         }
                         
-                        if type.chained != .none {
-                            "chain: WGPUChainedStruct()"
+                        switch type.chained {
+                        case .in:
+                            "chain: WGPUChainedStruct(next: chainedStruct, sType: \(type.sType))"
+                        case .out:
+                            "chain: WGPUChainedStructOut(next: nil, sType: \(type.sType))"
+                        case .none:
+                            nil
                         }
                         
                         for member in type.members {
@@ -131,6 +145,20 @@ func generateStructs(model: Model) -> String {
                             "}"
                         default:
                             nil
+                        }
+                    }
+                    
+                    if type.extensible == .in || type.chained == .in {
+                        "}"
+                    }
+                }
+                
+                if type.chained == .in {
+                    ""
+                    block("public func withChainedStruct<R>(_ body: (UnsafePointer<WGPUChainedStruct>) throws -> R) rethrows -> R") {
+                        block("return try withCPointer", "cStruct in") {
+                            "let chainedStruct = UnsafeRawPointer(cStruct).bindMemory(to: WGPUChainedStruct.self, capacity: 1)"
+                            "return try body(chainedStruct)"
                         }
                     }
                 }
