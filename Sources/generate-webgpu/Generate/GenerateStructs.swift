@@ -56,103 +56,41 @@ func generateStructs(model: Model) -> String {
                 
                 block("init(cValue: \(type.cName))") {
                     for member in type.swiftMembers {
-                        switch member.typeConversion {
-                        case .native:
-                            "self.\(member.swiftName) = cValue.\(member.cName)"
-                        case .value, .valueWithClosure:
-                            "self.\(member.swiftName) = \(member.swiftType)(cValue: cValue.\(member.cName))"
-                        case .pointerWithClosure:
-                            "self.\(member.swiftName) = \(member.swiftType)(cPointer: cValue.\(member.cName))"
-                        case .array:
-                            if let lengthMember = member.lengthMember {
-                                "self.\(member.swiftName) = \(member.swiftType)(cValues: UnsafeBufferPointer(start: cValue.\(member.cName), count: Int(cValue.\(lengthMember.cName))))"
-                            } else if case .fixed(let length) = member.length {
-                                "self.\(member.swiftName) = \(member.swiftType)(cValues: UnsafeBufferPointer(start: cValue.\(member.cName), count: \(length)))"
-                            }
-                        case .nativeArray:
-                            if let lengthMember = member.lengthMember {
-                                "self.\(member.swiftName) = \(member.swiftType)(UnsafeBufferPointer(start: cValue.\(member.cName), count: Int(cValue.\(lengthMember.cName))))"
-                            } else if case .fixed(let length) = member.length {
-                                "self.\(member.swiftName) = \(member.swiftType)(UnsafeBufferPointer(start: cValue.\(member.cName), count: \(length)))"
-                            }
-                        case .length:
-                            nil
-                        }
+                        "self.\(member.swiftName) = \(convertCToSwift(member: member, prefix: "cValue."))"
                     }
                 }
                 ""
                 
                 block("func withCValue<R>(_ body: (\(type.cName)) throws -> R) rethrows -> R") {
-                    if type.extensible == .in || type.chained == .in {
-                        "return try self.nextInChain.withChainedStruct { chainedStruct in"
-                    }
-                    
-                    for member in type.swiftMembers {
-                        switch member.typeConversion {
-                        case .valueWithClosure:
-                            "return try self.\(member.swiftName).withCValue { cValue_\(member.swiftName) in"
-                        case .pointerWithClosure:
-                                "return try self.\(member.swiftName).withCPointer { cPointer_\(member.swiftName) in"
-                        case .array:
-                            "return try self.\(member.swiftName).withCValues { cValues_\(member.swiftName) in"
-                        case .nativeArray:
-                            "return try self.\(member.swiftName).withUnsafeBufferPointer { cValues_\(member.swiftName) in"
-                        default:
-                            nil
-                        }
-                    }
-                    
-                    let structArgs = commaSeparated {
-                        switch type.extensible {
-                        case .in:
-                            "nextInChain: chainedStruct"
-                        case .out:
-                            "nextInChain: nil"
-                        case .none:
-                            nil
-                        }
-                        
-                        switch type.chained {
-                        case .in:
-                            "chain: WGPUChainedStruct(next: chainedStruct, sType: \(type.sType))"
-                        case .out:
-                            "chain: WGPUChainedStructOut(next: nil, sType: \(type.sType))"
-                        case .none:
-                            nil
-                        }
-                        
-                        for member in type.members {
-                            switch member.typeConversion {
-                            case .native:
-                                "\(member.cName): self.\(member.swiftName)"
-                            case .value:
-                                "\(member.cName): self.\(member.swiftName).cValue"
-                            case .valueWithClosure:
-                                "\(member.cName): cValue_\(member.swiftName)"
-                            case .pointerWithClosure:
-                                "\(member.cName): cPointer_\(member.swiftName)"
-                            case .array, .nativeArray:
-                                "\(member.cName): cValues_\(member.swiftName).baseAddress"
-                            case .length:
-                                "\(member.cName): \(member.cType)(cValues_\(member.parentMember!.swiftName).count)"
+                    block("return try self.nextInChain.withChainedStruct", "chainedStruct in", condition: type.extensible == .in || type.chained == .in) {
+                        convertSwiftToC(members: type.members, prefix: "self.", throws: true) { cValues in
+                            let structArgs = commaSeparated {
+                                switch type.extensible {
+                                case .in:
+                                    "nextInChain: chainedStruct"
+                                case .out:
+                                    "nextInChain: nil"
+                                case .none:
+                                    ()
+                                }
+                                
+                                switch type.chained {
+                                case .in:
+                                    "chain: WGPUChainedStruct(next: chainedStruct, sType: \(type.sType))"
+                                case .out:
+                                    "chain: WGPUChainedStructOut(next: nil, sType: \(type.sType))"
+                                case .none:
+                                    ()
+                                }
+                                
+                                for (member, cValue) in zip(type.members, cValues) {
+                                    "\(member.cName): \(cValue)"
+                                }
                             }
+                    
+                            "let cStruct = \(type.cName)(\(structArgs))"
+                            "return try body(cStruct)"
                         }
-                    }
-                    
-                    "let cStruct = \(type.cName)(\(structArgs))"
-                    "return try body(cStruct)"
-                    
-                    for member in type.swiftMembers {
-                        switch member.typeConversion {
-                        case .valueWithClosure, .pointerWithClosure, .array, .nativeArray:
-                            "}"
-                        default:
-                            nil
-                        }
-                    }
-                    
-                    if type.extensible == .in || type.chained == .in {
-                        "}"
                     }
                 }
                 

@@ -79,65 +79,23 @@ func generateClasses(model: Model) -> String {
                     }
                     
                     block(methodDefinition) {
-                        
                         block("return withUnsafeHandle", "_handle in") {
-                            for arg in method.swiftArguments {
-                                switch arg.typeConversion {
-                                case .valueWithClosure:
-                                    "return \(arg.swiftName).withCValue { cValue_\(arg.swiftName) in"
-                                case .pointerWithClosure:
-                                        "return \(arg.swiftName).withCPointer { cPointer_\(arg.swiftName) in"
-                                case .array:
-                                    "return \(arg.swiftName).withCValues { cValues_\(arg.swiftName) in"
-                                case .nativeArray:
-                                    "return \(arg.swiftName).withUnsafeBufferPointer { cValues_\(arg.swiftName) in"
-                                default:
-                                    nil
-                                }
-                            }
+                            convertSwiftToC(members: method.arguments) { cValues in
                         
-                            let functionArgs = commaSeparated {
-                                "_handle"
-                                for arg in method.arguments {
-                                    switch arg.typeConversion {
-                                    case .native:
-                                        "\(arg.swiftName)"
-                                    case .value:
-                                        "\(arg.swiftName).cValue"
-                                    case .valueWithClosure:
-                                        "cValue_\(arg.swiftName)"
-                                    case .pointerWithClosure:
-                                        "cPointer_\(arg.swiftName)"
-                                    case .array, .nativeArray:
-                                        "cValues_\(arg.swiftName).baseAddress"
-                                    case .length:
-                                        "\(arg.cType)(cValues_\(arg.parentMember!.swiftName).count)"
+                                let functionArgs = commaSeparated {
+                                    "_handle"
+                                    cValues
+                                }
+                        
+                                line {
+                                    if method.returnConversion != nil {
+                                        "let _result = "
                                     }
+                                    "\(method.cFunctionName)(\(functionArgs))"
                                 }
-                            }
-                        
-                            line {
-                                if method.returnConversion != nil {
-                                    "let _result = "
-                                }
-                                "\(method.cFunctionName)(\(functionArgs))"
-                            }
                             
-                            switch method.returnConversion {
-                            case .native:
-                                "return _result"
-                            case .value:
-                                "return .init(cValue: _result)"
-                            default:
-                                nil
-                            }
-                        
-                            for arg in method.swiftArguments {
-                                switch arg.typeConversion {
-                                case .valueWithClosure, .pointerWithClosure, .array, .nativeArray:
-                                    "}"
-                                default:
-                                    nil
+                                if let returnConversion = method.returnConversion, let returnType = method.swiftReturnType {
+                                    "return \(convertCToSwift(cValue: "_result", swiftType: returnType, typeConversion: returnConversion))"
                                 }
                             }
                         }

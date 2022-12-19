@@ -1,8 +1,15 @@
 @resultBuilder
 struct CodeBuilder {
-    static func buildExpression(_ expression: String?) -> [String] {
-        guard let expression = expression else { return [] }
+    static func buildExpression(_ expression: [String]) -> [String] {
+        return expression
+    }
+    
+    static func buildExpression(_ expression: String) -> [String] {
         return [expression]
+    }
+    
+    static func buildExpression(_ expression: ()) -> [String] {
+        return []
     }
     
     static func buildBlock(_ components: [String]...) -> [String] {
@@ -30,14 +37,14 @@ func code(@CodeBuilder builder: () -> [String]) -> String {
     return builder().joined(separator: "\n")
 }
 
-func indented(@CodeBuilder builder: () -> [String]) -> String {
-    return builder()
-        .flatMap { $0.split(separator: "\n", omittingEmptySubsequences: false).map { "    " + $0 } }
-        .joined(separator: "\n")
+func indented(size: Int = 4, @CodeBuilder builder: () -> [String]) -> [String] {
+    let indent = String(repeating: " ", count: size)
+    return builder().flatMap { $0.split(separator: "\n", omittingEmptySubsequences: false).map { indent + $0 } }
 }
 
-func block(_ prefix: String? = nil, _ suffix: String? = nil, @CodeBuilder builder: () -> [String]) -> String {
-    code {
+func block(_ prefix: String? = nil, _ suffix: String? = nil, condition: Bool = true, @CodeBuilder builder: () -> [String]) -> String {
+    guard condition else { return code(builder: builder) }
+    return code {
         line {
             if let prefix = prefix {
                 prefix
