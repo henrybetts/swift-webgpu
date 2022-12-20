@@ -18,6 +18,10 @@ class StructureType: Type {
         return "WGPUSType_" + name.pascalCased(preservingCasing: true)
     }
     
+    var hasDefaultSwiftInitializer: Bool {
+        return members.removingHidden.allSatisfy { $0.defaultSwiftValue != nil }
+    }
+    
     override func swiftValue(from value: Any) -> String {
         if let value = value as? String {
             let values = value.trimmingCharacters(in: .init(charactersIn: "{}")).split(separator: ",")

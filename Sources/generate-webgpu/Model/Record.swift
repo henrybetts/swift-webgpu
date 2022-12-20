@@ -165,6 +165,10 @@ class RecordMember {
             return "nil"
         }
         
+        if annotation == .none, let type = type as? StructureType, type.hasDefaultSwiftInitializer {
+            return "\(type.swiftName)()"
+        }
+        
         return nil
     }
 }
