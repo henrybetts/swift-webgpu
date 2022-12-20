@@ -10,6 +10,10 @@ class Method: FunctionType {
         return returnType != nil && arguments.isEmpty && name.hasPrefix("get ")
     }
     
+    var isCallbackSetter: Bool {
+        return name.hasPrefix("set ") && name.hasSuffix(" callback") && arguments.count == 2 && arguments[0].isCallback && arguments[1].isUserData
+    }
+    
     override var cFunctionName: String {
         return "wgpu" + objectName.pascalCased(preservingCasing: true) + name.pascalCased(preservingCasing: true)
     }

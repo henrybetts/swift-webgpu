@@ -75,7 +75,11 @@ class RecordMember {
     }
     
     var isUserData: Bool {
-        return name == "userdata"
+        return name == "userdata" && typeName == "void" && annotation == .mutablePointer
+    }
+    
+    var isCallback: Bool {
+        return name == "callback" && (type as? FunctionPointerType)?.isCallback == true
     }
     
     var isHidden: Bool {
@@ -111,16 +115,6 @@ class RecordMember {
     var typeConversion: TypeConversion {
         guard let type = self.type else { return .native }
         
-        if let type = type as? FunctionPointerType {
-            if type.isCallback {
-                return .callback
-            }
-        }
-        
-        if isUserData {
-            return .userData
-        }
-        
         if isString {
             return .valueWithClosure
         }
@@ -147,6 +141,14 @@ class RecordMember {
         
         if annotation == nil && (type.category == .enum || type.category == .bitmask) {
             return .value
+        }
+        
+        if isCallback {
+            return .callback
+        }
+        
+        if isUserData {
+            return .userData
         }
         
         return .native

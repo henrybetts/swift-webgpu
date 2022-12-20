@@ -18,7 +18,7 @@ class FunctionPointerType: Type {
     }
     
     var isCallback: Bool {
-        return arguments.contains { $0.name == "userdata" }
+        return name.hasSuffix(" callback") && arguments.contains { $0.isUserData }
     }
     
     var callbackFunctionName: String {
