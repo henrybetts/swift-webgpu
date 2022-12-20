@@ -6,6 +6,8 @@ enum TypeConversion {
     case array
     case nativeArray
     case length
+    case callback
+    case userData
 }
 
 class RecordMember {
@@ -56,15 +58,28 @@ class RecordMember {
             }
         }
         
+        if type.category == .object {
+            return type.cName + "!"
+        }
+        
         return type.cName
     }
     
     var isString: Bool {
-        return annotation == .pointer && length == .string && typeName == "char"
+        // TODO: Should check if length == .string, but dawn.json does not always specify this currently
+        return annotation == .pointer && typeName == "char"
     }
     
     var isArray: Bool {
         return annotation == .pointer && length != .single && length != .string
+    }
+    
+    var isUserData: Bool {
+        return name == "userdata"
+    }
+    
+    var isHidden: Bool {
+        return (parentMember?.isArray ?? false) || isUserData
     }
     
     var swiftType: String {
@@ -95,6 +110,16 @@ class RecordMember {
     
     var typeConversion: TypeConversion {
         guard let type = self.type else { return .native }
+        
+        if let type = type as? FunctionPointerType {
+            if type.isCallback {
+                return .callback
+            }
+        }
+        
+        if isUserData {
+            return .userData
+        }
         
         if isString {
             return .valueWithClosure
@@ -165,5 +190,9 @@ extension Record {
         for member in self {
             member.link(model: model)
         }
+    }
+    
+    var removingHidden: Record {
+        return filter { !$0.isHidden }
     }
 }

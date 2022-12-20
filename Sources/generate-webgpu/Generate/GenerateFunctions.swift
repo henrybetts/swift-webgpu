@@ -6,7 +6,7 @@ func generateFunctions(model: Model) -> String {
         for type in model.types(of: FunctionType.self) {
             let methodDefinition = line {
                 let methodParams = commaSeparated {
-                    for (index, arg) in type.swiftArguments.enumerated() {
+                    for (index, arg) in type.arguments.removingHidden.enumerated() {
                         line {
                             if index == 0 && type.hideFirstArgumentLabel {
                                 "_ "

@@ -20,7 +20,7 @@ func generateStructs(model: Model) -> String {
                 "typealias CType = \(type.cName)"
                 ""
                 
-                for member in type.swiftMembers {
+                for member in type.members.removingHidden {
                     "public var \(member.swiftName): \(member.swiftType)"
                 }
                 
@@ -31,7 +31,7 @@ func generateStructs(model: Model) -> String {
                 ""
                 
                 let initParams = commaSeparated {
-                    for member in type.swiftMembers {
+                    for member in type.members.removingHidden {
                         line {
                             "\(member.swiftName): \(member.swiftType)"
                             if let defaultValue = member.defaultSwiftValue {
@@ -45,7 +45,7 @@ func generateStructs(model: Model) -> String {
                 }
                 
                 block("public init(\(initParams))") {
-                    for member in type.swiftMembers {
+                    for member in type.members.removingHidden {
                         "self.\(member.swiftName) = \(member.swiftName)"
                     }
                     if type.extensible == .in || type.chained == .in {
@@ -55,7 +55,7 @@ func generateStructs(model: Model) -> String {
                 ""
                 
                 block("init(cValue: \(type.cName))") {
-                    for member in type.swiftMembers {
+                    for member in type.members.removingHidden {
                         "self.\(member.swiftName) = \(convertCToSwift(member: member, prefix: "cValue."))"
                     }
                 }

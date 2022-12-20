@@ -18,10 +18,6 @@ class StructureType: Type {
         return "WGPUSType_" + name.pascalCased(preservingCasing: true)
     }
     
-    var swiftMembers: Record {
-        return members.filter { !($0.parentMember?.isArray ?? false) }
-    }
-    
     override func swiftValue(from value: Any) -> String {
         if let value = value as? String {
             let values = value.trimmingCharacters(in: .init(charactersIn: "{}")).split(separator: ",")

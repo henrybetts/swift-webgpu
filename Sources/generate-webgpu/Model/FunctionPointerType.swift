@@ -16,4 +16,30 @@ class FunctionPointerType: Type {
         }
         arguments.link(model: model)
     }
+    
+    var isCallback: Bool {
+        return arguments.contains { $0.name == "userdata" }
+    }
+    
+    var callbackFunctionName: String {
+        return name.camelCased()
+    }
+    
+    var swiftReturnType: String? {
+        guard let returnType = returnType else { return nil }
+        if returnType.category == .functionPointer {
+            return returnType.swiftName + "?"
+        }
+        return returnType.swiftName
+    }
+    
+    var returnConversion: TypeConversion? {
+        guard let returnType = returnType else { return nil }
+        switch returnType.category {
+        case .enum, .bitmask, .structure, .object:
+            return .value
+        default:
+            return .native
+        }
+    }
 }

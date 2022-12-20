@@ -54,7 +54,7 @@ func generateClasses(model: Model) -> String {
                             "public var \(method.swiftFunctionName): \(returnType)"
                         } else {
                             let methodParams = commaSeparated {
-                                for (index, arg) in method.swiftArguments.enumerated() {
+                                for (index, arg) in method.arguments.removingHidden.enumerated() {
                                     line {
                                         if index == 0 && method.hideFirstArgumentLabel {
                                             "_ "

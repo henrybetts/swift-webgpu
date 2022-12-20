@@ -70,6 +70,10 @@ func convertSwiftToC(members: Record, prefix: String = "", throws: Bool = false,
                 return "c_\(member.swiftName).baseAddress"
             case .length:
                 return "\(member.cType)(c_\(member.parentMember!.swiftName).count)"
+            case .callback:
+                return "\((member.type as! FunctionPointerType).callbackFunctionName)"
+            case .userData:
+                return "UserData.passRetained(callback)"
             }
         }
         
