@@ -23,7 +23,7 @@ public class Instance {
     public var webGpuInstance: WebGPU.Instance {
         let object = dawnNativeInstanceGet(self.instance)
         wgpuInstanceReference(object)
-        return WebGPU.Instance(handle: object)
+        return WebGPU.Instance(handle: object!)
     }
     
     public func discoverDefaultAdapters() {
@@ -57,7 +57,7 @@ public class Adapter {
     public var webGpuAdapter: WebGPU.Adapter {
         let object = dawnNativeAdapterGet(self.adapter)
         wgpuAdapterReference(object)
-        return WebGPU.Adapter(handle: object)
+        return WebGPU.Adapter(handle: object!)
     }
     
     public var properties: AdapterProperties {
@@ -82,4 +82,3 @@ public class Adapter {
         return Device(handle: device)
     }
 }
-
