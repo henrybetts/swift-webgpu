@@ -1,4 +1,4 @@
-// swift-tools-version:5.4
+// swift-tools-version:5.5
 
 import PackageDescription
 
@@ -22,7 +22,8 @@ let package = Package(
             name: "CWebGPU"),
         .target(
             name: "WebGPU",
-            dependencies: ["CWebGPU"]),
+            dependencies: ["CWebGPU"],
+            plugins: [.plugin(name: "GenerateWebGPUPlugin")]),
         
         .systemLibrary(
             name: "CDawnProc"),
@@ -33,9 +34,14 @@ let package = Package(
         .target(
             name: "DawnNative",
             dependencies: ["WebGPU", "CDawnProc", "CDawnNative"]),
+        
         .executableTarget(
             name: "generate-webgpu",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]),
+        .plugin(
+            name: "GenerateWebGPUPlugin",
+            capability: .buildTool(),
+            dependencies: ["generate-webgpu"]),
         
         .systemLibrary(
             name: "CGLFW",
