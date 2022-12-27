@@ -1,5 +1,0 @@
-% for alias in model.types_by_category('typedef'):
-@available(*, deprecated, renamed: "${alias.type.swift_name}")
-public typealias ${alias.swift_name} = ${alias.type.swift_name}
-
-% end
