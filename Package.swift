@@ -70,5 +70,5 @@ let package = Package(
             dependencies: ["DawnNative", "WindowUtils", "SwiftMath"],
             path: "Demos/DemoCube"),
     ],
-    cxxLanguageStandard: .cxx14
+    cxxLanguageStandard: .cxx17
 )
