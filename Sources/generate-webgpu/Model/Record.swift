@@ -18,7 +18,7 @@ class RecordMember {
     let defaultValue: String?
     let isOptional: Bool
     
-    weak var type: Type?
+    weak var type: Type!
     
     weak var lengthMember: RecordMember?
     weak var parentMember: RecordMember?
@@ -33,7 +33,7 @@ class RecordMember {
     }
     
     func link(model: Model) {
-        type = model.types[typeName]
+        type = model.type(named: typeName)
     }
     
     var cName: String {
@@ -45,8 +45,6 @@ class RecordMember {
     }
     
     var cType: String {
-        guard let type = self.type else { return typeName }
-        
         if let annotation = annotation {
             switch annotation {
             case .pointer:
@@ -87,8 +85,6 @@ class RecordMember {
     }
     
     var swiftType: String {
-        guard let type = self.type else { return typeName }
-        
         var swiftType: String
         
         if isString {
@@ -113,8 +109,6 @@ class RecordMember {
     }
     
     var typeConversion: TypeConversion {
-        guard let type = self.type else { return .native }
-        
         if isString {
             return .valueWithClosure
         }

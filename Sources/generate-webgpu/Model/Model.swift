@@ -32,6 +32,11 @@ struct Model {
     }
     
     func types<T: Type>(of _: T.Type) -> [T] {
-        return types.values.compactMap { type(of: $0) == T.self ? ($0 as! T) : nil }
+        return types.values.compactMap { Swift.type(of: $0) == T.self ? ($0 as! T) : nil }
+    }
+    
+    func type(named name: String) -> Type {
+        guard let type = types[name] else { fatalError("Unknown type '\(name)'") }
+        return type
     }
 }

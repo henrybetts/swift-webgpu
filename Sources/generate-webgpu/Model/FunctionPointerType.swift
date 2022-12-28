@@ -12,7 +12,7 @@ class FunctionPointerType: Type {
     
     override func link(model: Model) {
         if let returnTypeName = returnTypeName, returnTypeName != "void" {
-            returnType = model.types[returnTypeName]
+            returnType = model.type(named: returnTypeName)
         }
         arguments.link(model: model)
     }
