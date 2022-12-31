@@ -71,7 +71,7 @@ Then add `WebGPU` as a dependency of your target, and link the `webgpu_dawn` lib
 ```swift
 .executableTarget(
     name: "MyApp",
-    dependencies: ["WebGPU"],
+    dependencies: [.product(name: "WebGPU", package: "swift-webgpu")],
     linkerSettings: [.linkedLibrary("webgpu_dawn")]
 ),
 ```
