@@ -1,18 +1,10 @@
 import WebGPU
-import CDawnProc
 import CDawnNative
-
-var dawnInitialized = false
 
 public class Instance {
     let instance: DawnNativeInstance!
     
     public init() {
-        if !dawnInitialized {
-            dawnProcSetProcs(dawnNativeGetProcs());
-            dawnInitialized = true;
-        }
-        
         self.instance = dawnNativeCreateInstance()
     }
     

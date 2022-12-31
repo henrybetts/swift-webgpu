@@ -15,16 +15,13 @@ Currently, swift-webgpu is based on the [Dawn](https://dawn.googlesource.com/daw
 
 To use swift-webgpu, you'll first need to build Dawn. See Dawn's [documentation](https://dawn.googlesource.com/dawn/+/HEAD/docs/building.md) to get started.
 
-swift-webgpu depends on the `libdawn_native` and `libdawn_proc` shared libraries, which can be built with the following command;
+swift-webgpu depends on the `libwebgpu_dawn` and `libdawn_native` shared libraries, which can be built like so;
 
 ```sh
-ninja -C out/Release/ src/dawn/native:shared src/dawn:proc_shared
-```
-
-Currently, the built libraries seem to have incorrect install names (i.e. running `otool -L out/Release/libdawn_native.dylib` shows `@rpath/libnative.dylib` rather than the expected `@rpath/libdawn_native.dylib`). This can be fixed with the following commands;
-```sh
-install_name_tool -id @rpath/libdawn_native.dylib out/Release/libdawn_native.dylib
-install_name_tool -id @rpath/libdawn_proc.dylib out/Release/libdawn_proc.dylib
+mkdir -p out/Release
+cd out/Release
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 ../..
+make # -j N for N-way parallel build
 ```
 
 
@@ -44,8 +41,8 @@ DAWN_JSON=/path/to/dawn/dawn.json \
 swift build -c release \
 -Xcc -I/path/to/dawn/include \
 -Xcc -I/path/to/dawn/out/Release/gen/include \
--Xlinker -L/path/to/dawn/out/Release \
--Xlinker -rpath -Xlinker /path/to/dawn/out/Release
+-Xlinker -L/path/to/dawn/out/Release/src/dawn/native \
+-Xlinker -rpath -Xlinker /path/to/dawn/out/Release/src/dawn/native
 ```
 
 Remember to replace `/path/to/dawn` with the actual path to the dawn directory. These arguments tell the compiler where to find the dawn headers, and the linker where to find the shared libraries. The `DAWN_JSON` variable defines the location of `dawn.json`, which is needed for code generation.
@@ -69,7 +66,15 @@ To use swift-webgpu with Swift Package Manager, add it to your `Package.swift` f
 .package(url: "https://github.com/henrybetts/swift-webgpu.git", branch: "master")
 ```
 
-Then add `WebGPU` and `DawnNative` as dependencies of your target.
+Then add `WebGPU` as a dependency of your target, and link the `webgpu_dawn` library;
+
+```swift
+.executableTarget(
+    name: "MyApp",
+    dependencies: ["WebGPU"],
+    linkerSettings: [.linkedLibrary("webgpu_dawn")]
+),
+```
 
 
 ## Basic Usage

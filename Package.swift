@@ -19,56 +19,71 @@ let package = Package(
     ],
     targets: [
         .systemLibrary(
-            name: "CWebGPU"),
+            name: "CWebGPU"
+        ),
         .target(
             name: "WebGPU",
             dependencies: ["CWebGPU"],
-            plugins: [.plugin(name: "GenerateWebGPUPlugin")]),
+            plugins: [.plugin(name: "GenerateWebGPUPlugin")]
+        ),
         
-        .systemLibrary(
-            name: "CDawnProc"),
         .target(
             name: "CDawnNative",
             linkerSettings: [
-                .linkedLibrary("dawn_native")]),
+                .linkedLibrary("dawn_native")]
+        ),
         .target(
             name: "DawnNative",
-            dependencies: ["WebGPU", "CDawnProc", "CDawnNative"]),
+            dependencies: ["WebGPU", "CDawnNative"]
+        ),
         
         .executableTarget(
             name: "generate-webgpu",
-            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]),
+            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]
+        ),
         .plugin(
             name: "GenerateWebGPUPlugin",
             capability: .buildTool(),
-            dependencies: ["generate-webgpu"]),
+            dependencies: ["generate-webgpu"]
+        ),
         
         .systemLibrary(
             name: "CGLFW",
             path: "Demos/CGLFW",
             pkgConfig: "glfw3",
             providers: [
-                .brew(["glfw"])]),
+                .brew(["glfw"])]
+        ),
         .target(
             name: "WindowUtils",
             dependencies: ["WebGPU", "CGLFW"],
-            path: "Demos/WindowUtils"),
+            path: "Demos/WindowUtils"
+        ),
+        
         .executableTarget(
             name: "DemoInfo",
             dependencies: ["DawnNative"],
-            path: "Demos/DemoInfo"),
+            path: "Demos/DemoInfo",
+            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+        ),
         .executableTarget(
             name: "DemoClearColor",
             dependencies: ["DawnNative", "WindowUtils"],
-            path: "Demos/DemoClearColor"),
+            path: "Demos/DemoClearColor",
+            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+        ),
         .executableTarget(
             name: "DemoTriangle",
             dependencies: ["DawnNative", "WindowUtils"],
-            path: "Demos/DemoTriangle"),
+            path: "Demos/DemoTriangle",
+            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+        ),
         .executableTarget(
             name: "DemoCube",
             dependencies: ["DawnNative", "WindowUtils", "SwiftMath"],
-            path: "Demos/DemoCube"),
+            path: "Demos/DemoCube",
+            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+        ),
     ],
     cxxLanguageStandard: .cxx17
 )
