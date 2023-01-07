@@ -6,24 +6,12 @@ class Method: FunctionType {
         super.init(name: data.name, data: FunctionTypeData(category: .function, tags: data.tags, returns: data.returns, args: data.args))
     }
     
-    var isGetter: Bool {
-        return returnType != nil && arguments.isEmpty && name.hasPrefix("get ")
-    }
-    
     var isCallbackSetter: Bool {
         return name.hasPrefix("set ") && name.hasSuffix(" callback") && arguments.count == 2 && arguments[0].isCallback && arguments[1].isUserData
     }
     
     override var cFunctionName: String {
         return "wgpu" + objectName.pascalCased(preservingCasing: true) + name.pascalCased(preservingCasing: true)
-    }
-    
-    override var swiftFunctionName: String {
-        if isGetter {
-            return String(name.dropFirst(4)).camelCased()
-        } else {
-            return name.camelCased()
-        }
     }
 }
 

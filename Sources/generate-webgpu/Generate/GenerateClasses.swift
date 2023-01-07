@@ -71,57 +71,7 @@ func generateClasses(model: Model) -> String {
                         }
                         
                     } else {
-                        let methodDefinition = line {
-                            if method.isGetter, let returnType = method.swiftReturnType {
-                                "public var \(method.swiftFunctionName): \(returnType)"
-                            } else {
-                                let methodParams = commaSeparated {
-                                    for (index, arg) in method.arguments.removingHidden.enumerated() {
-                                        line {
-                                            if index == 0 && method.hideFirstArgumentLabel {
-                                                "_ "
-                                            }
-                                            "\(arg.swiftName): "
-                                            if arg.type?.category == .functionPointer {
-                                                "@escaping "
-                                            }
-                                            arg.swiftType
-                                            if let defaultValue = arg.defaultSwiftValue {
-                                                " = \(defaultValue)"
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                "public func \(method.swiftFunctionName)(\(methodParams))"
-                                if let returnType = method.swiftReturnType {
-                                    " -> \(returnType)"
-                                }
-                            }
-                        }
-                    
-                        block(methodDefinition) {
-                            block("return withUnsafeHandle", "_handle in") {
-                                convertSwiftToC(members: method.arguments) { cValues in
-                            
-                                    let functionArgs = commaSeparated {
-                                        "_handle"
-                                        cValues
-                                    }
-                            
-                                    line {
-                                        if method.returnConversion != nil {
-                                            "let _result = "
-                                        }
-                                        "\(method.cFunctionName)(\(functionArgs))"
-                                    }
-                                
-                                    if let returnConversion = method.returnConversion, let returnType = method.swiftReturnType {
-                                        "return \(convertCToSwift(cValue: "_result", swiftType: returnType, typeConversion: returnConversion))"
-                                    }
-                                }
-                            }
-                        }
+                        generateFunction(method, isMethod: true)
                     }
                 }
             }

@@ -17,8 +17,12 @@ class FunctionPointerType: Type {
         arguments.link(model: model)
     }
     
+    var isGetter: Bool {
+        return returnType != nil && arguments.isEmpty && name.hasPrefix("get ")
+    }
+    
     var isCallback: Bool {
-        return name.hasSuffix(" callback") && arguments.contains { $0.isUserData }
+        return category == .functionPointer && name.hasSuffix(" callback") && arguments.contains { $0.isUserData }
     }
     
     var callbackFunctionName: String {

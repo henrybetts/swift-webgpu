@@ -4,7 +4,11 @@ class FunctionType: FunctionPointerType {
     }
     
     var swiftFunctionName: String {
-        return name.camelCased()
+        if isGetter {
+            return String(name.dropFirst(4)).camelCased()
+        } else {
+            return name.camelCased()
+        }
     }
     
     var hideFirstArgumentLabel: Bool {
