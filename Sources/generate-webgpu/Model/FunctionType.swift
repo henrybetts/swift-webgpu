@@ -4,7 +4,7 @@ class FunctionType: FunctionPointerType {
     }
     
     var swiftFunctionName: String {
-        if isGetter {
+        if isGetter || isExtensibleGetter {
             return String(name.dropFirst(4)).camelCased()
         } else {
             return name.camelCased()

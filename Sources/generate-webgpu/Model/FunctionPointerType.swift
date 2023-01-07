@@ -21,6 +21,11 @@ class FunctionPointerType: Type {
         return returnType != nil && arguments.isEmpty && name.hasPrefix("get ")
     }
     
+    var isExtensibleGetter: Bool {
+        // TODO: Return type may be bool
+        return arguments.count == 1 && arguments[0].annotation == .mutablePointer && (arguments[0].type as? StructureType)?.extensible == .out && name.hasPrefix("get ")
+    }
+    
     var isCallback: Bool {
         return category == .functionPointer && name.hasSuffix(" callback") && arguments.contains { $0.isUserData }
     }
