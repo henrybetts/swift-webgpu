@@ -41,7 +41,7 @@ public class Window {
                 layer: Unmanaged.passUnretained(view.layer!).toOpaque()
             )
         #elseif os(Linux)
-            surfaceDescriptor.nextInChain = SurfaceDescriptorFromXlib(
+            surfaceDescriptor.nextInChain = SurfaceDescriptorFromXlibWindow(
                 display: UnsafeMutableRawPointer(glfwGetX11Display()),
                 window: UInt32(glfwGetX11Window(handle))
             )
