@@ -1,5 +1,5 @@
 extension Array where Element: ConvertibleFromC {
-    init(cValues: UnsafeBufferPointer<Element.CType>) {
+    init<S: Sequence>(cValues: S) where S.Element == Element.CType {
         self = cValues.map { .init(cValue: $0) }
     }
 }

@@ -3,6 +3,8 @@ func generateFunction(_ function: FunctionType, isMethod: Bool = false) -> Strin
         return generateGetter(function: function, isMethod: isMethod)
     } else if function.isExtensibleGetter {
         return generateExtensibleGetter(function: function, isMethod: isMethod)
+    } else if function.isEnumerator {
+        return generateEnumerator(function: function, isMethod: isMethod)
     } else {
         return generateStandard(function: function, isMethod: isMethod)
     }
@@ -85,6 +87,32 @@ fileprivate func generateExtensibleGetter(function: FunctionType, isMethod: Bool
             "\(function.cFunctionName)(\(functionArgs))"
             
             "return \(convertCToSwift(cValue: "_cStruct", swiftType: structType.swiftName, typeConversion: .value))"
+        }
+    }
+}
+
+fileprivate func generateEnumerator(function: FunctionType, isMethod: Bool) -> String {
+    let enumeratedType = function.arguments[0].type!
+    let returnType = function.swiftReturnType!
+    
+    return block("public var \(function.swiftFunctionName): \(returnType)") {
+        block("return withUnsafeHandle", "_handle in", condition: isMethod) {
+            
+            let functionArgs = commaSeparated {
+                if isMethod { "_handle" }
+                "nil"
+            }
+            "let _count = \(function.cFunctionName)(\(functionArgs))"
+            
+            block("let _cValues = [\(enumeratedType.cName)](unsafeUninitializedCapacity: _count)", "_buffer, _initializedCount in") {
+                let functionArgs = commaSeparated {
+                    if isMethod { "_handle" }
+                    "_buffer.baseAddress"
+                }
+                "_initializedCount = wgpuDeviceEnumerateFeatures(\(functionArgs))"
+            }
+            
+            "return \(convertCToSwift(cValue: "_cValues", swiftType: returnType, typeConversion: function.returnConversion!))"
         }
     }
 }

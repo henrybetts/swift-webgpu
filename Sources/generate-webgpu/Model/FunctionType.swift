@@ -4,8 +4,8 @@ class FunctionType: FunctionPointerType {
     }
     
     var swiftFunctionName: String {
-        if isGetter || isExtensibleGetter {
-            return String(name.dropFirst(4)).camelCased()
+        if isGetter || isExtensibleGetter || isEnumerator {
+            return name.split(separator: " ").dropFirst().joined(separator: " ").camelCased()
         } else {
             return name.camelCased()
         }

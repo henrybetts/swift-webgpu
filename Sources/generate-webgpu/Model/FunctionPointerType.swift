@@ -26,6 +26,10 @@ class FunctionPointerType: Type {
         return arguments.count == 1 && arguments[0].annotation == .mutablePointer && (arguments[0].type as? StructureType)?.extensible == .out && name.hasPrefix("get ")
     }
     
+    var isEnumerator: Bool {
+        return returnTypeName == "size_t" && arguments.count == 1 && arguments[0].annotation == .mutablePointer && name.hasPrefix("enumerate ")
+    }
+    
     var isCallback: Bool {
         return category == .functionPointer && name.hasSuffix(" callback") && arguments.contains { $0.isUserData }
     }
@@ -35,6 +39,14 @@ class FunctionPointerType: Type {
     }
     
     var swiftReturnType: String? {
+        if isExtensibleGetter {
+            return arguments[0].type.swiftName
+        }
+        
+        if isEnumerator {
+            return "[\(arguments[0].type.swiftName)]"
+        }
+        
         guard let returnType = returnType else { return nil }
         if returnType.category == .functionPointer {
             return returnType.swiftName + "?"
@@ -43,6 +55,19 @@ class FunctionPointerType: Type {
     }
     
     var returnConversion: TypeConversion? {
+        if isExtensibleGetter {
+            return .value
+        }
+        
+        if isEnumerator {
+            switch arguments[0].type.category {
+            case .enum, .bitmask, .structure, .object:
+                return .array
+            default:
+                return .nativeArray
+            }
+        }
+        
         guard let returnType = returnType else { return nil }
         switch returnType.category {
         case .enum, .bitmask, .structure, .object:

@@ -1,33 +1,35 @@
-func convertCToSwift(cValue: String, swiftType: String, typeConversion: TypeConversion) -> String {
+func convertCToSwift(cValue: String, swiftType: String, typeConversion: TypeConversion, count: String? = nil) -> String {
+    var cValue = cValue
+    
+    if (typeConversion == .array || typeConversion == .nativeArray), let count = count {
+        cValue = "UnsafeBufferPointer(start: \(cValue), count: Int(\(count)))"
+    }
+    
     switch typeConversion {
     case .value, .valueWithClosure:
         return "\(swiftType)(cValue: \(cValue))"
     case .pointerWithClosure:
         return "\(swiftType)(cPointer: \(cValue))"
+    case .array:
+        return "\(swiftType)(cValues: \(cValue))"
+    case .nativeArray:
+        return "\(swiftType)(\(cValue))"
     default:
         return cValue
     }
 }
 
 func convertCToSwift(member: RecordMember, prefix: String = "") -> String {
-    switch member.typeConversion {
-    case .array:
-        if let lengthMember = member.lengthMember {
-            return "\(member.swiftType)(cValues: UnsafeBufferPointer(start: \(prefix)\(member.cName), count: Int(\(prefix)\(lengthMember.cName))))"
-        } else if case .fixed(let length) = member.length {
-            return "\(member.swiftType)(cValues: UnsafeBufferPointer(start: \(prefix)\(member.cName), count: \(length)))"
-        }
-    case .nativeArray:
-        if let lengthMember = member.lengthMember {
-            return "\(member.swiftType)(UnsafeBufferPointer(start: \(prefix)\(member.cName), count: Int(cValue.\(lengthMember.cName))))"
-        } else if case .fixed(let length) = member.length {
-            return "\(member.swiftType)(UnsafeBufferPointer(start: \(prefix)\(member.cName), count: \(length)))"
-        }
-    default:
-        break
+    let count: String?
+    if let lengthMember = member.lengthMember {
+        count = prefix + lengthMember.cName
+    } else if case .fixed(let length) = member.length {
+        count = String(length)
+    } else {
+        count = nil
     }
     
-    return convertCToSwift(cValue: prefix + member.cName, swiftType: member.swiftType, typeConversion: member.typeConversion)
+    return convertCToSwift(cValue: prefix + member.cName, swiftType: member.swiftType, typeConversion: member.typeConversion, count: count)
 }
 
 
