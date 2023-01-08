@@ -1,6 +1,10 @@
 import WebGPU
 import CDawnNative
 
+public var procs: UnsafePointer<DawnProcTable> {
+    return dawnNativeGetProcs()
+}
+
 public class Instance {
     let instance: DawnNativeInstance!
     

@@ -1,9 +1,9 @@
 #include <dawn/webgpu.h>
+#include <dawn/dawn_proc_table.h>
 
 typedef struct DawnNativeInstanceImpl* DawnNativeInstance;
 typedef struct DawnNativeAdapterImpl* DawnNativeAdapter;
 
-typedef struct DawnProcTable DawnProcTable;
 const DawnProcTable* dawnNativeGetProcs();
 
 DawnNativeInstance dawnNativeCreateInstance();
