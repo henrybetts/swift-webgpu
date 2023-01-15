@@ -30,7 +30,11 @@ class NativeType: Type {
     override func swiftValue(from value: Any) -> String {
         if let value = value as? String {
             if value.starts(with: "WGPU_") {
-                return "\(swiftName)(\(value))"
+                if name == "size_t" {
+                    return "Int(bitPattern: UInt(\(value)))"
+                } else {
+                    return "\(swiftName)(\(value))"
+                }
             }
         
             if value == "NAN" {
