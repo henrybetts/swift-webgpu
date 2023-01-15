@@ -87,6 +87,12 @@ let package = Package(
             path: "Demos/DemoCube",
             linkerSettings: [.linkedLibrary("webgpu_dawn")]
         ),
+        .executableTarget(
+            name: "DemoBoids",
+            dependencies: ["DawnNative", "WindowUtils"],
+            path: "Demos/DemoBoids",
+            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+        )
     ],
     cxxLanguageStandard: .cxx17
 )

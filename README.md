@@ -55,6 +55,7 @@ cd .build/release
 ./DemoClearColor
 ./DemoTriangle
 ./DemoCube
+./DemoBoids
 ```
 
 
