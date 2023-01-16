@@ -1,4 +1,4 @@
-class Type {
+class Type: Taggable {
     let name: String
     let category: Category
     let tags: [String]

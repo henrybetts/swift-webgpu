@@ -4,6 +4,7 @@ func generateClasses(model: Model) -> String {
         ""
         
         for type in model.types(of: ObjectType.self) {
+            availability(of: type)
             block("public class \(type.swiftName): ConvertibleFromC, ConvertibleToCWithClosure") {
                 "typealias CType = \(type.cName)?"
                 

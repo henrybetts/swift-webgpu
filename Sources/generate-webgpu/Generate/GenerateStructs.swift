@@ -16,6 +16,7 @@ func generateStructs(model: Model) -> String {
                 }
             }
             
+            availability(of: type)
             block("public struct \(type.swiftName): \(adoptions)") {
                 "typealias CType = \(type.cName)"
                 ""

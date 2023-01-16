@@ -8,6 +8,11 @@ struct CodeBuilder {
         return [expression]
     }
     
+    static func buildExpression(_ expression: String?) -> [String] {
+        guard let expression = expression else { return [] }
+        return [expression]
+    }
+    
     static func buildExpression(_ expression: ()) -> [String] {
         return []
     }
@@ -75,5 +80,13 @@ extension String {
             return "`\(self)`"
         }
         return self
+    }
+}
+
+func availability(of type: Taggable) -> String? {
+    if type.isDeprecated {
+        return "@available(*, deprecated)"
+    } else {
+        return nil
     }
 }

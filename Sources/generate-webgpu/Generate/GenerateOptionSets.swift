@@ -4,6 +4,7 @@ func generateOptionSets(model: Model) -> String {
         ""
         
         for type in model.types(of: BitmaskType.self) {
+            availability(of: type)
             block("public struct \(type.swiftName): OptionSet, ConvertibleFromC, ConvertibleToC") {
                 "typealias CType = \(type.cName)"
                 ""
