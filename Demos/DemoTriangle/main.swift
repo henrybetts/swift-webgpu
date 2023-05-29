@@ -32,8 +32,7 @@ withGLFW {
         format: window.preferredTextureFormat,
         width: 800,
         height: 600,
-        presentMode: .fifo,
-        implementation: 0))
+        presentMode: .fifo))
     
     let vertexShaderSource = """
         struct VertexOut {
@@ -61,12 +60,12 @@ withGLFW {
     let vertexShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
-            nextInChain: ShaderModuleWgslDescriptor(source: vertexShaderSource)))
+            nextInChain: ShaderModuleWgslDescriptor(code: vertexShaderSource)))
     
     let fragmentShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
-            nextInChain: ShaderModuleWgslDescriptor(source: fragmentShaderSource)))
+            nextInChain: ShaderModuleWgslDescriptor(code: fragmentShaderSource)))
     
     let pipeline = device.createRenderPipeline(descriptor: RenderPipelineDescriptor(
         vertex: VertexState(

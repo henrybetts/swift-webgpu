@@ -54,14 +54,13 @@ withGLFW {
         format: window.preferredTextureFormat,
         width: 800,
         height: 600,
-        presentMode: .fifo,
-        implementation: 0))
+        presentMode: .fifo))
     
     
     let renderShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
-            nextInChain: ShaderModuleWgslDescriptor(source: renderShaderSource)))
+            nextInChain: ShaderModuleWgslDescriptor(code: renderShaderSource)))
     
     let renderPipeline = device.createRenderPipeline(
         descriptor: RenderPipelineDescriptor(
@@ -98,7 +97,7 @@ withGLFW {
     let computeShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
-            nextInChain: ShaderModuleWgslDescriptor(source: computeShaderSource)))
+            nextInChain: ShaderModuleWgslDescriptor(code: computeShaderSource)))
     
     let computePipeline = device.createComputePipeline(
         descriptor: ComputePipelineDescriptor(

@@ -27,8 +27,7 @@ withGLFW {
         format: window.preferredTextureFormat,
         width: 800,
         height: 600,
-        presentMode: .fifo,
-        implementation: 0))
+        presentMode: .fifo))
     
     var hue = 0.0
         
