@@ -56,7 +56,7 @@ class RecordMember {
             }
         }
         
-        if type.category == .object {
+        if type.category == .object || type.category == .functionPointer {
             return type.cName + "!"
         }
         
@@ -92,8 +92,11 @@ class RecordMember {
         
         } else if isArray {
             swiftType = type.name == "void" ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
-        
-        } else if annotation == nil || (annotation == .pointer && type.category == .structure) {
+            
+        } else if annotation == .pointer && type.category == .structure {
+            swiftType = type.swiftName
+            
+        } else if annotation == nil && !(type.category == .functionPointer && !isCallback) {
             swiftType = type.swiftName
         
         } else {
@@ -157,7 +160,7 @@ class RecordMember {
             return "[]"
         }
         
-        if isOptional {
+        if isOptional || defaultValue == "nullptr" {
             return "nil"
         }
         
