@@ -44,23 +44,12 @@ class RecordMember {
         return name.camelCased()
     }
     
-    var cType: String {
-        if let annotation = annotation {
-            switch annotation {
-            case .pointer:
-                return type.name == "void" ? "UnsafeRawPointer!" : "UnsafePointer<\(type.cName)>!"
-            case .mutablePointer:
-                return type.name == "void" ? "UnsafeMutableRawPointer!" : "UnsafeMutablePointer<\(type.cName)>!"
-            case .pointerToPointer:
-                return type.name == "void" ? "UnsafePointer<UnsafeRawPointer?>!" : "UnsafePointer<UnsafePointer<\(type.cName)>?>!"
-            }
-        }
-        
-        if type.category == .object || type.category == .functionPointer {
-            return type.cName + "!"
-        }
-        
-        return type.cName
+    var isVoidPointer: Bool {
+        return (typeName == "void" && annotation == .pointer) || typeName == "void const *"
+    }
+    
+    var isMutableVoidPointer: Bool {
+        return (typeName == "void" && annotation == .mutablePointer) || typeName == "void *"
     }
     
     var isString: Bool {
@@ -69,11 +58,11 @@ class RecordMember {
     }
     
     var isArray: Bool {
-        return annotation == .pointer && length != .single && length != .string
+        return (annotation == .pointer || isVoidPointer) && length != .single && length != .string
     }
     
     var isUserData: Bool {
-        return name == "userdata" && typeName == "void" && annotation == .mutablePointer
+        return name == "userdata" && isMutableVoidPointer
     }
     
     var isCallback: Bool {
@@ -84,6 +73,33 @@ class RecordMember {
         return (parentMember?.isArray ?? false) || isUserData
     }
     
+    var cType: String {
+        if isVoidPointer {
+            return "UnsafeRawPointer!"
+        }
+        
+        if isMutableVoidPointer {
+            return "UnsafeMutableRawPointer!"
+        }
+        
+        if let annotation = annotation {
+            switch annotation {
+            case .pointer:
+                return "UnsafePointer<\(type.cName)>!"
+            case .mutablePointer:
+                return "UnsafeMutablePointer<\(type.cName)>!"
+            case .pointerToPointer:
+                return "UnsafePointer<UnsafePointer<\(type.cName)>?>!"
+            }
+        }
+        
+        if type.category == .object || type.category == .functionPointer {
+            return type.cName + "!"
+        }
+        
+        return type.cName
+    }
+    
     var swiftType: String {
         var swiftType: String
         
@@ -91,7 +107,7 @@ class RecordMember {
             swiftType = "String"
         
         } else if isArray {
-            swiftType = type.name == "void" ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
+            swiftType = isVoidPointer ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
             
         } else if annotation == .pointer && type.category == .structure {
             swiftType = type.swiftName
