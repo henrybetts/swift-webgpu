@@ -8,7 +8,6 @@ const DawnProcTable* dawnNativeGetProcs();
 
 DawnNativeInstance dawnNativeCreateInstance();
 WGPUInstance dawnNativeInstanceGet(DawnNativeInstance instance);
-void dawnNativeInstanceDiscoverDefaultAdapters(DawnNativeInstance instance);
 void dawnNativeInstanceEnumerateAdapters(DawnNativeInstance instance, size_t* adaptersCount, DawnNativeAdapter* adapters);
 void dawnNativeInstanceRelease(DawnNativeInstance instance);
 

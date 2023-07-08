@@ -4,7 +4,6 @@ import WindowUtils
 
 let instance = DawnNative.Instance()
 
-instance.discoverDefaultAdapters()
 guard let adapter = instance.adapters.first(where: { $0.properties.backendType != .null }) else {
     fatalError("No adapters found")
 }

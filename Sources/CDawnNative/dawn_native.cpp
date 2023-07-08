@@ -17,14 +17,9 @@ WGPUInstance dawnNativeInstanceGet(DawnNativeInstance cInstance) {
     return instance->Get();
 }
 
-void dawnNativeInstanceDiscoverDefaultAdapters(DawnNativeInstance cInstance) {
-    auto instance = reinterpret_cast<dawn_native::Instance*>(cInstance);
-    instance->DiscoverDefaultAdapters();
-}
-
 void dawnNativeInstanceEnumerateAdapters(DawnNativeInstance cInstance, size_t* adaptersCount, DawnNativeAdapter* cAdapters) {
     auto instance = reinterpret_cast<dawn_native::Instance*>(cInstance);
-    auto adapters = instance->GetAdapters();
+    auto adapters = instance->EnumerateAdapters();
     if (cAdapters == NULL) {
         *adaptersCount = adapters.size();
     } else {
@@ -33,6 +28,7 @@ void dawnNativeInstanceEnumerateAdapters(DawnNativeInstance cInstance, size_t* a
             auto adapter = new dawn_native::Adapter(adapters[i]);
             cAdapters[i] = reinterpret_cast<DawnNativeAdapter>(adapter);
         }
+        *adaptersCount = count;
     }
 }
 

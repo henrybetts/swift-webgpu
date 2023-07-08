@@ -1,7 +1,6 @@
 import DawnNative
 
 let instance = Instance()
-instance.discoverDefaultAdapters()
 let adapters = instance.adapters
 
 print("===========")

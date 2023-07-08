@@ -22,10 +22,6 @@ public class Instance {
         return WebGPU.Instance(handle: object!)
     }
     
-    public func discoverDefaultAdapters() {
-        dawnNativeInstanceDiscoverDefaultAdapters(self.instance)
-    }
-    
     public var adapters: [Adapter] {
         var count: Int = 0
         dawnNativeInstanceEnumerateAdapters(self.instance, &count, nil)
