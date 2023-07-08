@@ -120,7 +120,7 @@ fileprivate func generateEnumerator(function: FunctionType, isMethod: Bool) -> S
                         if isMethod { "_handle" }
                         "_buffer.baseAddress"
                     }
-                    "_initializedCount = wgpuDeviceEnumerateFeatures(\(functionArgs))"
+                    "_initializedCount = \(function.cFunctionName)(\(functionArgs))"
                 }
                 
                 "return \(convertCToSwift(cValue: "_cValues", swiftType: returnType, typeConversion: function.returnConversion!))"
