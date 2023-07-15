@@ -32,7 +32,7 @@ struct Model {
     }
     
     func types<T: Type>(of _: T.Type) -> [T] {
-        return types.values.compactMap { Swift.type(of: $0) == T.self ? ($0 as! T) : nil }
+        return types.values.compactMap { Swift.type(of: $0) == T.self ? ($0 as! T) : nil }.sorted { $0.name < $1.name }
     }
     
     func type(named name: String) -> Type {
