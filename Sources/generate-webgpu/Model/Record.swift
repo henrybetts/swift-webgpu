@@ -53,8 +53,7 @@ class RecordMember {
     }
     
     var isString: Bool {
-        // TODO: Should check if length == .string, but dawn.json does not always specify this currently
-        return annotation == .pointer && typeName == "char"
+        return annotation == .pointer && typeName == "char" && length == .string
     }
     
     var isArray: Bool {
