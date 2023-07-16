@@ -16,7 +16,7 @@ class RecordMember {
     let annotation: Annotation?
     let length: Length
     let defaultValue: String?
-    let isOptional: Bool
+    private let _isOptional: Bool
     
     weak var type: Type!
     
@@ -29,7 +29,7 @@ class RecordMember {
         annotation = data.annotation
         length = data.length
         defaultValue = data.default
-        isOptional = data.optional
+        _isOptional = data.optional
     }
     
     func link(model: Model) {
@@ -42,6 +42,10 @@ class RecordMember {
     
     var swiftName: String {
         return name.camelCased()
+    }
+    
+    var isOptional: Bool {
+        return _isOptional || defaultValue == "nullptr"
     }
     
     var isVoidPointer: Bool {
@@ -72,58 +76,62 @@ class RecordMember {
         return (parentMember?.isArray ?? false) || isUserData
     }
     
-    var cType: String {
+    var unwrappedCType: String {
         if isVoidPointer {
-            return "UnsafeRawPointer!"
+            return "UnsafeRawPointer"
         }
         
         if isMutableVoidPointer {
-            return "UnsafeMutableRawPointer!"
+            return "UnsafeMutableRawPointer"
         }
         
         if let annotation = annotation {
             switch annotation {
             case .pointer:
-                return "UnsafePointer<\(type.cName)>!"
+                return "UnsafePointer<\(type.cName)>"
             case .mutablePointer:
-                return "UnsafeMutablePointer<\(type.cName)>!"
+                return "UnsafeMutablePointer<\(type.cName)>"
             case .pointerToPointer:
-                return "UnsafePointer<UnsafePointer<\(type.cName)>?>!"
+                return "UnsafePointer<UnsafePointer<\(type.cName)>?>"
             }
-        }
-        
-        if type.category == .object || type.category == .functionPointer {
-            return type.cName + "!"
         }
         
         return type.cName
     }
     
-    var swiftType: String {
-        var swiftType: String
-        
+    var cType: String {
+        if annotation != nil || isVoidPointer || isMutableVoidPointer || type.category == .object || type.category == .functionPointer {
+            return unwrappedCType + "!"
+        }
+        return unwrappedCType
+    }
+    
+    var unwrappedSwiftType: String {
         if isString {
-            swiftType = "String"
+            return "String"
         
         } else if isArray {
-            swiftType = isVoidPointer ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
+            return isVoidPointer ? "UnsafeRawBufferPointer" : "[\(type.swiftName)]"
             
         } else if annotation == .pointer && type.category == .structure {
-            swiftType = type.swiftName
+            return type.swiftName
             
-        } else if annotation == nil && !(type.category == .functionPointer && !isCallback) {
-            swiftType = type.swiftName
+        } else if type.category == .functionPointer && !isCallback {
+            return unwrappedCType
+            
+        } else if annotation == nil && !isVoidPointer && !isMutableVoidPointer {
+            return type.swiftName
         
         } else {
-            return cType
+            return unwrappedCType
         }
-        
-        if isOptional {
-            swiftType += "?"
+    }
+    
+    var swiftType: String {
+        if isOptional && !(isArray && !isVoidPointer) {
+            return unwrappedSwiftType + "?"
         }
-        
-        return swiftType
-        
+        return unwrappedSwiftType
     }
     
     var typeConversion: TypeConversion {
@@ -171,11 +179,11 @@ class RecordMember {
             return type?.swiftValue(from: defaultValue)
         }
         
-        if isArray && lengthMember?.defaultValue == "0" {
-            return "[]"
+        if isArray && (isOptional || lengthMember?.defaultValue == "0") {
+            return isVoidPointer ? "nil" : "[]"
         }
         
-        if isOptional || defaultValue == "nullptr" {
+        if isOptional {
             return "nil"
         }
         
