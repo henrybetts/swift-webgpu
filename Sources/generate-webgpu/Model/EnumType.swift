@@ -31,4 +31,8 @@ class EnumType: Type {
         }
         return super.swiftValue(from: value)
     }
+    
+    var isStatus: Bool {
+        return values.contains { $0.name == "success" }
+    }
 }

@@ -10,28 +10,33 @@ func generateFunction(_ function: FunctionType, isMethod: Bool = false) -> Strin
     }
 }
 
-fileprivate func generateStandard(function: FunctionType, isMethod: Bool) -> String {
-    code {
-        let methodParams = commaSeparated {
-            for (index, arg) in function.arguments.removingHidden.enumerated() {
-                line {
-                    if index == 0 && function.hideFirstArgumentLabel {
-                        "_ "
-                    }
-                    "\(arg.swiftName): "
-                    if arg.type?.category == .functionPointer {
-                        "@escaping "
-                    }
-                    arg.swiftType
-                    if let defaultValue = arg.defaultSwiftValue {
-                        " = \(defaultValue)"
-                    }
+fileprivate func generateParameters(_ record: Record, hideFirstLabel: Bool) -> String {
+    commaSeparated {
+        for (index, arg) in record.enumerated() {
+            line {
+                if index == 0 && hideFirstLabel {
+                    "_ "
+                }
+                "\(arg.swiftName): "
+                if arg.type?.category == .functionPointer {
+                    "@escaping "
+                }
+                arg.swiftType
+                if let defaultValue = arg.defaultSwiftValue {
+                    " = \(defaultValue)"
                 }
             }
         }
+    }
+}
+
+fileprivate func generateStandard(function: FunctionType, isMethod: Bool) -> String {
+    code {
+        let functionParams = generateParameters(function.arguments.removingHidden, hideFirstLabel: function.hideFirstArgumentLabel)
+
         
         let functionDefinition = line {
-            "public func \(function.swiftFunctionName)(\(methodParams))"
+            "public func \(function.swiftFunctionName)(\(functionParams))"
             if let returnType = function.swiftReturnType {
                 " -> \(returnType)"
             }
@@ -59,6 +64,74 @@ fileprivate func generateStandard(function: FunctionType, isMethod: Bool) -> Str
                     }
                 }
             }
+        }
+        
+        if function.isRequest {
+            ""
+            generateRequestOverloads(function: function)
+        }
+        
+    }
+}
+
+fileprivate func generateRequestOverloads(function: FunctionType) -> String {
+    code {
+        let functionArgs = function.arguments.dropLast(2).removingHidden
+        
+        let callback = function.arguments[function.arguments.count - 2].type as! FunctionPointerType
+        let callbackArgs = callback.arguments.removingHidden
+        
+        let statusArg = callbackArgs[0]
+        let successArg = callbackArgs.count > 1 ? callbackArgs[1] : nil
+        let messageArg = callbackArgs.count > 2 ? callbackArgs[2] : nil
+
+        let successType = successArg?.unwrappedSwiftType ?? "Void"
+        let failureType = "RequestError<\(statusArg.swiftType)>"
+        let resultType = "Result<\(successType), \(failureType)>"
+        
+        let functionParams = generateParameters(functionArgs, hideFirstLabel: function.hideFirstArgumentLabel)
+        
+        let functionParamsWithCallback = commaSeparated {
+            if functionArgs.count > 0 {
+                functionParams
+            }
+            "callback: @escaping (\(resultType)) -> Void)"
+        }
+        
+        let functionCallArgs = commaSeparated {
+            for (index, arg) in functionArgs.enumerated() {
+                if index == 0 && function.hideFirstArgumentLabel {
+                    arg.swiftName
+                } else {
+                    "\(arg.swiftName): \(arg.swiftName)"
+                }
+            }
+        }
+    
+        availability(of: function)
+        block("public func \(function.swiftFunctionName)(\(functionParamsWithCallback)") {
+            
+            let callbackArgNames = commaSeparated {
+                for arg in callbackArgs {
+                    arg.swiftName
+                }
+            }
+            
+            block("\(function.swiftFunctionName)(\(functionCallArgs))", "\(callbackArgNames) in") {
+                block("if status == .success") {
+                    let successArg = line {
+                        "\(successArg?.swiftName ?? "()")"
+                        if successArg?.isOptional == true {
+                            "!"
+                        }
+                    }
+                    "callback(Result.success(\(successArg)))"
+                }
+                block("else") {
+                    "callback(Result.failure(RequestError(status: \(statusArg.swiftName), message: \(messageArg?.swiftName ?? "nil"))))"
+                }
+            }
+            
         }
     }
 }

@@ -31,7 +31,31 @@ class FunctionPointerType: Type {
     }
     
     var isCallback: Bool {
-        return category == .functionPointer && name.hasSuffix(" callback") && arguments.contains { $0.isUserData }
+        return category == .functionPointer && name.hasSuffix(" callback") && arguments.last?.isUserData == true
+    }
+    
+    var isRequestCallback: Bool {
+        if isCallback,
+           returnType == nil,
+           let statusArg = arguments.first,
+           statusArg.name == "status",
+           (statusArg.type as? EnumType)?.isStatus == true {
+            if arguments.count < 4 {
+                return true
+            } else if arguments.count == 4 {
+                return arguments[2].isString && arguments[2].name == "message"
+            }
+        }
+        return false
+    }
+    
+    var isRequest: Bool {
+        guard arguments.count >= 2, returnType == nil else { return false }
+        
+        let callbackArg = arguments[arguments.count - 2]
+        let userDataArg = arguments[arguments.count - 1]
+        
+        return callbackArg.isCallback && (callbackArg.type as! FunctionPointerType).isRequestCallback && userDataArg.isUserData
     }
     
     var callbackFunctionName: String {
