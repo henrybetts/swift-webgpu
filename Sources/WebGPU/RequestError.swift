@@ -1,5 +1,5 @@
-public struct RequestError<T: RawRepresentable>: Error {
-    public let status: T
+public struct RequestError<Status: RawRepresentable>: Error {
+    public let status: Status
     public let message: String?
 }
 

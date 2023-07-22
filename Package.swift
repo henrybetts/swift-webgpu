@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "swift-webgpu",
-    platforms: [.macOS("10.11")],
+    platforms: [.macOS("10.15")],
     products: [
         .library(
             name: "WebGPU",

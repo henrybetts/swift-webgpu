@@ -110,7 +110,7 @@ fileprivate func generateRequestOverloads(function: FunctionType) -> String {
     
         availability(of: function)
         block("public func \(function.swiftFunctionName)(\(functionParamsWithCallback)") {
-            
+
             let callbackArgNames = commaSeparated {
                 for arg in callbackArgs {
                     arg.swiftName
@@ -132,6 +132,16 @@ fileprivate func generateRequestOverloads(function: FunctionType) -> String {
                 }
             }
             
+        }
+        
+        ""
+        availability(of: function)
+        block("public func \(function.swiftFunctionName)(\(functionParams)) async throws -> \(successType)") {
+            block("return try await withUnsafeThrowingContinuation", "_continuation in") {
+                block("\(function.swiftFunctionName)(\(functionCallArgs))", "_result in") {
+                    "_continuation.resume(with: _result)"
+                }
+            }
         }
     }
 }
