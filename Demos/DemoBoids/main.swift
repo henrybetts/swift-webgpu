@@ -1,5 +1,4 @@
 import WebGPU
-import DawnNative
 import WindowUtils
 
 typealias Vector2 = (Float, Float)
@@ -29,24 +28,20 @@ let vertexData = [
 ]
 
 
-let instance = DawnNative.Instance()
+let instance = createInstance()
 
-guard let adapter = instance.adapters.first(where: { $0.properties.backendType != .null }) else {
-    fatalError("No adapters found")
-}
+let adapter = try await instance.requestAdapter()
 print("Using adapter: \(adapter.properties.name)")
+
+let device = try await adapter.requestDevice()
+
+device.setUncapturedErrorCallback { (errorType, errorMessage) in
+    print("Error (\(errorType)): \(errorMessage)")
+}
 
 withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoBoids")
-    let surface = instance.webGpuInstance.createSurface(descriptor: window.surfaceDescriptor)
-        
-    guard let device = adapter.createDevice() else {
-        fatalError("Failed to create device")
-    }
-    
-    device.setUncapturedErrorCallback { (errorType, errorMessage) in
-        print("Error (\(errorType)): \(errorMessage)")
-    }
+    let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
     
     let swapchain = device.createSwapChain(surface: surface, descriptor: SwapChainDescriptor(
         usage: .renderAttachment,

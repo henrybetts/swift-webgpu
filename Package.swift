@@ -71,25 +71,25 @@ let package = Package(
         ),
         .executableTarget(
             name: "DemoClearColor",
-            dependencies: ["DawnNative", "WindowUtils"],
+            dependencies: ["WindowUtils"],
             path: "Demos/DemoClearColor",
             linkerSettings: [.linkedLibrary("webgpu_dawn")]
         ),
         .executableTarget(
             name: "DemoTriangle",
-            dependencies: ["DawnNative", "WindowUtils"],
+            dependencies: ["WindowUtils"],
             path: "Demos/DemoTriangle",
             linkerSettings: [.linkedLibrary("webgpu_dawn")]
         ),
         .executableTarget(
             name: "DemoCube",
-            dependencies: ["DawnNative", "WindowUtils", "SwiftMath"],
+            dependencies: ["WindowUtils", "SwiftMath"],
             path: "Demos/DemoCube",
             linkerSettings: [.linkedLibrary("webgpu_dawn")]
         ),
         .executableTarget(
             name: "DemoBoids",
-            dependencies: ["DawnNative", "WindowUtils"],
+            dependencies: ["WindowUtils"],
             path: "Demos/DemoBoids",
             linkerSettings: [.linkedLibrary("webgpu_dawn")]
         )

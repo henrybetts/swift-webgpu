@@ -7,12 +7,14 @@ import WebGPU
     import WinSDK
 #endif
 
+@MainActor
 public func withGLFW<R>(_ body: () throws -> R) rethrows -> R {
     glfwInit()
     defer { glfwTerminate() }
     return try body()
 }
 
+@MainActor
 public class Window {
     let handle: OpaquePointer!
     
@@ -73,6 +75,7 @@ public class Window {
     }
 }
 
+@MainActor
 public func pollEvents() {
     glfwPollEvents()
 }
