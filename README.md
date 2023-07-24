@@ -15,7 +15,7 @@ Currently, swift-webgpu is based on the [Dawn](https://dawn.googlesource.com/daw
 
 To use swift-webgpu, you'll first need to build Dawn. See Dawn's [documentation](https://dawn.googlesource.com/dawn/+/HEAD/docs/building.md) to get started.
 
-swift-webgpu depends on the `libwebgpu_dawn` and `libdawn_native` shared libraries, which can be built like so;
+swift-webgpu depends on the `libwebgpu_dawn` shared library, which can be built like so;
 
 ```sh
 mkdir -p out/Release
@@ -86,25 +86,68 @@ Import the WebGPU module where needed;
 import WebGPU
 ```
 
-A typical application will start by creating an `Instance`, requesting an `Adapter`, and then requesting a `Device`. However, some of the specification is not yet implemented in Dawn, particularly regarding these initialization steps. Therefore, the `DawnNative` module exists for the time being, providing an entry point to the rest of the WebGPU API. For example;
+A typical application will start by creating an `Instance`, requesting an `Adapter`, and then requesting a `Device`. For example;
 
 ```swift
-import DawnNative
-
 // create an instance
-let instance = DawnNative.Instance()
+let instance = createInstance()
 
 // find an adapter
-instance.discoverDefaultAdapters()
-guard let adapter = instance.adapters.first else {
-    fatalError("No adapters found")
-}
+let adapter = try await instance.requestAdapter()
 print("Using adapter: \(adapter.properties.name)")
 
-// create a WebGPU.Device
-guard let device = adapter.createDevice() else {
-    fatalError("Failed to create device")
+// create a device
+let device = try await adapter.requestDevice()
+```
+
+You'll usually want to set an error handler, to log any errors produced by the device;
+
+```swift
+device.setUncapturedErrorCallback { (errorType, errorMessage) in
+  print("Error (\(errorType)): \(errorMessage)")
 }
 ```
+
+With the device obtained, you can create most of the other types of WebGPU objects. A shader module, for example;
+
+```swift
+let shaderModule = device.createShaderModule(
+  descriptor: .init(
+    nextInChain: ShaderModuleWgslDescriptor(
+      code: """
+        @vertex
+        fn vertexMain() -> @builtin(position) vec4f {
+          return vec4f(0, 0, 0, 1);
+        }
+         
+        @fragment
+        fn fragmentMain() -> @location(0) vec4f {
+          return vec4f(1, 0, 0, 1);
+        }
+      """
+    )
+  )
+)
+```
+
+Or a render pipeline;
+
+```swift
+let renderPipeline = device.createRenderPipeline(
+  descriptor: .init(
+    vertex: VertexState(
+      module: shaderModule,
+      entryPoint: "vertexMain"
+    ),
+    fragment: FragmentState(
+      module: shaderModule,
+      entryPoint: "fragmentMain",
+      targets: [ColorTargetState(format: .bgra8Unorm)]
+    )
+  )
+)
+```
+
+Most objects are created with a descriptor. In some cases, WebGPU uses a chainable struct pattern to support future extensions or platform specific features. This is indicated by the `nextInChain` property. (There is scope to improve the ergonomics of this in Swift.)
 
 See the demos for further usage examples.
