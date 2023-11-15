@@ -5,7 +5,7 @@ struct Model {
         var types = [String: Type]()
         
         for (name, data) in data.types {
-            if data.tags.contains("upstream") { continue }
+            guard data.isEnabled else { continue }
             
             if data.category == .native, let data = data as? NativeTypeData {
                 types[name] = NativeType(name: name, data: data)

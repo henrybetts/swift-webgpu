@@ -6,7 +6,7 @@ class FunctionPointerType: Type {
     
     init(name: String, data: FunctionTypeData) {
         returnTypeName = data.returns
-        arguments = Record(data: data.args.filter { !$0.tags.contains("upstream") })
+        arguments = Record(data: data.args.filter { $0.isEnabled }, context: .function)
         super.init(name: name, data: data)
     }
     

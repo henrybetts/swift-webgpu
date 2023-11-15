@@ -10,6 +10,11 @@ enum TypeConversion {
     case userData
 }
 
+enum RecordContext {
+    case structure
+    case function
+}
+
 class RecordMember {
     let name: String
     let typeName: String
@@ -18,18 +23,21 @@ class RecordMember {
     let defaultValue: String?
     private let _isOptional: Bool
     
+    let context: RecordContext
+    
     weak var type: Type!
     
     weak var lengthMember: RecordMember?
     weak var parentMember: RecordMember?
     
-    init(data: RecordMemberData) {
+    init(data: RecordMemberData, context: RecordContext) {
         name = data.name
         typeName = data.type
         annotation = data.annotation
         length = data.length
         defaultValue = data.default
         _isOptional = data.optional
+        self.context = context
     }
     
     func link(model: Model) {
@@ -65,11 +73,11 @@ class RecordMember {
     }
     
     var isUserData: Bool {
-        return name == "userdata" && isMutableVoidPointer
+        return context == .function && name == "userdata" && isMutableVoidPointer
     }
     
     var isCallback: Bool {
-        return name == "callback" && (type as? FunctionPointerType)?.isCallback == true
+        return context == .function && name == "callback" && (type as? FunctionPointerType)?.isCallback == true
     }
     
     var isHidden: Bool {
@@ -203,8 +211,8 @@ class RecordMember {
 typealias Record = [RecordMember]
 
 extension Record {
-    init(data: RecordData) {
-        self = data.map { RecordMember(data: $0) }
+    init(data: RecordData, context: RecordContext) {
+        self = data.map { RecordMember(data: $0, context: context) }
         
         for member in self {
             if case .member(let length) = member.length {

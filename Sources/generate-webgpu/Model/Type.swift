@@ -1,7 +1,7 @@
 class Type: Taggable {
     let name: String
     let category: Category
-    let tags: [String]
+    let tags: Set<String>
     
     init(name: String, data: TypeData) {
         self.name = name

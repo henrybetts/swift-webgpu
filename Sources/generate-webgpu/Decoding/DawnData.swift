@@ -107,14 +107,14 @@ extension DefaultValueDecoder: DefaultFallbackProtocol {
 
 // MARK: Secondary Data
 
-struct EnumValueData: Decodable {
-    @DefaultFallback var tags: [String]
+struct EnumValueData: Taggable, Decodable {
+    @DefaultFallback var tags: Set<String>
     var name: String
     var value: Int
 }
 
-struct RecordMemberData: Decodable {
-    @DefaultFallback var tags: [String]
+struct RecordMemberData: Taggable, Decodable {
+    @DefaultFallback var tags: Set<String>
     var name: String
     var type: String
     var annotation: Annotation?
@@ -125,8 +125,8 @@ struct RecordMemberData: Decodable {
 
 typealias RecordData = [RecordMemberData]
 
-struct MethodData: Decodable {
-    @DefaultFallback var tags: [String]
+struct MethodData: Taggable, Decodable {
+    @DefaultFallback var tags: Set<String>
     var name: String
     var returns: String?
     @DefaultFallback var args: RecordData
@@ -135,31 +135,31 @@ struct MethodData: Decodable {
 
 // MARK: Type Data
 
-protocol TypeData {
+protocol TypeData: Taggable {
     var category: Category { get }
-    var tags: [String] { get }
+    var tags: Set<String> { get }
 }
 
 struct NativeTypeData: TypeData, Decodable {
     var category: Category
-    @DefaultFallback var tags: [String]
+    @DefaultFallback var tags: Set<String>
 }
 
 struct TypedefTypeData: TypeData, Decodable {
     var category: Category
-    @DefaultFallback var tags: [String]
+    @DefaultFallback var tags: Set<String>
     var type: String
 }
 
 struct EnumTypeData: TypeData, Decodable {
     var category: Category
-    @DefaultFallback var tags: [String]
+    @DefaultFallback var tags: Set<String>
     var values: [EnumValueData]
 }
 
 struct StructureTypeData: TypeData, Decodable {
     var category: Category
-    @DefaultFallback var tags: [String]
+    @DefaultFallback var tags: Set<String>
     var members: RecordData
     @DefaultFallback var extensible: Extensibility
     @DefaultFallback var chained: Extensibility
@@ -167,20 +167,20 @@ struct StructureTypeData: TypeData, Decodable {
 
 struct ObjectTypeData: TypeData, Decodable {
     var category: Category
-    @DefaultFallback var tags: [String]
+    @DefaultFallback var tags: Set<String>
     @DefaultFallback var methods: [MethodData]
 }
 
 struct ConstantTypeData: TypeData, Decodable {
     var category: Category
-    @DefaultFallback var tags: [String]
+    @DefaultFallback var tags: Set<String>
     var type: String
     var value: String
 }
 
 struct FunctionTypeData: TypeData, Decodable {
     var category: Category
-    @DefaultFallback var tags: [String]
+    @DefaultFallback var tags: Set<String>
     var returns: String?
     @DefaultFallback var args: RecordData
 }

@@ -15,7 +15,7 @@ class EnumType: Type {
     let values: [EnumValue]
     
     init(name: String, data: EnumTypeData) {
-        let values = data.values.filter { !$0.tags.contains("upstream") }
+        let values = data.values.filter { $0.isEnabled }
         
         let requiresPrefix = values.contains { $0.name.first!.isNumber }
         self.requiresPrefix = requiresPrefix

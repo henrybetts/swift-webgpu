@@ -3,4 +3,5 @@ protocol HasDefaultValue {
 }
 
 extension Array: HasDefaultValue {}
+extension Set: HasDefaultValue {}
 extension Bool: HasDefaultValue {}

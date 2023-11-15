@@ -19,7 +19,7 @@ class ObjectType: Type {
     let methods: [Method]
     
     init(name: String, data: ObjectTypeData) {
-        methods = data.methods.filter { !$0.tags.contains("upstream") }.map { Method(data: $0, objectName: name) }
+        methods = data.methods.filter { $0.isEnabled }.map { Method(data: $0, objectName: name) }
         super.init(name: name, data: data)
     }
     

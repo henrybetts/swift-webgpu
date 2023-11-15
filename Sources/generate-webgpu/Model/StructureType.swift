@@ -6,7 +6,7 @@ class StructureType: Type {
     init(name: String, data: StructureTypeData) {
         extensible = data.extensible
         chained = data.chained
-        members = Record(data: data.members.filter { !$0.tags.contains("upstream") })
+        members = Record(data: data.members.filter { $0.isEnabled }, context: .structure)
         super.init(name: name, data: data)
     }
     
