@@ -10,7 +10,7 @@ struct Camera {
 let instance = createInstance()
 
 let adapter = try await instance.requestAdapter()
-print("Using adapter: \(adapter.properties.name)")
+print("Using adapter: \(adapter.properties.name ?? "Unknown")")
 
 let device = try await adapter.requestDevice()
 

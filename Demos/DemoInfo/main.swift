@@ -13,10 +13,10 @@ withIndent {
     for (i, adapter) in adapters.enumerated() {
         let properties = adapter.properties
         
-        print(subtitle: "[\(i)] \(properties.name)")
+        print(subtitle: "[\(i)] \(properties.name ?? "Unknown")")
         withIndent {
-            if !properties.driverDescription.isEmpty {
-                print(properties.driverDescription)
+            if let description = properties.driverDescription, !description.isEmpty {
+                print(description)
             }
             print(key: "vendorId", value: hex(properties.vendorId))
             print(key: "deviceId", value: hex(properties.deviceId))
