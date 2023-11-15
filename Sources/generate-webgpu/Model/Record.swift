@@ -140,7 +140,7 @@ class RecordMember {
         }
         
         if isArray {
-            return type.category == .native ? .nativeArray : .array
+            return type.category == .native && typeName != "bool" ? .nativeArray : .array
         }
         
         if parentMember?.isArray == true {
@@ -160,6 +160,10 @@ class RecordMember {
         }
         
         if annotation == nil && (type.category == .enum || type.category == .bitmask) {
+            return .value
+        }
+        
+        if annotation == nil && typeName == "bool" {
             return .value
         }
         

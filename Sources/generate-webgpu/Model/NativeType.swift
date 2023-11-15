@@ -19,11 +19,15 @@ class NativeType: Type {
             "int64_t": "Int64",
             "size_t": "Int",
             "int": "Int32",
-            "bool": "Bool"
+            "bool": "WGPUBool"
         ][name] ?? name
     }
     
     override var swiftName: String {
+        if name == "bool" {
+            // Special case for 'bool' because it has a typedef for compatibility.
+            return "Bool"
+        }
         return cName
     }
     

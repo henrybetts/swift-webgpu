@@ -97,7 +97,7 @@ class FunctionPointerType: Type {
         case .enum, .bitmask, .structure, .object:
             return .value
         default:
-            return .native
+            return returnType.name == "bool" ? .value : .native
         }
     }
 }
