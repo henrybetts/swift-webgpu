@@ -170,6 +170,12 @@ fileprivate func generateExtensibleGetter(function: FunctionType, isMethod: Bool
             block("return withUnsafeHandle", "_handle in", condition: isMethod) {
                 "var _cStruct = \(structType.cName)()"
                 
+                if let s = structType as? StructureType {
+                    if s.extensible != .none {
+                        "_cStruct.nextInChain = nil"
+                    }
+                }
+                
                 let functionArgs = commaSeparated {
                     if isMethod { "_handle" }
                     "&_cStruct"
