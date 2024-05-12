@@ -75,7 +75,7 @@ func convertSwiftToC(members: Record, prefix: String = "", throws: Bool = false,
             case .callback:
                 return "\((member.type as! FunctionPointerType).callbackFunctionName)"
             case .userData:
-                return "UserData.passRetained(callback)"
+                return "UserData.passRetained(\(members.first(where: { $0.isCallback })?.swiftName ?? "callback"))"
             }
         }
         

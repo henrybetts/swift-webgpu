@@ -77,7 +77,7 @@ class RecordMember {
     }
     
     var isCallback: Bool {
-        return context == .function && name == "callback" && (type as? FunctionPointerType)?.isCallback == true
+        return context == .function && name.hasSuffix("callback") && (type as? FunctionPointerType)?.isCallback == true
     }
     
     var isHidden: Bool {
