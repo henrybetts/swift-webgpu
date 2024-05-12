@@ -20,8 +20,8 @@ swift-webgpu depends on the `libwebgpu_dawn` shared library, which can be built 
 ```sh
 mkdir -p out/Release
 cd out/Release
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 ../..
-make # -j N for N-way parallel build
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 -GNinja ../..
+ninja webgpu_dawn
 ```
 
 
@@ -37,7 +37,7 @@ cd swift-webgpu
 Build the package;
 
 ```sh
-DAWN_JSON=/path/to/dawn/dawn.json \
+DAWN_JSON=/path/to/dawn/src/dawn/dawn.json \
 swift build -c release \
 -Xcc -I/path/to/dawn/include \
 -Xcc -I/path/to/dawn/out/Release/gen/include \
