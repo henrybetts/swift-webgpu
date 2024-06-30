@@ -6,7 +6,7 @@ Despite being designed for the web, WebGPU can also be used natively, enabling d
 
 Efforts are being made to define a standard native version of the API via a [shared header](https://github.com/webgpu-native/webgpu-headers). Note, however, that the specification is still work-in-progress.
 
-Currently, swift-webgpu is based on the [Dawn](https://dawn.googlesource.com/dawn/) implementation, and generated from [dawn.json](https://dawn.googlesource.com/dawn/+/refs/heads/main/dawn.json).
+Currently, swift-webgpu is based on the [Dawn](https://dawn.googlesource.com/dawn/) implementation, and generated from [dawn.json](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/dawn.json).
 
 
 ## Requirements
@@ -15,14 +15,26 @@ Currently, swift-webgpu is based on the [Dawn](https://dawn.googlesource.com/daw
 
 To use swift-webgpu, you'll first need to build Dawn. See Dawn's [documentation](https://dawn.googlesource.com/dawn/+/HEAD/docs/building.md) to get started.
 
-swift-webgpu depends on the `libwebgpu_dawn` shared library, which can be built like so;
+swift-webgpu depends on the bundled `libwebgpu_dawn` library, which can be built and installed like so;
 
 ```sh
 mkdir -p out/Release
 cd out/Release
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 -GNinja ../..
-ninja webgpu_dawn
+cmake -DCMAKE_BUILD_TYPE=Release -DDAWN_ENABLE_INSTALL=1 -DDAWN_BUILD_SAMPLES=0 -GNinja ../..
+ninja
+sudo ninja install
 ```
+
+This should install the library and headers to `/usr/local/` - this is probably the simplest way to allow Swift to find the library currently.
+
+#### dawn.json
+This file contains a description of the WebGPU native API. By default, swift-webgpu will look for it in `/usr/local/share/dawn/`, so you will need to copy it there manually;
+```sh
+sudo install -d /usr/local/share/dawn
+sudo install ../../src/dawn/dawn.json /usr/local/share/dawn/
+```
+
+Alternatively, you can specify a `DAWN_JSON` environment variable when building swift-webgpu.
 
 
 ## Running the Demos
@@ -34,8 +46,12 @@ git clone https://github.com/henrybetts/swift-webgpu.git
 cd swift-webgpu
 ```
 
-Build the package;
+Build the package (assuming that Dawn is installed and Swift can find it automatically);
+```sh
+swift build -c release
+```
 
+Otherwise, you may need to specify the search paths manually;
 ```sh
 DAWN_JSON=/path/to/dawn/src/dawn/dawn.json \
 swift build -c release \
@@ -44,8 +60,6 @@ swift build -c release \
 -Xlinker -L/path/to/dawn/out/Release/src/dawn/native \
 -Xlinker -rpath -Xlinker /path/to/dawn/out/Release/src/dawn/native
 ```
-
-Remember to replace `/path/to/dawn` with the actual path to the dawn directory. These arguments tell the compiler where to find the dawn headers, and the linker where to find the shared libraries. The `DAWN_JSON` variable defines the location of `dawn.json`, which is needed for code generation.
 
 Finally, run the demos;
 
@@ -64,16 +78,15 @@ cd .build/release
 To use swift-webgpu with Swift Package Manager, add it to your `Package.swift` file's dependencies;
 
 ```swift
-.package(url: "https://github.com/henrybetts/swift-webgpu.git", branch: "master")
+.package(url: "https://github.com/henrybetts/swift-webgpu.git", branch: "main")
 ```
 
-Then add `WebGPU` as a dependency of your target, and link the `webgpu_dawn` library;
+Then add `WebGPU` as a dependency of your target;
 
 ```swift
 .executableTarget(
     name: "MyApp",
     dependencies: [.product(name: "WebGPU", package: "swift-webgpu")],
-    linkerSettings: [.linkedLibrary("webgpu_dawn")]
 ),
 ```
 
