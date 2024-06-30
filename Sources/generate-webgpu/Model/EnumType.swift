@@ -1,11 +1,17 @@
-struct EnumValue {
+struct EnumValue: Taggable {
     let name: String
+    let swiftName: String
+    let tags: Set<String>
     let value: Int
-    let requiresPrefix: Bool
     
-    var swiftName: String {
-        let name = requiresPrefix ? "type " + self.name : self.name
-        return name.camelCased()
+    init(data: EnumValueData, requiresPrefix: Bool) {
+        name = data.name
+        swiftName = (requiresPrefix ? "type " + name : name).camelCased()
+        
+        tags = data.tags
+        
+        let prefix = tags.contains("native") ? 0x0001_0000 : 0
+        value = prefix + data.value
     }
 }
 
@@ -20,7 +26,7 @@ class EnumType: Type {
         let requiresPrefix = values.contains { $0.name.first!.isNumber }
         self.requiresPrefix = requiresPrefix
         
-        self.values = values.map { EnumValue(name: $0.name, value: $0.value, requiresPrefix: requiresPrefix) }
+        self.values = values.map { EnumValue(data: $0, requiresPrefix: requiresPrefix) }
         super.init(name: name, data: data)
     }
     

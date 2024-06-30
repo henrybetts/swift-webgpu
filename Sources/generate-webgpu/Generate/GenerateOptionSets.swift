@@ -22,12 +22,6 @@ func generateOptionSets(model: Model) -> String {
                 }
                 ""
                 
-                // TODO: This shouldn't be needed, but there are currently a couple of mistakes in the generated webgpu.h
-                block("init(cValue: \(type.cEnumName))") {
-                    "self.init(rawValue: \(type.cName)(cValue.rawValue))"
-                }
-                ""
-                
                 block("var cValue: \(type.cName)") {
                     "return self.rawValue"
                 }
