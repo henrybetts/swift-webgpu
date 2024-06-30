@@ -19,7 +19,7 @@ class ObjectType: Type {
     let methods: [Method]
     
     init(name: String, data: ObjectTypeData) {
-        methods = data.methods.filter { $0.isEnabled }.map { Method(data: $0, objectName: name) }
+        methods = data.methods.map { Method(data: $0, objectName: name) }.filter { $0.isEnabled }
         super.init(name: name, data: data)
     }
     

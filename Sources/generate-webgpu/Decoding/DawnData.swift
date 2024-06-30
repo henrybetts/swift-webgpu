@@ -13,6 +13,8 @@ enum Category: String, Decodable {
     case constant
     case function
     case functionPointer = "function pointer"
+    case callbackFunction = "callback function"
+    case callbackInfo = "callback info"
 }
 
 enum Length: Equatable {
@@ -185,6 +187,18 @@ struct FunctionTypeData: TypeData, Decodable {
     @DefaultFallback var args: RecordData
 }
 
+struct CallbackFunctionTypeData: TypeData, Decodable {
+    var category: Category
+    @DefaultFallback var tags: Set<String>
+    @DefaultFallback var args: RecordData
+}
+
+struct CallbackInfoTypeData: TypeData, Decodable {
+    var category: Category
+    @DefaultFallback var tags: Set<String>
+    var members: RecordData
+}
+
 
 // MARK: Dawn Data
 
@@ -216,6 +230,10 @@ struct DawnData: Decodable {
                 types[key] = try container.decode(ConstantTypeData.self, forKey: key)
             case .function, .functionPointer:
                 types[key] = try container.decode(FunctionTypeData.self, forKey: key)
+            case .callbackFunction:
+                types[key] = try container.decode(CallbackFunctionTypeData.self, forKey: key)
+            case .callbackInfo:
+                types[key] = try container.decode(CallbackInfoTypeData.self, forKey: key)
             }
         }
         

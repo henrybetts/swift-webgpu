@@ -23,3 +23,10 @@ class Type: Taggable {
         return String(describing: value)
     }
 }
+
+
+class NonconvertibleType: Type {
+    override var swiftName: String {
+        return cName
+    }
+}

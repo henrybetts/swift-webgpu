@@ -21,6 +21,8 @@ struct Model {
                 types[name] = FunctionPointerType(name: name, data: data)
             } else if data.category == .function, let data = data as? FunctionTypeData {
                 types[name] = FunctionType(name: name, data: data)
+            } else {
+                types[name] = NonconvertibleType(name: name, data: data)
             }
         }
         

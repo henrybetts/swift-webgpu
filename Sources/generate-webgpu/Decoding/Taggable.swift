@@ -8,7 +8,11 @@ extension Taggable {
             return true
         }
         // TODO: This could be configurable
-        return !tags.isDisjoint(with: ["dawn", "native", "deprecated"])
+        return tags.isSubset(of: ["native", "deprecated"])
+    }
+    
+    var isUpstream: Bool {
+        return tags.contains("upstream")
     }
     
     var isDeprecated: Bool {
