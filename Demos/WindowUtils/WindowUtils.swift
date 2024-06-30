@@ -65,10 +65,10 @@ public class Window {
         return glfwWindowShouldClose(handle) == GLFW_TRUE
     }
     
-    public func loop(body: () -> ()) {
+    public func loop(body: () throws -> ()) rethrows {
         repeat {
-            _autoreleasepool {
-                body()
+            try _autoreleasepool {
+                try body()
                 pollEvents()
             }
         } while !shouldClose
@@ -80,13 +80,13 @@ public func pollEvents() {
     glfwPollEvents()
 }
 
-func _autoreleasepool(invoking body: () -> ()) {
+func _autoreleasepool(invoking body: () throws -> ()) rethrows {
     #if os(macOS)
-        autoreleasepool {
-            body()
+        try autoreleasepool {
+            try body()
         }
     #else
-        body()
+        try body()
     #endif
 }
 

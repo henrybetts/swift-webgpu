@@ -17,16 +17,10 @@ device.setUncapturedErrorCallback { (errorType, errorMessage) in
     print("Error (\(errorType)): \(errorMessage)")
 }
 
-withGLFW {
+try withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoTriangle")
     let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
-    
-    let swapchain = device.createSwapChain(surface: surface, descriptor: SwapChainDescriptor(
-        usage: .renderAttachment,
-        format: window.preferredTextureFormat,
-        width: 800,
-        height: 600,
-        presentMode: .fifo))
+    surface.configure(config: .init(device: device, format: window.preferredTextureFormat, width: 800, height: 600))
     
     let vertexShaderSource = """
         struct VertexOut {
@@ -100,13 +94,13 @@ withGLFW {
         return vertexBuffer
     }
     
-    window.loop {
+    try window.loop {
         let encoder = device.createCommandEncoder()
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
                 RenderPassColorAttachment(
-                    view: swapchain.currentTextureView,
+                    view: try surface.getCurrentTexture().texture.createView(),
                     loadOp: .clear,
                     storeOp: .store,
                     clearValue: Color(r: 0, g: 0, b: 0, a: 1))]))
@@ -118,6 +112,6 @@ withGLFW {
         let commandBuffer = encoder.finish()
         device.queue.submit(commands: [commandBuffer])
         
-        swapchain.present()
+        surface.present()
     }
 }

@@ -12,26 +12,20 @@ device.setUncapturedErrorCallback { (errorType, errorMessage) in
     print("Error (\(errorType)): \(errorMessage)")
 }
 
-withGLFW {
+try withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoClearColor")
     let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
-    
-    let swapchain = device.createSwapChain(surface: surface, descriptor: SwapChainDescriptor(
-        usage: .renderAttachment,
-        format: window.preferredTextureFormat,
-        width: 800,
-        height: 600,
-        presentMode: .fifo))
+    surface.configure(config: .init(device: device, format: window.preferredTextureFormat, width: 800, height: 600))
     
     var hue = 0.0
         
-    window.loop {
+    try window.loop {
         let encoder = device.createCommandEncoder()
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
                 RenderPassColorAttachment(
-                    view: swapchain.currentTextureView,
+                    view: try surface.getCurrentTexture().texture.createView(),
                     loadOp: .clear,
                     storeOp: .store,
                     clearValue: Color(h: hue, s: 0.9, v: 0.9, a: 1.0))]))
@@ -40,7 +34,7 @@ withGLFW {
         let commandBuffer = encoder.finish()
         device.queue.submit(commands: [commandBuffer])
         
-        swapchain.present()
+        surface.present()
         
         hue = (hue + 0.5).truncatingRemainder(dividingBy: 360)
     }
