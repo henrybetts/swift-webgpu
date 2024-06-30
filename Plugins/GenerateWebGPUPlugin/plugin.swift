@@ -3,8 +3,13 @@ import Foundation
 
 @main struct GenerateWebGPUPlugin: BuildToolPlugin {
     func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
-        guard let dawnJsonEnv = ProcessInfo.processInfo.environment["DAWN_JSON"] else { return [] }
-        let dawnJson = Path(dawnJsonEnv)
+        let dawnJsonPath: Path
+        
+        if let dawnJsonEnv = ProcessInfo.processInfo.environment["DAWN_JSON"] {
+            dawnJsonPath = Path(dawnJsonEnv)
+        } else {
+            dawnJsonPath = Path("/usr/local/share/dawn/dawn.json")
+        }
         
         let generateTool = try context.tool(named: "generate-webgpu")
         let outputDir = context.pluginWorkDirectory.appending("Generated")
@@ -23,8 +28,8 @@ import Foundation
             .buildCommand(
                 displayName: "Generating WebGPU",
                 executable: generateTool.path,
-                arguments: ["--dawn-json", dawnJson, "--output-dir", outputDir],
-                inputFiles: [dawnJson],
+                arguments: ["--dawn-json", dawnJsonPath, "--output-dir", outputDir],
+                inputFiles: [dawnJsonPath],
                 outputFiles: outputFiles)]
     }
 }

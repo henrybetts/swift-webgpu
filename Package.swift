@@ -19,7 +19,8 @@ let package = Package(
     ],
     targets: [
         .systemLibrary(
-            name: "CWebGPU"
+            name: "CWebGPU",
+            pkgConfig: "webgpu"
         ),
         .target(
             name: "WebGPU",
@@ -27,17 +28,15 @@ let package = Package(
             plugins: [.plugin(name: "GenerateWebGPUPlugin")]
         ),
         
+        .systemLibrary(name: "CxxDawnNative",
+                      pkgConfig: "dawn_native"),
         .target(
             name: "CDawnNative",
-            linkerSettings: [
-                .linkedLibrary("dawn_native")]
+            dependencies: ["CxxDawnNative"]
         ),
         .target(
             name: "DawnNative",
             dependencies: ["WebGPU", "CDawnNative"]
-        ),
-        .systemLibrary(
-            name: "CDawnProc"
         ),
         
         .executableTarget(
@@ -66,32 +65,27 @@ let package = Package(
         .executableTarget(
             name: "DemoInfo",
             dependencies: ["DawnNative"],
-            path: "Demos/DemoInfo",
-            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+            path: "Demos/DemoInfo"
         ),
         .executableTarget(
             name: "DemoClearColor",
             dependencies: ["WindowUtils"],
-            path: "Demos/DemoClearColor",
-            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+            path: "Demos/DemoClearColor"
         ),
         .executableTarget(
             name: "DemoTriangle",
             dependencies: ["WindowUtils"],
-            path: "Demos/DemoTriangle",
-            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+            path: "Demos/DemoTriangle"
         ),
         .executableTarget(
             name: "DemoCube",
             dependencies: ["WindowUtils", "SwiftMath"],
-            path: "Demos/DemoCube",
-            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+            path: "Demos/DemoCube"
         ),
         .executableTarget(
             name: "DemoBoids",
             dependencies: ["WindowUtils"],
-            path: "Demos/DemoBoids",
-            linkerSettings: [.linkedLibrary("webgpu_dawn")]
+            path: "Demos/DemoBoids"
         )
     ],
     cxxLanguageStandard: .cxx17
