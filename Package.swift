@@ -19,8 +19,7 @@ let package = Package(
     ],
     targets: [
         .systemLibrary(
-            name: "CWebGPU",
-            pkgConfig: "webgpu"
+            name: "CWebGPU"
         ),
         .target(
             name: "WebGPU",
@@ -28,11 +27,9 @@ let package = Package(
             plugins: [.plugin(name: "GenerateWebGPUPlugin")]
         ),
         
-        .systemLibrary(name: "CxxDawnNative",
-                      pkgConfig: "dawn_native"),
         .target(
             name: "CDawnNative",
-            dependencies: ["CxxDawnNative"]
+            dependencies: ["CWebGPU"]
         ),
         .target(
             name: "DawnNative",
