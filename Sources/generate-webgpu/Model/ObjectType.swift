@@ -13,6 +13,14 @@ class Method: FunctionType {
     override var cFunctionName: String {
         return "wgpu" + objectName.pascalCased(preservingCasing: true) + name.pascalCased(preservingCasing: true)
     }
+    
+    var isEnabled: Bool {
+        // TODO: Temporary patch for dawn bug
+        if objectName == "surface" && name == "set label" {
+            return false
+        }
+        return super.isEnabled
+    }
 }
 
 class ObjectType: Type {
