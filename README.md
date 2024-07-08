@@ -27,6 +27,17 @@ sudo ninja install
 
 This should install the library and headers to `/usr/local/` - this is probably the simplest way to allow Swift to find the library currently.
 
+#### pkg-config
+You may need to manually create a pkg-config file, depending on which tools you are using. For example, running `swift build` directly from the command line seems to search `/usr/local/` automatically, whereas building with Xcode does not. If you run into this issue, create a file at `/usr/local/lib/pkgconfig/webgpu.pc` with the following contents;
+```
+prefix=/usr/local
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Cflags: -I${includedir}
+Libs: -L${libdir} -lwebgpu_dawn
+```  
+
 #### dawn.json
 This file contains a description of the WebGPU native API. By default, swift-webgpu will look for it in `/usr/local/share/dawn/`, so you will need to copy it there manually;
 ```sh

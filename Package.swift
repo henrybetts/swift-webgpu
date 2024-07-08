@@ -19,7 +19,8 @@ let package = Package(
     ],
     targets: [
         .systemLibrary(
-            name: "CWebGPU"
+            name: "CWebGPU",
+            pkgConfig: "webgpu"
         ),
         .target(
             name: "WebGPU",
