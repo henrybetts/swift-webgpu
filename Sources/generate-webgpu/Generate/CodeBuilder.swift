@@ -76,7 +76,7 @@ func line(@CodeBuilder builder: () -> [String]) -> String {
 
 extension String {
     func swiftSafe() -> String {
-        if (["repeat", "internal"].contains(self)) {
+        if (["repeat", "internal", "false", "true"].contains(self)) {
             return "`\(self)`"
         }
         return self
