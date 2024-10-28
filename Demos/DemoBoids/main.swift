@@ -47,7 +47,7 @@ try withGLFW {
     let renderShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
-            nextInChain: ShaderModuleWgslDescriptor(code: renderShaderSource)))
+            nextInChain: ShaderSourceWgsl(code: renderShaderSource)))
     
     let renderPipeline = device.createRenderPipeline(
         descriptor: RenderPipelineDescriptor(
@@ -84,7 +84,7 @@ try withGLFW {
     let computeShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
-            nextInChain: ShaderModuleWgslDescriptor(code: computeShaderSource)))
+            nextInChain: ShaderSourceWgsl(code: computeShaderSource)))
     
     let computePipeline = device.createComputePipeline(
         descriptor: ComputePipelineDescriptor(
