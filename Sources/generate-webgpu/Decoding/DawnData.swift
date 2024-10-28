@@ -19,7 +19,6 @@ enum Category: String, Decodable {
 
 enum Length: Equatable {
     case fixed(Int)
-    case string
     case member(String)
     
     static let single = Length.fixed(1)
@@ -37,12 +36,7 @@ extension Length: Decodable {
         do {
             self = try .fixed(container.decode(Int.self))
         } catch DecodingError.typeMismatch {
-            let value = try container.decode(String.self)
-            if value == "strlen" {
-                self = .string
-            } else {
-                self = .member(value)
-            }
+            self = try .member(container.decode(String.self))
         }
     }
 }

@@ -65,11 +65,11 @@ class RecordMember {
     }
     
     var isString: Bool {
-        return annotation == .pointer && typeName == "char" && length == .string
+        return annotation == .none && typeName == "string view"
     }
     
     var isArray: Bool {
-        return (annotation == .pointer || isVoidPointer) && length != .single && length != .string
+        return (annotation == .pointer || isVoidPointer) && length != .single
     }
     
     var isUserData: Bool {
@@ -199,7 +199,7 @@ class RecordMember {
             return "nil"
         }
         
-        if annotation == .none, let type = type as? StructureType, type.hasDefaultSwiftInitializer {
+        if annotation == .none, !isString, let type = type as? StructureType, type.hasDefaultSwiftInitializer {
             return "\(type.swiftName)()"
         }
         
