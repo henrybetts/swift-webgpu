@@ -11,17 +11,17 @@ print()
 print(title: "Adapters (\(adapters.count))")
 withIndent {
     for (i, adapter) in adapters.enumerated() {
-        let properties = adapter.properties
+        let info = adapter.info
         
-        print(subtitle: "[\(i)] \(properties.name ?? "Unknown")")
+        print(subtitle: "[\(i)] \(info.device)")
         withIndent {
-            if let description = properties.driverDescription, !description.isEmpty {
-                print(description)
-            }
-            print(key: "vendorId", value: hex(properties.vendorId))
-            print(key: "deviceId", value: hex(properties.deviceId))
-            print(key: "adapterType", value: properties.adapterType)
-            print(key: "backendType", value: properties.backendType)
+            print(info.description)
+            print(key: "vendor", value: info.vendor)
+            print(key: "vendorId", value: hex(info.vendorId))
+            print(key: "deviceId", value: hex(info.deviceId))
+            print(key: "adapterType", value: info.adapterType)
+            print(key: "backendType", value: info.backendType)
+            print(key: "architecture", value: info.architecture)
         }
         print()
     }

@@ -52,19 +52,25 @@ public class Adapter {
         return WebGPU.Adapter(handle: object!)
     }
     
-    public var properties: AdapterProperties {
-        var cProps = WGPUAdapterProperties()
-        dawnNativeAdapterGetProperties(self.adapter, &cProps)
-        return AdapterProperties(
-            vendorId: cProps.vendorID,
-            vendorName: String(cString: cProps.vendorName),
-            architecture: String(cString: cProps.architecture),
-            deviceId: cProps.deviceID,
-            name: String(cString: cProps.name),
-            driverDescription: String(cString: cProps.driverDescription),
-            adapterType: AdapterType(rawValue: cProps.adapterType.rawValue)!,
-            backendType: BackendType(rawValue: cProps.backendType.rawValue)!
-        )
+    public var info: AdapterInfo {
+        var cInfo = WGPUAdapterInfo()
+        dawnNativeAdapterGetInfo(self.adapter, &cInfo)
+        
+        func convertString(_ cString: WGPUStringView) -> String {
+            let bytes = UnsafeRawBufferPointer(start: cString.data, count: cString.length)
+            return String(decoding: bytes, as: UTF8.self)
+        }
+        
+        return AdapterInfo(
+            vendor: convertString(cInfo.vendor),
+            architecture: convertString(cInfo.architecture),
+            device: convertString(cInfo.device),
+            description: convertString(cInfo.description),
+            backendType: BackendType(rawValue: cInfo.backendType.rawValue)!,
+            adapterType: AdapterType(rawValue: cInfo.adapterType.rawValue)!,
+            vendorId: cInfo.vendorID,
+            deviceId: cInfo.deviceID,
+            compatibilityMode: cInfo.compatibilityMode != 0)
     }
     
     public func createDevice() -> Device? {

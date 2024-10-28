@@ -42,9 +42,9 @@ WGPUAdapter dawnNativeAdapterGet(DawnNativeAdapter cAdapter) {
     return adapter->Get();
 }
 
-void dawnNativeAdapterGetProperties(DawnNativeAdapter cAdapter, WGPUAdapterProperties* properties) {
+WGPUStatus dawnNativeAdapterGetInfo(DawnNativeAdapter cAdapter, WGPUAdapterInfo* info) {
     auto adapter = reinterpret_cast<dawn::native::Adapter*>(cAdapter);
-    adapter->GetProperties(reinterpret_cast<wgpu::AdapterProperties*>(properties));
+    return WGPUStatus(adapter->GetInfo(info));
 }
 
 WGPUDevice dawnNativeAdapterCreateDevice(DawnNativeInstance cAdapter) {
