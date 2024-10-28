@@ -39,16 +39,16 @@ public class Window {
                 view.layer = CAMetalLayer()
             }
                 
-            surfaceDescriptor.nextInChain = SurfaceDescriptorFromMetalLayer(
+            surfaceDescriptor.nextInChain = SurfaceSourceMetalLayer(
                 layer: Unmanaged.passUnretained(view.layer!).toOpaque()
             )
         #elseif os(Linux)
-            surfaceDescriptor.nextInChain = SurfaceDescriptorFromXlibWindow(
+            surfaceDescriptor.nextInChain = SurfaceSourceXlibWindow(
                 display: UnsafeMutableRawPointer(glfwGetX11Display()),
                 window: UInt32(glfwGetX11Window(handle))
             )
         #elseif os(Windows)
-            surfaceDescriptor.nextInChain = SurfaceDescriptorFromWindowsHwnd(
+            surfaceDescriptor.nextInChain = SurfaceSourceWindowsHwnd(
                 hinstance: GetModuleHandleW(nil),
                 hwnd: glfwGetWin32Window(handle)
             )
