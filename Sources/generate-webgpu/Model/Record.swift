@@ -53,7 +53,7 @@ class RecordMember {
     }
     
     var isOptional: Bool {
-        return _isOptional || defaultValue == "nullptr"
+        return _isOptional || defaultValue == "nullptr" || typeName == "optional bool"
     }
     
     var isVoidPointer: Bool {
@@ -62,6 +62,10 @@ class RecordMember {
     
     var isMutableVoidPointer: Bool {
         return (typeName == "void" && annotation == .mutablePointer) || typeName == "void *"
+    }
+    
+    var isBool: Bool {
+        return typeName == "bool" || typeName == "optional bool"
     }
     
     var isString: Bool {
@@ -115,7 +119,10 @@ class RecordMember {
     }
     
     var unwrappedSwiftType: String {
-        if isString {
+        if isBool {
+            return "Bool"
+            
+        } else if isString {
             return "String"
         
         } else if isArray {
@@ -171,7 +178,7 @@ class RecordMember {
             return .value
         }
         
-        if annotation == nil && typeName == "bool" {
+        if annotation == nil && isBool {
             return .value
         }
         
@@ -187,6 +194,10 @@ class RecordMember {
     }
     
     var defaultSwiftValue: String? {
+        if isBool && defaultValue == "undefined" {
+            return "nil"
+        }
+        
         if let defaultValue = defaultValue, defaultValue != "nullptr" {
             return type?.swiftValue(from: defaultValue)
         }
