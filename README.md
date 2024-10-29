@@ -118,7 +118,7 @@ let instance = createInstance()
 
 // find an adapter
 let adapter = try await instance.requestAdapter()
-print("Using adapter: \(adapter.properties.name)")
+print("Using adapter: \(adapter.info.device)")
 
 // create a device
 let device = try await adapter.requestDevice()
@@ -137,7 +137,7 @@ With the device obtained, you can create most of the other types of WebGPU objec
 ```swift
 let shaderModule = device.createShaderModule(
   descriptor: .init(
-    nextInChain: ShaderModuleWgslDescriptor(
+    nextInChain: ShaderSourceWgsl(
       code: """
         @vertex
         fn vertexMain() -> @builtin(position) vec4f {
