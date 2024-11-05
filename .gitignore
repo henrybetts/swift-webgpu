@@ -152,7 +152,7 @@ cython_debug/
 Sources/WebGpu/Generated
 Sources/DawnNative/Dawn.xcframework/
 
-# Dawn-built artifacts we require
+# Dawn-built artifacts we require and their paths
 Sources/DawnNative/lib/libwebgpu_dawn.dylib
 Sources/DawnNative/dawn.json
 Sources/DawnNative/include/

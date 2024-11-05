@@ -3,7 +3,7 @@ import Foundation
 
 @main struct GenerateWebGPUPlugin: BuildToolPlugin {
     func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
-        let dawnJsonPath = Path("Sources/DawnNative/dawn.json")
+        let dawnJsonPath = Path("Sources/DawnNative/Dawn.xcframework/dawn.json")
 
         let generateTool = try context.tool(named: "generate-webgpu")
         let outputDir = context.pluginWorkDirectory.appending("Generated")
