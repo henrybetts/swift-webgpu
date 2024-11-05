@@ -11,12 +11,11 @@ RELEASE_ROOT="./"
 OUTPUT_FILENAME="Dawn.xcframework"
 OUTPUT_PATH="./${OUTPUT_FILENAME}"
 
-#MACOS_LIBRARY_PATH="${RELEASE_ROOT}/lib/libwebgpu_dawn.dylib"
-MACOS_LIBRARY_PATH="${RELEASE_ROOT}/libwebgpu_dawn.dylib"
+MACOS_LIBRARY_PATH="${RELEASE_ROOT}/lib/libwebgpu_dawn.dylib"
 MACOS_HEADER_PATH="${RELEASE_ROOT}/include"
 
-#	-headers ${MACOS_HEADER_PATH}	\
 
 xcodebuild -create-xcframework \
 	-library ${MACOS_LIBRARY_PATH} \
+	-headers ${MACOS_HEADER_PATH}	\
 	-output ${OUTPUT_PATH}
