@@ -8,7 +8,7 @@ set -e
 #RELEASE_ROOT="Dawn-ecf224df05e711fe7009fbd76840301fb82bde1a-macos-latest-Release"
 RELEASE_ROOT="./"
 
-OUTPUT_FILENAME="Dawn.xcframework"
+OUTPUT_FILENAME="webgpu_dawn.xcframework"
 OUTPUT_PATH="./${OUTPUT_FILENAME}"
 
 MACOS_LIBRARY_PATH="${RELEASE_ROOT}/lib/libwebgpu_dawn.dylib"

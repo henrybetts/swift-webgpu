@@ -11,7 +11,7 @@ let package = Package(
             targets: ["WebGPU"]),
         .library(
             name: "DawnNative",
-			targets: ["DawnNative","DawnDylib","WebGPU"]),
+			targets: ["DawnNative","DawnFramework","WebGPU"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
@@ -61,8 +61,8 @@ let package = Package(
         ),
         
 		.binaryTarget(
-			name: "DawnDylib",
-			path: "Sources/DawnNative/Dawn.xcframework"
+			name: "DawnFramework",
+			path: "Sources/DawnNative/webgpu_dawn.xcframework"
 			//url: "https://github.com/NewChromantics/PopH264/releases/download/v1.3.41/PopH264.xcframework.zip",
 			//checksum: "8a378470a2ab720f2ee6ecf4e7a5e202a3674660c31e43d95d672fe76d61d68c"
 		),
