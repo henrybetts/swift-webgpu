@@ -24,13 +24,11 @@ let package = Package(
 			//,
             //pkgConfig: "webgpu"
 			dependencies: ["DawnFramework"],
-			//	gr: this compiles ALL the headers, including cpp ones, which seem to need to be C??
-			//		this works though! just include webgpu/webgpu.h
-			publicHeadersPath:"webgpu",
-			cxxSettings: [
-				//.headerSearchPath("./"),	//	this allows headers in same place as .cpp
-				//.headerSearchPath("../DawnNative/webgpu_dawn.xcframework/macos-arm64/Headers"),
-			]
+			//	gr: this compiles ALL the headers recursively, including cpp ones - they need to be C
+			//		and we can't filter, so make sure only C headers are here (webgpu/webgpu.h) to produce
+			//		C->Swift symbols
+			//		The path also needs to be inside $target_name/ (not root of package)
+			publicHeadersPath:"include/webgpu"	//	nil == include/
         ),
         .target(
             name: "WebGPU",
