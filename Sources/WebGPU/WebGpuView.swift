@@ -1,5 +1,4 @@
 import SwiftUI
-import WebGPU
 import MetalKit
 
 //	macos -> ios aliases to make things a little cleaner to write
