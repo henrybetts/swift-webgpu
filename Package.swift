@@ -7,8 +7,9 @@ let package = Package(
     platforms: [.macOS("10.15")],
     products: [
         .library(
-            name: "WebGPU",
-            targets: ["WebGPU"]),
+			name: "WebGPU",
+			//	webgpu needs the dawnframework as that contains webgpu headers
+            targets: ["WebGPU","DawnFramework"]),
         .library(
             name: "DawnNative",
 			targets: ["DawnNative","DawnFramework","WebGPU"]),

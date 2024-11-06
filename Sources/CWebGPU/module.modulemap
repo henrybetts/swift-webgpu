@@ -1,5 +1,4 @@
 module CWebGPU [system] {
     header "shim.h"
     export *
-    link "webgpu_dawn"
 }
