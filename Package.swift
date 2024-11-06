@@ -19,24 +19,33 @@ let package = Package(
         .package(url: "https://github.com/SwiftGFX/SwiftMath", from: "3.3.0") // for demos only
     ],
     targets: [
-        .systemLibrary(
+        .target(
             name: "CWebGPU",
-            pkgConfig: "webgpu"
+			//,
+            //pkgConfig: "webgpu"
+			dependencies: ["DawnFramework"],
+			//	gr: this compiles ALL the headers, including cpp ones, which seem to need to be C??
+			//		this works though! just include webgpu/webgpu.h
+			publicHeadersPath:"webgpu",
+			cxxSettings: [
+				//.headerSearchPath("./"),	//	this allows headers in same place as .cpp
+				//.headerSearchPath("../DawnNative/webgpu_dawn.xcframework/macos-arm64/Headers"),
+			]
         ),
         .target(
             name: "WebGPU",
-            dependencies: ["CWebGPU"],
+            dependencies: ["DawnFramework","CWebGPU"],
             plugins: [.plugin(name: "GenerateWebGPUPlugin")]
         ),
         
         .target(
             name: "CDawnNative",
-            dependencies: ["CWebGPU"]
-        ),
+            dependencies: ["DawnFramework","CWebGPU"]
+		),
         .target(
             name: "DawnNative",
-            dependencies: ["WebGPU", "CDawnNative"]
-        ),
+            dependencies: ["DawnFramework","WebGPU", "CDawnNative"]
+		),
         
         .executableTarget(
             name: "generate-webgpu",
