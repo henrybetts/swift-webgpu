@@ -2,21 +2,35 @@ import SwiftUI
 import WebGPU
 import MetalKit
 
-
-
+//	macos -> ios aliases to make things a little cleaner to write
 #if canImport(UIKit)
 import UIKit
 #else//macos
 import AppKit
-typealias UIView = NSView
-typealias UIColor = NSColor
-typealias UIRect = NSRect
-typealias UIViewRepresentable = NSViewRepresentable
+public typealias UIView = NSView
+public typealias UIColor = NSColor
+public typealias UIRect = NSRect
+public typealias UIViewRepresentable = NSViewRepresentable
 #endif
 
 
+struct RenderError: Error
+{
+	let description: String
+	
+	init(_ description: String) {
+		self.description = description
+	}
+	
+	var errorDescription: String? {
+		description
+	}
+}
+
+
+
 //	callback from low-level (metal)view when its time to render
-protocol ContentRenderer
+public protocol ContentRenderer
 {
 	func Render(contentRect:CGRect,layer:CAMetalLayer)
 }
@@ -32,7 +46,7 @@ public class WebGpuRenderer
 	var initTask : Task<Void,any Error>!
 	var error : String?
 	
-	init()
+	public init()
 	{
 		//super.init()
 		
@@ -63,12 +77,11 @@ public class WebGpuRenderer
 	}
 	
 	
-	
-	func Render(metalLayer:CAMetalLayer,getCommands:(Device,CommandEncoder,TextureView)->()) throws
+	public func Render(metalLayer:CAMetalLayer,getCommands:(Device,CommandEncoder,TextureView)->()) throws
 	{
 		guard let device else
 		{
-			throw RuntimeError("Waiting for device")
+			throw RenderError("Waiting for device")
 		}
 		
 		let FinalChainSurface = SurfaceSourceMetalLayer(
@@ -99,16 +112,18 @@ public class WebGpuRenderer
 
 
 //	our own abstracted low level view, so we can get access to the layer
-class RenderView : UIView
+public class RenderView : UIView
 {
 	//var wantsLayer: Bool	{	return true	}
 	//	gr: don't seem to need this
 	//override var wantsUpdateLayer: Bool { return true	}
-	public var contentRenderer : ContentRenderer
+	var contentRenderer : ContentRenderer
+	
+	//	todo: reinstate vsync auto-renderer from https://github.com/NewChromantics/PopLottie.SwiftPackage
 	//var vsync : VSyncer? = nil
 	
 #if os(macOS)
-	override var isFlipped: Bool { return true	}
+	public override var isFlipped: Bool { return true	}
 #endif
 	
 	required init?(coder: NSCoder)
@@ -147,13 +162,13 @@ class RenderView : UIView
 	
 	
 #if os(macOS)
-	override func layout()
+	public override func layout()
 	{
 		super.layout()
 		OnContentsChanged()
 	}
 #else
-	override func layoutSubviews()
+	public override func layoutSubviews()
 	{
 		super.layoutSubviews()
 		OnContentsChanged()
@@ -168,7 +183,8 @@ class RenderView : UIView
 		contentRenderer.Render(contentRect: contentRect, layer:metalLayer)
 	}
 	
-	@objc func Render()
+	//	gr: why did I need @objc...
+	@objc public func Render()
 	{
 		//self.layer?.setNeedsDisplay()
 		OnContentsChanged()
@@ -182,25 +198,25 @@ class RenderView : UIView
 public struct WebGpuView : UIViewRepresentable
 {
 	typealias UIViewType = RenderView
-	typealias NSViewType = RenderView
+	public typealias NSViewType = RenderView
 	
 	var contentRenderer : ContentRenderer
 	
 	var renderView : RenderView?
 	
-	init(contentRenderer:ContentRenderer)
+	public init(contentRenderer:ContentRenderer)
 	{
 		self.contentRenderer = contentRenderer
 		//contentLayer.contentsGravity = .resizeAspect
 	}
 	
-	func makeUIView(context: Context) -> RenderView
+	public func makeUIView(context: Context) -> RenderView
 	{
 		let view = RenderView(contentRenderer: contentRenderer)
 		return view
 	}
 	
-	func makeNSView(context: Context) -> RenderView
+	public func makeNSView(context: Context) -> RenderView
 	{
 		let view = RenderView(contentRenderer: contentRenderer)
 		return view
@@ -208,12 +224,12 @@ public struct WebGpuView : UIViewRepresentable
 	
 	//	gr: this occurs when the RenderViewRep() is re-initialised, (from uiview redraw)
 	//		but the UIView underneath has persisted
-	func updateUIView(_ view: RenderView, context: Context)
+	public func updateUIView(_ view: RenderView, context: Context)
 	{
 		view.contentRenderer = self.contentRenderer
 	}
 	
-	func updateNSView(_ view: RenderView, context: Context)
+	public func updateNSView(_ view: RenderView, context: Context)
 	{
 		updateUIView(view,context: context)
 	}
