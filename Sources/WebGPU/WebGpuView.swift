@@ -13,7 +13,7 @@ public typealias UIViewRepresentable = NSViewRepresentable
 #endif
 
 
-struct RenderError: Error
+struct RenderError: LocalizedError
 {
 	let description: String
 	
@@ -39,7 +39,7 @@ public protocol ContentRenderer
 public class WebGpuRenderer
 {
 	var webgpu : WebGPU.Instance = createInstance()
-	var device : Device?
+	public var device : Device?
 	var windowTextureFormat = TextureFormat.bgra8Unorm
 
 	var initTask : Task<Void,any Error>!
@@ -76,7 +76,7 @@ public class WebGpuRenderer
 	}
 	
 	
-	public func Render(metalLayer:CAMetalLayer,getCommands:(Device,CommandEncoder,TextureView)->()) throws
+	public func Render(metalLayer:CAMetalLayer,getCommands:(Device,CommandEncoder,Texture)throws->()) throws
 	{
 		guard let device else
 		{
@@ -92,13 +92,14 @@ public class WebGpuRenderer
 		let surface = webgpu.createSurface(descriptor: surfaceDesc)
 		surface.configure(config: .init(device: device, format: windowTextureFormat, width: 800, height: 600))
 		
-		let surfaceView = try surface.getCurrentTexture().texture.createView()
+		let surfaceTexture = try surface.getCurrentTexture().texture
+		let surfaceView = surfaceTexture.createView()
 		
 		let encoder = device.createCommandEncoder()
 		
 		
 		//	let caller provide render commands
-		getCommands(device,encoder,surfaceView)
+		try getCommands(device,encoder,surfaceTexture)
 		
 		
 		let commandBuffer = encoder.finish()
