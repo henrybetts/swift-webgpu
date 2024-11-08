@@ -118,12 +118,10 @@ public class RenderView : UIView
 	//	gr: don't seem to need this
 	//override var wantsUpdateLayer: Bool { return true	}
 	var contentRenderer : ContentRenderer
-	
-	//	todo: reinstate vsync auto-renderer from https://github.com/NewChromantics/PopLottie.SwiftPackage
-	//var vsync : VSyncer? = nil
+	var vsync : VSyncer? = nil
 	
 #if os(macOS)
-	public override var isFlipped: Bool { return true	}
+	public override var isFlipped: Bool { return true	}	//	gr: this isn't doing anything when in use with webgpu... but true should match ios
 #endif
 	
 	required init?(coder: NSCoder)
@@ -157,7 +155,7 @@ public class RenderView : UIView
 		self.layer = CAMetalLayer()
 		//viewLayer!.addSublayer(metalLayer)
 		
-		//vsync = VSyncer(Callback: Render)
+		vsync = VSyncer(Callback: Render)
 	}
 	
 	
@@ -236,4 +234,28 @@ public struct WebGpuView : UIViewRepresentable
 }
 
 
+
+class VSyncer
+{
+	public var Callback : ()->Void
+	
+	
+	init(Callback:@escaping ()->Void)
+	{
+		self.Callback = Callback
+		
+		//	macos 14.0 has CADisplayLink but no way to use it
+#if os(macOS)
+		let timer = Timer.scheduledTimer(timeInterval: 1.0/60.0, target: self, selector: #selector(OnVsync), userInfo: nil, repeats: true)
+#else
+		let displayLink = CADisplayLink(target: self, selector: #selector(OnVsync))
+		displayLink.add(to: .current, forMode: .default)
+#endif
+	}
+	
+	@objc func OnVsync()
+	{
+		Callback()
+	}
+}
 
