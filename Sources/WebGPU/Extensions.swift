@@ -12,3 +12,13 @@ extension Surface {
         return SurfaceTexture(cValue: surfaceTexture)
     }
 }
+extension Device
+{
+	public func tick()
+	{
+		withUnsafeHandle {
+			handle in
+			wgpuDeviceTick(handle)
+		}
+	}
+}
