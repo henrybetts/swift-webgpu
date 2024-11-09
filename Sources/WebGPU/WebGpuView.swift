@@ -55,6 +55,12 @@ public class WebGpuRenderer
 		}
 	}
 	
+	public func waitForDevice() async throws -> Device
+	{
+		try await Init()
+		return device!
+	}
+	
 	func OnError(_ error:String)
 	{
 		print("CameraPreviewManager error; \(error)")
