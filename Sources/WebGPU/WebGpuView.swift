@@ -38,6 +38,7 @@ public protocol ContentRenderer
 //	persistent interface to webgpu for use with a [WebGpu]View
 public class WebGpuRenderer
 {
+	public var instance : WebGPU.Instance	{	webgpu	}
 	var webgpu : WebGPU.Instance = createInstance()
 	public var device : Device?
 	var windowTextureFormat = TextureFormat.bgra8Unorm
