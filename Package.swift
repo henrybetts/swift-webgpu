@@ -48,6 +48,7 @@ let package = Package(
         .executableTarget(
             name: "generate-webgpu",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]
+			linkerSettings: [.unsafeFlags(["-rpath","@executable_path/PackageFrameworks"])]
         ),
         .plugin(
             name: "GenerateWebGPUPlugin",
