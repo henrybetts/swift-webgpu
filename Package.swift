@@ -47,8 +47,11 @@ let package = Package(
         
         .executableTarget(
             name: "generate-webgpu",
-            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]
-			linkerSettings: [.unsafeFlags(["-rpath","@executable_path/PackageFrameworks"])]
+            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")],
+			//	xcode for some reason in release doesn't pass in the @rpath flags, so when we run ./generate-webgpu it
+			//	fails to find the swift-argument-parser dylib(in the framework) and fails to run
+			//	https://github.com/henrybetts/swift-webgpu/issues/17
+			linkerSettings: [.unsafeFlags(["-rpath","@executable_path/Frameworks"])]
         ),
         .plugin(
             name: "GenerateWebGPUPlugin",
