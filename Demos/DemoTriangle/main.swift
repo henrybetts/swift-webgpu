@@ -11,11 +11,13 @@ let instance = createInstance()
 let adapter = try await instance.requestAdapter()
 print("Using adapter: \(adapter.info.device)")
 
-let device = try await adapter.requestDevice()
-
-device.setUncapturedErrorCallback { (errorType, errorMessage) in
+let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
     print("Error (\(errorType)): \(errorMessage)")
 }
+
+let device = try await adapter.requestDevice(descriptor: .init(
+    uncapturedErrorCallback: uncapturedErrorCallback
+))
 
 try withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoTriangle")
@@ -62,6 +64,7 @@ try withGLFW {
             buffers: [
                 VertexBufferLayout(
                     arrayStride: UInt64(MemoryLayout<Vertex>.stride),
+                    stepMode: .vertex,
                     attributes: [
                         VertexAttribute(
                             format: .float32x3,

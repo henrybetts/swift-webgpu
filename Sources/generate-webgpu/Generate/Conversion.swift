@@ -73,7 +73,15 @@ func convertSwiftToC(members: Record, prefix: String = "", throws: Bool = false,
             case .length:
                 return "\(member.cType)(c_\(member.parentMember!.swiftName).count)"
             case .callback:
-                return "\((member.type as! FunctionPointerType).callbackFunctionName)"
+                if let callback = member.type as? CallbackFunctionType {
+                    if member.isOptional {
+                        return "\(prefix)\(member.swiftName) != nil ? \(callback.callbackFunctionName) : nil"
+                    } else {
+                        return callback.callbackFunctionName
+                    }
+                } else {
+                    return "\((member.type as! FunctionPointerType).callbackFunctionName)"
+                }
             case .userData:
                 return "UserData.passRetained(\(members.first(where: { $0.isCallback })?.swiftName ?? "callback"))"
             }

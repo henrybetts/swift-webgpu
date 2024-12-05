@@ -25,6 +25,7 @@ struct GenerateWebGPU: ParsableCommand {
         try writeSource(generateFunctionTypes(model: model), toFileNamed: "FunctionTypes.swift")
         try writeSource(generateFunctions(model: model), toFileNamed: "Functions.swift")
         try writeSource(generateCallbacks(model: model), toFileNamed: "Callbacks.swift")
+        try writeSource(generateCallbackInfo(model: model), toFileNamed: "CallbackInfo.swift")
     }
     
     func writeSource(_ source: String, toFileNamed fileName: String) throws {

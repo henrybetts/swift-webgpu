@@ -98,13 +98,18 @@ class RecordMember {
         }
         
         if let annotation = annotation {
+            var innerType = type.cName
+            if type.category == .object {
+                innerType += "?"
+            }
+            
             switch annotation {
             case .pointer:
-                return "UnsafePointer<\(type.cName)>"
+                return "UnsafePointer<\(innerType)>"
             case .mutablePointer:
-                return "UnsafeMutablePointer<\(type.cName)>"
+                return "UnsafeMutablePointer<\(innerType)>"
             case .pointerToPointer:
-                return "UnsafePointer<UnsafePointer<\(type.cName)>?>"
+                return "UnsafePointer<UnsafePointer<\(innerType)>?>"
             }
         }
         
@@ -182,8 +187,12 @@ class RecordMember {
             return .value
         }
         
-        if isCallback {
+        if isCallback || type.category == .callbackFunction {
             return .callback
+        }
+        
+        if type.category == .callbackInfo {
+            return .valueWithClosure
         }
         
         if isUserData {
@@ -211,6 +220,10 @@ class RecordMember {
         }
         
         if annotation == .none, !isString, let type = type as? StructureType, type.hasDefaultSwiftInitializer {
+            return "\(type.swiftName)()"
+        }
+        
+        if let type = type as? CallbackInfoType, type.hasDefaultSwiftInitializer {
             return "\(type.swiftName)()"
         }
         

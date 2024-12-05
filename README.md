@@ -127,9 +127,13 @@ let device = try await adapter.requestDevice()
 You'll usually want to set an error handler, to log any errors produced by the device;
 
 ```swift
-device.setUncapturedErrorCallback { (errorType, errorMessage) in
-  print("Error (\(errorType)): \(errorMessage)")
+let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
+    print("Error (\(errorType)): \(errorMessage)")
 }
+
+let device = try await adapter.requestDevice(descriptor: .init(
+    uncapturedErrorCallback: uncapturedErrorCallback
+))
 ```
 
 With the device obtained, you can create most of the other types of WebGPU objects. A shader module, for example;

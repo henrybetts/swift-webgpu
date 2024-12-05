@@ -10,7 +10,7 @@ func generateFunction(_ function: FunctionType, isMethod: Bool = false) -> Strin
     }
 }
 
-fileprivate func generateParameters(_ record: Record, hideFirstLabel: Bool) -> String {
+func generateParameters(_ record: Record, hideFirstLabel: Bool = false) -> String {
     commaSeparated {
         for (index, arg) in record.enumerated() {
             line {
@@ -18,7 +18,7 @@ fileprivate func generateParameters(_ record: Record, hideFirstLabel: Bool) -> S
                     "_ "
                 }
                 "\(arg.swiftName): "
-                if arg.type?.category == .functionPointer {
+                if (arg.type?.category == .functionPointer || arg.type?.category == .callbackFunction) && !arg.isOptional {
                     "@escaping "
                 }
                 arg.swiftType

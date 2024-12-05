@@ -22,6 +22,7 @@ import Foundation
             outputDir.appending("Functions.swift"),
             outputDir.appending("FunctionTypes.swift"),
             outputDir.appending("Callbacks.swift"),
+            outputDir.appending("CallbackInfo.swift"),
         ]
         
         return [

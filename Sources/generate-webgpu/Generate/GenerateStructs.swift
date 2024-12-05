@@ -6,7 +6,9 @@ func generateStructs(model: Model) -> String {
         for type in model.types(of: StructureType.self) {
             
             let adoptions = commaSeparated {
-                "ConvertibleFromC"
+                if type.name != "device descriptor" {
+                    "ConvertibleFromC"
+                }
                 "ConvertibleToCWithClosure"
                 if type.extensible == .in {
                     "Extensible"
@@ -55,12 +57,14 @@ func generateStructs(model: Model) -> String {
                 }
                 ""
                 
-                block("init(cValue: \(type.cName))") {
-                    for member in type.members.removingHidden {
-                        "self.\(member.swiftName) = \(convertCToSwift(member: member, prefix: "cValue."))"
+                if type.name != "device descriptor" {
+                    block("init(cValue: \(type.cName))") {
+                        for member in type.members.removingHidden {
+                            "self.\(member.swiftName) = \(convertCToSwift(member: member, prefix: "cValue."))"
+                        }
                     }
+                    ""
                 }
-                ""
                 
                 block("func withCValue<R>(_ body: (\(type.cName)) throws -> R) rethrows -> R") {
                     block("return try self.nextInChain.withChainedStruct", "chainedStruct in", condition: type.extensible == .in || type.chained == .in) {
