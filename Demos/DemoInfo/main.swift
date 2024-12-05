@@ -11,7 +11,7 @@ print()
 print(title: "Adapters (\(adapters.count))")
 withIndent {
     for (i, adapter) in adapters.enumerated() {
-        let info = adapter.info
+        let info = adapter.webGpuAdapter.info
         
         print(subtitle: "[\(i)] \(info.device)")
         withIndent {

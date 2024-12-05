@@ -42,11 +42,6 @@ WGPUAdapter dawnNativeAdapterGet(DawnNativeAdapter cAdapter) {
     return adapter->Get();
 }
 
-WGPUStatus dawnNativeAdapterGetInfo(DawnNativeAdapter cAdapter, WGPUAdapterInfo* info) {
-    auto adapter = reinterpret_cast<dawn::native::Adapter*>(cAdapter);
-    return WGPUStatus(adapter->GetInfo(info));
-}
-
 WGPUDevice dawnNativeAdapterCreateDevice(DawnNativeInstance cAdapter) {
     auto adapter = reinterpret_cast<dawn::native::Adapter*>(cAdapter);
     return adapter->CreateDevice();

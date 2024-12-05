@@ -12,7 +12,6 @@ void dawnNativeInstanceEnumerateAdapters(DawnNativeInstance instance, size_t* ad
 void dawnNativeInstanceRelease(DawnNativeInstance instance);
 
 WGPUAdapter dawnNativeAdapterGet(DawnNativeAdapter adapter);
-WGPUStatus dawnNativeAdapterGetInfo(DawnNativeAdapter adapter, WGPUAdapterInfo* info);
 WGPUDevice dawnNativeAdapterCreateDevice(DawnNativeInstance adapter);
 void dawnNativeAdapterRelease(DawnNativeAdapter adapter);
 
