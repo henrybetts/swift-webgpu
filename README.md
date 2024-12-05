@@ -13,19 +13,28 @@ Currently, swift-webgpu is based on the [Dawn](https://dawn.googlesource.com/daw
 
 ### Dawn
 
-To use swift-webgpu, you'll first need to build Dawn. See Dawn's [documentation](https://dawn.googlesource.com/dawn/+/HEAD/docs/building.md) to get started.
+To use swift-webgpu, you'll first need to build Dawn. Assuming you don't need to work on Dawn itself, the easiest way to build it is by following the [Quickstart with CMake guide](https://dawn.googlesource.com/dawn/+/HEAD/docs/quickstart-cmake.md).
 
 swift-webgpu depends on the bundled `libwebgpu_dawn` library, which can be built and installed like so;
 
 ```sh
-mkdir -p out/Release
-cd out/Release
-cmake -DCMAKE_BUILD_TYPE=Release -DDAWN_ENABLE_INSTALL=1 -DDAWN_BUILD_SAMPLES=0 -GNinja ../..
-ninja
-sudo ninja install
+git clone https://dawn.googlesource.com/dawn
+cd dawn
+cmake -S . -B out/Release -DDAWN_FETCH_DEPENDENCIES=ON -DDAWN_ENABLE_INSTALL=ON -DDAWN_BUILD_SAMPLES=OFF -DCMAKE_BUILD_TYPE=Release
+cmake --build out/Release
+[sudo] cmake --install out/Release
 ```
 
 This should install the library and headers to `/usr/local/` - this is probably the simplest way to allow Swift to find the library currently.
+
+On macOS, you may need to correct the install name of the library, like so:
+
+``` sh
+sudo install_name_tool -id /usr/local/lib/libwebgpu_dawn.dylib /usr/local/lib/libwebgpu_dawn.dylib
+```
+
+Otherwise you will likely need to place the library next to your executable, or configure rpaths appropriately for your executable.
+
 
 #### pkg-config
 You may need to manually create a pkg-config file, depending on which tools you are using. For example, running `swift build` directly from the command line seems to search `/usr/local/` automatically, whereas building with Xcode does not. If you run into this issue, create a file at `/usr/local/lib/pkgconfig/webgpu.pc` with the following contents;
@@ -42,7 +51,7 @@ Libs: -L${libdir} -lwebgpu_dawn
 This file contains a description of the WebGPU native API. By default, swift-webgpu will look for it in `/usr/local/share/dawn/`, so you will need to copy it there manually;
 ```sh
 sudo install -d /usr/local/share/dawn
-sudo install ../../src/dawn/dawn.json /usr/local/share/dawn/
+sudo install src/dawn/dawn.json /usr/local/share/dawn/
 ```
 
 Alternatively, you can specify a `DAWN_JSON` environment variable when building swift-webgpu.
