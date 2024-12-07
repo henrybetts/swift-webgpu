@@ -20,4 +20,16 @@ extension Surface {
         }
         return SurfaceTexture(cValue: surfaceTexture)
     }
+    
+    public func getCapabilities(adapter: Adapter) -> SurfaceCapabilities {
+        var capabilities = WGPUSurfaceCapabilities()
+        defer { wgpuSurfaceCapabilitiesFreeMembers(capabilities) }
+        
+        let status = getCapabilities(adapter: adapter, capabilities: &capabilities)
+        
+        // this shouldn't fail as we are not passing in any chained structs
+        precondition(status == .success, "Failed to get surface capabilities")
+        
+        return SurfaceCapabilities(cValue: capabilities)
+    }
 }
