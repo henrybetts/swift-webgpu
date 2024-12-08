@@ -33,3 +33,13 @@ extension Surface {
         return SurfaceCapabilities(cValue: capabilities)
     }
 }
+extension Device
+{
+	public func tick()
+	{
+		withUnsafeHandle {
+			handle in
+			wgpuDeviceTick(handle)
+		}
+	}
+}
