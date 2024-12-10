@@ -90,7 +90,7 @@ try withGLFW {
     
     let computePipeline = device.createComputePipeline(
         descriptor: ComputePipelineDescriptor(
-            compute: ProgrammableStageDescriptor(
+            compute: ComputeState(
                 module: computeShader,
                 entryPoint: "main")))
     
