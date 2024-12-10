@@ -68,7 +68,11 @@ let package = Package(
         .executableTarget(
             name: "DemoClearColor",
             dependencies: ["WindowUtils"],
-            path: "Demos/DemoClearColor"
+            path: "Demos/DemoClearColor",
+            linkerSettings: [
+                // Surely Swift PM should be linking this automatically?
+                .linkedLibrary("m", .when(platforms: [.linux]))
+            ]
         ),
         .executableTarget(
             name: "DemoTriangle",
@@ -83,7 +87,11 @@ let package = Package(
         .executableTarget(
             name: "DemoBoids",
             dependencies: ["WindowUtils"],
-            path: "Demos/DemoBoids"
+            path: "Demos/DemoBoids",
+            linkerSettings: [
+                // Surely Swift PM should be linking this automatically?
+                .linkedLibrary("m", .when(platforms: [.linux]))
+            ]
         )
     ],
     cxxLanguageStandard: .cxx17

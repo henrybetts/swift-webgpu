@@ -45,7 +45,7 @@ public class Window {
         #elseif os(Linux)
             surfaceDescriptor.nextInChain = SurfaceSourceXlibWindow(
                 display: UnsafeMutableRawPointer(glfwGetX11Display()),
-                window: UInt32(glfwGetX11Window(handle))
+                window: UInt64(glfwGetX11Window(handle))
             )
         #elseif os(Windows)
             surfaceDescriptor.nextInChain = SurfaceSourceWindowsHwnd(
