@@ -1,4 +1,4 @@
 module CGLFW [system] {
     header "shim.h"
-    link "glfw"
+    link "glfw3"
 }

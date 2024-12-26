@@ -36,7 +36,7 @@ extension Optional<String> {
         if let value = self {
             return try value.withCValue(body)
         } else {
-            return try body(String.CType(data: nil, length: Int(bitPattern: WGPU_STRLEN)))
+            return try body(String.CType(data: nil, length: Int(bitPattern: UInt(WGPU_STRLEN))))
         }
     }
 }
