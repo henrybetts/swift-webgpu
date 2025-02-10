@@ -47,8 +47,6 @@ instance.requestAdapter(options: nil, callbackInfo: RequestAdapterCallbackInfo(c
     }
 }))
 
-print("Using device: \(device?.limits)")
-
 try await MainActor.run {
 
 try withGLFW {
