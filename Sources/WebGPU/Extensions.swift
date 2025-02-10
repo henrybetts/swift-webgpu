@@ -3,10 +3,10 @@
 import CWebGPU
 
 extension DeviceDescriptor {
-    public init(deviceLostCallback: DeviceLostCallback2? = nil, uncapturedErrorCallback: UncapturedErrorCallback? = nil) {
+    public init(deviceLostCallback: DeviceLostCallback? = nil, uncapturedErrorCallback: UncapturedErrorCallback? = nil) {
         self.init(
-            deviceLostCallbackInfo2: .init(callback: deviceLostCallback),
-            uncapturedErrorCallbackInfo2: .init(callback: uncapturedErrorCallback)
+            deviceLostCallbackInfo: .init(callback: deviceLostCallback),
+            uncapturedErrorCallbackInfo: .init(callback: uncapturedErrorCallback)
         )
     }
 }

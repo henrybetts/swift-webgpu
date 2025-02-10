@@ -29,29 +29,39 @@ let vertexData = [
 
 
 let instance = createInstance()
+var device: Device? = nil;
 
-let adapter = try await instance.requestAdapter()
-print("Using adapter: \(adapter.info.device)")
+instance.requestAdapter(options: nil, callbackInfo: RequestAdapterCallbackInfo(callback: { (status, adapter, msg) -> () in
+    if (status == .success && adapter != nil) {
+        print("Using adapter: \(adapter?.info.device)")
+        
+        let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
+            print("Error (\(errorType)): \(errorMessage)")
+        }
 
-let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
-    print("Error (\(errorType)): \(errorMessage)")
-}
+        adapter?.requestDevice(options: DeviceDescriptor(uncapturedErrorCallback: uncapturedErrorCallback), callbackInfo: RequestDeviceCallbackInfo(callback: { (status, deviceOut, msg) -> () in
+            if (status == .success && deviceOut != nil) {
+                device = deviceOut
+            }
+        }))
+    }
+}))
 
-let device = try await adapter.requestDevice(descriptor: .init(
-    uncapturedErrorCallback: uncapturedErrorCallback
-))
+print("Using device: \(device?.limits)")
+
+try await MainActor.run {
 
 try withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoBoids")
     let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
-    surface.configure(config: .init(device: device, format: window.preferredTextureFormat, width: 800, height: 600))
+    surface.configure(config: .init(device: device!, format: window.preferredTextureFormat, width: 800, height: 600))
     
-    let renderShader = device.createShaderModule(
+    let renderShader = device!.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
             nextInChain: ShaderSourceWgsl(code: renderShaderSource)))
     
-    let renderPipeline = device.createRenderPipeline(
+    let renderPipeline = device!.createRenderPipeline(
         descriptor: RenderPipelineDescriptor(
             vertex: VertexState(
                 module: renderShader,
@@ -83,12 +93,12 @@ try withGLFW {
                 targets: [ColorTargetState(format: window.preferredTextureFormat)])))
     
     
-    let computeShader = device.createShaderModule(
+    let computeShader = device!.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
             nextInChain: ShaderSourceWgsl(code: computeShaderSource)))
     
-    let computePipeline = device.createComputePipeline(
+    let computePipeline = device!.createComputePipeline(
         descriptor: ComputePipelineDescriptor(
             compute: ComputeState(
                 module: computeShader,
@@ -96,7 +106,7 @@ try withGLFW {
     
     
     let vertexBuffer = vertexData.withUnsafeBytes { bytes -> Buffer in
-        let buffer = device.createBuffer(descriptor: BufferDescriptor(
+        let buffer = device!.createBuffer(descriptor: BufferDescriptor(
             usage: .vertex,
             size: UInt64(bytes.count),
             mappedAtCreation: true))
@@ -106,7 +116,7 @@ try withGLFW {
     }
     
     let simParamBuffer = withUnsafeBytes(of: simParams) { bytes in
-        let buffer = device.createBuffer(descriptor: BufferDescriptor(
+        let buffer = device!.createBuffer(descriptor: BufferDescriptor(
             usage: .uniform,
             size: UInt64(bytes.count),
             mappedAtCreation: true))
@@ -128,7 +138,7 @@ try withGLFW {
     
     particles.withUnsafeBytes { bytes in
         for _ in 0..<2 {
-            let buffer = device.createBuffer(descriptor: BufferDescriptor(
+            let buffer = device!.createBuffer(descriptor: BufferDescriptor(
                 usage: [.vertex, .storage],
                 size: UInt64(bytes.count),
                 mappedAtCreation: true))
@@ -139,7 +149,7 @@ try withGLFW {
     }
     
     for index in 0..<2 {
-        let bindGroup = device.createBindGroup(descriptor: BindGroupDescriptor(
+        let bindGroup = device!.createBindGroup(descriptor: BindGroupDescriptor(
             layout: computePipeline.getBindGroupLayout(groupIndex: 0),
             entries: [
                 BindGroupEntry(
@@ -158,7 +168,7 @@ try withGLFW {
     
     var i = 0
     try window.loop {
-        let encoder = device.createCommandEncoder()
+        let encoder = device!.createCommandEncoder()
         
         let computePass = encoder.beginComputePass()
         computePass.setPipeline(computePipeline)
@@ -180,10 +190,11 @@ try withGLFW {
         renderPass.end()
         
         let commandBuffer = encoder.finish()
-        device.queue.submit(commands: [commandBuffer])
+        device!.queue.submit(commands: [commandBuffer])
         
         surface.present()
         
         i = 1 - i
     }
+}
 }

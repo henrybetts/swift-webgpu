@@ -7,22 +7,32 @@ struct Vertex {
 }
 
 let instance = createInstance()
+var device: Device? = nil;
 
-let adapter = try await instance.requestAdapter()
-print("Using adapter: \(adapter.info.device)")
+instance.requestAdapter(options: nil, callbackInfo: RequestAdapterCallbackInfo(callback: { (status, adapter, msg) -> () in
+    if (status == .success && adapter != nil) {
+        print("Using adapter: \(adapter?.info.device)")
+        
+        let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
+            print("Error (\(errorType)): \(errorMessage)")
+        }
 
-let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
-    print("Error (\(errorType)): \(errorMessage)")
-}
+        adapter?.requestDevice(options: DeviceDescriptor(uncapturedErrorCallback: uncapturedErrorCallback), callbackInfo: RequestDeviceCallbackInfo(callback: { (status, deviceOut, msg) -> () in
+            if (status == .success && deviceOut != nil) {
+                device = deviceOut
+            }
+        }))
+    }
+}))
 
-let device = try await adapter.requestDevice(descriptor: .init(
-    uncapturedErrorCallback: uncapturedErrorCallback
-))
+print("Using device: \(device?.limits)")
+
+try await MainActor.run {
 
 try withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoTriangle")
     let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
-    surface.configure(config: .init(device: device, format: window.preferredTextureFormat, width: 800, height: 600))
+    surface.configure(config: .init(device: device!, format: window.preferredTextureFormat, width: 800, height: 600))
     
     let vertexShaderSource = """
         struct VertexOut {
@@ -47,17 +57,17 @@ try withGLFW {
         }
     """
     
-    let vertexShader = device.createShaderModule(
+    let vertexShader = device!.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
             nextInChain: ShaderSourceWgsl(code: vertexShaderSource)))
     
-    let fragmentShader = device.createShaderModule(
+    let fragmentShader = device!.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
             nextInChain: ShaderSourceWgsl(code: fragmentShaderSource)))
     
-    let pipeline = device.createRenderPipeline(descriptor: RenderPipelineDescriptor(
+    let pipeline = device!.createRenderPipeline(descriptor: RenderPipelineDescriptor(
         vertex: VertexState(
             module: vertexShader,
             entryPoint: "main",
@@ -87,7 +97,7 @@ try withGLFW {
     ]
     
     let vertexBuffer = vertexData.withUnsafeBytes { vertexBytes -> Buffer in
-        let vertexBuffer = device.createBuffer(descriptor: BufferDescriptor(
+        let vertexBuffer = device!.createBuffer(descriptor: BufferDescriptor(
             usage: .vertex,
             size: UInt64(vertexBytes.count),
             mappedAtCreation: true))
@@ -98,7 +108,7 @@ try withGLFW {
     }
     
     try window.loop {
-        let encoder = device.createCommandEncoder()
+        let encoder = device!.createCommandEncoder()
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
@@ -113,8 +123,9 @@ try withGLFW {
         renderPass.end()
         
         let commandBuffer = encoder.finish()
-        device.queue.submit(commands: [commandBuffer])
+        device!.queue.submit(commands: [commandBuffer])
         
         surface.present()
     }
+}
 }

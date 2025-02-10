@@ -72,7 +72,7 @@ func generateStructs(model: Model) -> String {
                             let structArgs = commaSeparated {
                                 switch type.extensible {
                                 case .in:
-                                    "nextInChain: chainedStruct"
+                                    "nextInChain: UnsafeMutablePointer(mutating: chainedStruct)"
                                 case .out:
                                     "nextInChain: nil"
                                 case .none:
@@ -81,9 +81,9 @@ func generateStructs(model: Model) -> String {
                                 
                                 switch type.chained {
                                 case .in:
-                                    "chain: WGPUChainedStruct(next: chainedStruct, sType: \(type.sType))"
+                                    "chain: WGPUChainedStruct(next: UnsafeMutablePointer(mutating: chainedStruct), sType: \(type.sType))"
                                 case .out:
-                                    "chain: WGPUChainedStructOut(next: nil, sType: \(type.sType))"
+                                    "chain: WGPUChainedStruct(next: nil, sType: \(type.sType))"
                                 case .none:
                                     ()
                                 }
@@ -92,7 +92,7 @@ func generateStructs(model: Model) -> String {
                                     "\(member.cName): \(cValue)"
                                 }
                             }
-                    
+
                             "let cStruct = \(type.cName)(\(structArgs))"
                             "return try body(cStruct)"
                         }

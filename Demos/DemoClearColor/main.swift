@@ -2,27 +2,36 @@ import WebGPU
 import WindowUtils
 
 let instance = createInstance()
+var device: Device? = nil;
 
-let adapter = try await instance.requestAdapter()
-print("Using adapter: \(adapter.info.device)")
+instance.requestAdapter(options: nil, callbackInfo: RequestAdapterCallbackInfo(callback: { (status, adapter, msg) -> () in
+    if (status == .success && adapter != nil) {
+        print("Using adapter: \(adapter?.info.device)")
+        
+        let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
+            print("Error (\(errorType)): \(errorMessage)")
+        }
 
-let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
-    print("Error (\(errorType)): \(errorMessage)")
-}
+        adapter?.requestDevice(options: DeviceDescriptor(uncapturedErrorCallback: uncapturedErrorCallback), callbackInfo: RequestDeviceCallbackInfo(callback: { (status, deviceOut, msg) -> () in
+            if (status == .success && deviceOut != nil) {
+                device = deviceOut
+            }
+        }))
+    }
+}))
 
-let device = try await adapter.requestDevice(descriptor: .init(
-    uncapturedErrorCallback: uncapturedErrorCallback
-))
+print("Using device: \(device?.limits)")
 
+try await MainActor.run {
 try withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoClearColor")
     let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
-    surface.configure(config: .init(device: device, format: window.preferredTextureFormat, width: 800, height: 600))
+    surface.configure(config: .init(device: device!, format: window.preferredTextureFormat, width: 800, height: 600))
     
     var hue = 0.0
         
     try window.loop {
-        let encoder = device.createCommandEncoder()
+        let encoder = device!.createCommandEncoder()
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
@@ -34,10 +43,11 @@ try withGLFW {
         renderPass.end()
         
         let commandBuffer = encoder.finish()
-        device.queue.submit(commands: [commandBuffer])
+        device!.queue.submit(commands: [commandBuffer])
         
         surface.present()
         
         hue = (hue + 0.5).truncatingRemainder(dividingBy: 360)
     }
+}
 }

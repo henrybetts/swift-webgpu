@@ -8,22 +8,32 @@ struct Camera {
 }
 
 let instance = createInstance()
+var device: Device? = nil;
 
-let adapter = try await instance.requestAdapter()
-print("Using adapter: \(adapter.info.device)")
+instance.requestAdapter(options: nil, callbackInfo: RequestAdapterCallbackInfo(callback: { (status, adapter, msg) -> () in
+    if (status == .success && adapter != nil) {
+        print("Using adapter: \(adapter?.info.device)")
+        
+        let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
+            print("Error (\(errorType)): \(errorMessage)")
+        }
 
-let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, errorMessage in
-    print("Error (\(errorType)): \(errorMessage)")
-}
+        adapter?.requestDevice(options: DeviceDescriptor(uncapturedErrorCallback: uncapturedErrorCallback), callbackInfo: RequestDeviceCallbackInfo(callback: { (status, deviceOut, msg) -> () in
+            if (status == .success && deviceOut != nil) {
+                device = deviceOut
+            }
+        }))
+    }
+}))
 
-let device = try await adapter.requestDevice(descriptor: .init(
-    uncapturedErrorCallback: uncapturedErrorCallback
-))
+print("Using device: \(device?.limits)")
+
+try await MainActor.run {
 
 try withGLFW {
     let window = Window(width: 800, height: 600, title: "DemoCube")
     let surface = instance.createSurface(descriptor: window.surfaceDescriptor)
-    surface.configure(config: .init(device: device, format: window.preferredTextureFormat, width: 800, height: 600))
+    surface.configure(config: .init(device: device!, format: window.preferredTextureFormat, width: 800, height: 600))
     
     let vertexShaderSource = """
         struct Camera {
@@ -54,27 +64,27 @@ try withGLFW {
         }
     """
     
-    let vertexShader = device.createShaderModule(
+    let vertexShader = device!.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
             nextInChain: ShaderSourceWgsl(code: vertexShaderSource)))
     
-    let fragmentShader = device.createShaderModule(
+    let fragmentShader = device!.createShaderModule(
         descriptor: ShaderModuleDescriptor(
             label: nil,
             nextInChain: ShaderSourceWgsl(code: fragmentShaderSource)))
     
-    let bindGroupLayout = device.createBindGroupLayout(descriptor: BindGroupLayoutDescriptor(
+    let bindGroupLayout = device!.createBindGroupLayout(descriptor: BindGroupLayoutDescriptor(
         entries: [
             BindGroupLayoutEntry(
                 binding: 0,
                 visibility: .vertex,
                 buffer: BufferBindingLayout(type: .uniform))]))
     
-    let pipelineLayout = device.createPipelineLayout(descriptor: PipelineLayoutDescriptor(
+    let pipelineLayout = device!.createPipelineLayout(descriptor: PipelineLayoutDescriptor(
         bindGroupLayouts: [bindGroupLayout]))
     
-    let pipeline = device.createRenderPipeline(descriptor: RenderPipelineDescriptor(
+    let pipeline = device!.createRenderPipeline(descriptor: RenderPipelineDescriptor(
         layout: pipelineLayout,
         vertex: VertexState(
             module: vertexShader,
@@ -104,7 +114,7 @@ try withGLFW {
                     format: window.preferredTextureFormat)])))
     
     let vertexBuffer = cubeVertices.withUnsafeBytes { vertexBytes -> Buffer in
-        let vertexBuffer = device.createBuffer(descriptor: BufferDescriptor(
+        let vertexBuffer = device!.createBuffer(descriptor: BufferDescriptor(
             usage: .vertex,
             size: UInt64(vertexBytes.count),
             mappedAtCreation: true))
@@ -115,7 +125,7 @@ try withGLFW {
     }
     
     let indexBuffer = cubeIndices.withUnsafeBytes { indexBytes -> Buffer in
-        let indexBuffer = device.createBuffer(descriptor: BufferDescriptor(
+        let indexBuffer = device!.createBuffer(descriptor: BufferDescriptor(
             usage: .index,
             size: UInt64(indexBytes.count),
             mappedAtCreation: true))
@@ -129,18 +139,18 @@ try withGLFW {
         view: Matrix4x4f(),
         projection: Matrix4x4f.proj(fovy: Angle(degrees: 45), aspect: 800/600, near: 1, far: 100))
     
-    let cameraBuffer = device.createBuffer(descriptor: BufferDescriptor(
+    let cameraBuffer = device!.createBuffer(descriptor: BufferDescriptor(
         usage: [.uniform, .copyDst],
         size: UInt64(MemoryLayout<Camera>.size)))
     
-    let bindGroup = device.createBindGroup(descriptor: BindGroupDescriptor(
+    let bindGroup = device!.createBindGroup(descriptor: BindGroupDescriptor(
         layout: bindGroupLayout,
         entries: [
             BindGroupEntry(binding: 0,
                            buffer: cameraBuffer,
                            size: UInt64(MemoryLayout<Camera>.size))]))
     
-    let depthStencilView = device.createTexture(descriptor: TextureDescriptor(
+    let depthStencilView = device!.createTexture(descriptor: TextureDescriptor(
         usage: .renderAttachment,
         size: Extent3d(width: 800, height: 600),
         format: .depth24Plus)
@@ -155,10 +165,10 @@ try withGLFW {
             at: vec3(0, 0, 0))
         
         withUnsafeBytes(of: &camera) { cameraBytes in
-            device.queue.writeBuffer(cameraBuffer, bufferOffset: 0, data: cameraBytes)
+            device!.queue.writeBuffer(cameraBuffer, bufferOffset: 0, data: cameraBytes)
         }
         
-        let encoder = device.createCommandEncoder()
+        let encoder = device!.createCommandEncoder()
         
         let renderPass = encoder.beginRenderPass(descriptor: RenderPassDescriptor(
             colorAttachments: [
@@ -180,8 +190,9 @@ try withGLFW {
         renderPass.end()
         
         let commandBuffer = encoder.finish()
-        device.queue.submit(commands: [commandBuffer])
+        device!.queue.submit(commands: [commandBuffer])
         
         surface.present()
     }
+}
 }
