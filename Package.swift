@@ -12,6 +12,9 @@ let package = Package(
         .library(
             name: "DawnNative",
             targets: ["DawnNative", "WebGPU"]),
+        .library(
+            name: "WindowUtils",
+            targets: ["WindowUtils"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
