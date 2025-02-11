@@ -21,9 +21,13 @@ let package = Package(
         .package(url: "https://github.com/SwiftGFX/SwiftMath", from: "3.3.0") // for demos only
     ],
     targets: [
-        .systemLibrary(
+        .binaryTarget(
+            name: "DawnFramework",
+            path: "webgpu_dawn.xcframework"
+        ),
+        .target(
             name: "CWebGPU",
-            pkgConfig: "webgpu"
+            dependencies: ["DawnFramework"]
         ),
         .target(
             name: "WebGPU",
