@@ -16,7 +16,7 @@ let uncapturedErrorCallback: UncapturedErrorCallback = { device, errorType, erro
     print("Error (\(errorType)): \(errorMessage)")
 }
 
-let device = try await adapter.requestDevice(descriptor: .init(
+let device = try await adapter.requestDevice(options: .init(
     uncapturedErrorCallback: uncapturedErrorCallback
 ))
 
