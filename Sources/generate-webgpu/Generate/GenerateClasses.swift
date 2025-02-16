@@ -27,11 +27,6 @@ func generateClasses(model: Model) -> String {
                 ""
                 
                 block("deinit") {
-                    for method in type.methods {
-                        if method.isCallbackSetter {
-                            "\(method.swiftFunctionName)(nil)"
-                        }
-                    }
                     "\(type.releaseFunctionName)(handle)"
                 }
                 ""
@@ -54,26 +49,7 @@ func generateClasses(model: Model) -> String {
                 
                 for method in type.methods {
                     ""
-                    
-                    if method.isCallbackSetter {
-                        "var _\(method.swiftFunctionName): UserData<\(method.arguments[0].swiftType)>? = nil"
-                        block("public func \(method.swiftFunctionName)(_ callback: \(method.arguments[0].swiftType)?)") {
-                            block("self.withUnsafeHandle", "_handle in") {
-                                block("if let callback = callback") {
-                                    "let userData = UserData(callback)"
-                                    "self._\(method.swiftFunctionName) = userData"
-                                    "\(method.cFunctionName)(_handle, \((method.arguments[0].type as! FunctionPointerType).callbackFunctionName), userData.toOpaque())"
-                                }
-                                block("else") {
-                                    "self._\(method.swiftFunctionName) = nil"
-                                    "\(method.cFunctionName)(_handle, nil, nil)"
-                                }
-                            }
-                        }
-                        
-                    } else {
-                        generateFunction(method, isMethod: true)
-                    }
+                    generateFunction(method, isMethod: true)
                 }
             }
             ""

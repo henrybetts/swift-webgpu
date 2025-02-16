@@ -76,9 +76,10 @@ fileprivate func generateStandard(function: FunctionType, isMethod: Bool) -> Str
 
 fileprivate func generateRequestOverloads(function: FunctionType) -> String {
     code {
-        let functionArgs = function.arguments.dropLast(2).removingHidden
+        let functionArgs = function.arguments.dropLast().removingHidden
         
-        let callback = function.arguments[function.arguments.count - 2].type as! FunctionPointerType
+        let callbackInfo = function.arguments.last!.type as! CallbackInfoType
+        let callback = callbackInfo.callbackMember.type as! CallbackFunctionType
         let callbackArgs = callback.arguments.removingHidden
         
         let statusArg = callbackArgs[0]
@@ -95,7 +96,7 @@ fileprivate func generateRequestOverloads(function: FunctionType) -> String {
             if functionArgs.count > 0 {
                 functionParams
             }
-            "callback: @escaping (\(resultType)) -> Void)"
+            "callback: @escaping (\(resultType)) -> Void"
         }
         
         let functionCallArgs = commaSeparated {
@@ -109,7 +110,8 @@ fileprivate func generateRequestOverloads(function: FunctionType) -> String {
         }
     
         availability(of: function)
-        block("public func \(function.swiftFunctionName)(\(functionParamsWithCallback)") {
+        "@discardableResult"
+        block("public func \(function.swiftFunctionName)(\(functionParamsWithCallback)) -> Future") {
 
             let callbackArgNames = commaSeparated {
                 for arg in callbackArgs {
@@ -117,7 +119,7 @@ fileprivate func generateRequestOverloads(function: FunctionType) -> String {
                 }
             }
             
-            block("\(function.swiftFunctionName)(\(functionCallArgs))", "\(callbackArgNames) in") {
+            block("let _callbackWrapper: \(callback.swiftName) = ", "\(callbackArgNames) in") {
                 block("if status == .success") {
                     let successArg = line {
                         "\(successArg?.swiftName ?? "()")"
@@ -132,9 +134,17 @@ fileprivate func generateRequestOverloads(function: FunctionType) -> String {
                 }
             }
             
+            let functionCallArgsWithCallback = commaSeparated {
+                if functionArgs.count > 0 {
+                    functionCallArgs
+                }
+                "callbackInfo: \(callbackInfo.swiftName)(callback: _callbackWrapper)"
+            }
+            
+            "return \(function.swiftFunctionName)(\(functionCallArgsWithCallback))"
         }
-        
         ""
+        
         availability(of: function)
         block("public func \(function.swiftFunctionName)(\(functionParams)) async throws -> \(successType)") {
             block("return try await withUnsafeThrowingContinuation", "_continuation in") {

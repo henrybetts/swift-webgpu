@@ -7,7 +7,6 @@ enum TypeConversion {
     case nativeArray
     case length
     case callback
-    case userData
 }
 
 enum RecordContext {
@@ -76,16 +75,8 @@ class RecordMember {
         return (annotation == .pointer || isVoidPointer) && length != .single
     }
     
-    var isUserData: Bool {
-        return context == .function && name == "userdata" && isMutableVoidPointer
-    }
-    
-    var isCallback: Bool {
-        return context == .function && name.hasSuffix("callback") && (type as? FunctionPointerType)?.isCallback == true
-    }
-    
     var isHidden: Bool {
-        return (parentMember?.isArray ?? false) || isUserData
+        return parentMember?.isArray ?? false
     }
     
     var unwrappedCType: String {
@@ -136,7 +127,7 @@ class RecordMember {
         } else if annotation == .pointer && type.category == .structure {
             return type.swiftName
             
-        } else if type.category == .functionPointer && !isCallback {
+        } else if type.category == .functionPointer {
             return unwrappedCType
             
         } else if annotation == nil && !isVoidPointer && !isMutableVoidPointer {
@@ -187,16 +178,12 @@ class RecordMember {
             return .value
         }
         
-        if isCallback || type.category == .callbackFunction {
+        if type.category == .callbackFunction {
             return .callback
         }
         
         if type.category == .callbackInfo {
             return .valueWithClosure
-        }
-        
-        if isUserData {
-            return .userData
         }
         
         return .native

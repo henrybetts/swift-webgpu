@@ -30,36 +30,13 @@ class FunctionPointerType: Type {
         return returnTypeName == "size_t" && arguments.count == 1 && arguments[0].annotation == .mutablePointer && name.hasPrefix("enumerate ")
     }
     
-    var isCallback: Bool {
-        return category == .functionPointer && name.hasSuffix(" callback") && arguments.last?.isUserData == true
-    }
-    
-    var isRequestCallback: Bool {
-        if isCallback,
-           returnType == nil,
-           let statusArg = arguments.first,
-           statusArg.name == "status",
-           (statusArg.type as? EnumType)?.isStatus == true {
-            if arguments.count < 4 {
-                return true
-            } else if arguments.count == 4 {
-                return arguments[2].isString && arguments[2].name == "message"
-            }
+    var isRequest: Bool {
+        if returnType?.name == "future",
+           let callbackInfo = arguments.last?.type as? CallbackInfoType,
+           (callbackInfo.callbackMember.type as! CallbackFunctionType).isRequestCallback {
+            return true
         }
         return false
-    }
-    
-    var isRequest: Bool {
-        guard arguments.count >= 2, returnType == nil else { return false }
-        
-        let callbackArg = arguments[arguments.count - 2]
-        let userDataArg = arguments[arguments.count - 1]
-        
-        return callbackArg.isCallback && (callbackArg.type as! FunctionPointerType).isRequestCallback && userDataArg.isUserData
-    }
-    
-    var callbackFunctionName: String {
-        return name.camelCased()
     }
     
     var swiftReturnType: String? {
