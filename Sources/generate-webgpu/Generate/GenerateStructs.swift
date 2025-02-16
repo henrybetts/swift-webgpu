@@ -66,6 +66,11 @@ func generateStructs(model: Model) -> String {
                     ""
                 }
                 
+                if type.name.hasSuffix(" binding layout") {
+                    "public static var zero = \(type.swiftName)(cValue: \(type.cName)())"
+                    ""
+                }
+                
                 block("func withCValue<R>(_ body: (\(type.cName)) throws -> R) rethrows -> R") {
                     block("return try self.nextInChain.withChainedStruct", "chainedStruct in", condition: type.extensible == .in || type.chained == .in) {
                         convertSwiftToC(members: type.members, prefix: "self.", throws: true) { cValues in
