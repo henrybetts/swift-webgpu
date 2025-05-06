@@ -1,8 +1,10 @@
 struct Model {
     let types: [String: Type]
+    let constants: [String: ConstantTypeData]
     
     init(data: DawnData) {
         var types = [String: Type]()
+        var constants = [String: ConstantTypeData]()
         
         for (name, data) in data.types {
             guard data.isEnabled else { continue }
@@ -25,12 +27,15 @@ struct Model {
                 types[name] = CallbackFunctionType(name: name, data: data)
             } else if data.category == .callbackInfo, let data = data as? CallbackInfoTypeData {
                 types[name] = CallbackInfoType(name: name, data: data)
+            } else if data.category == .constant, let data = data as? ConstantTypeData {
+                constants[name] = data
             } else {
                 types[name] = NonconvertibleType(name: name, data: data)
             }
         }
         
         self.types = types
+        self.constants = constants
         
         for type in types.values {
             type.link(model: self)

@@ -2,6 +2,12 @@ class NativeType: Type {
     init(name: String, data: NativeTypeData) {
         super.init(name: name, data: data)
     }
+
+    private var constants: [String: ConstantTypeData] = [:]
+
+    override func link(model: Model) {
+        self.constants = model.constants
+    }
     
     override var cName: String {
         return [
@@ -33,18 +39,21 @@ class NativeType: Type {
     
     override func swiftValue(from value: Any) -> String {
         if let value = value as? String {
-            if value.starts(with: "WGPU_") {
+            if let constant = constants[value] {
+                let constantName = "WGPU_" + value.snakeCased(uppercased: true)
                 if name == "size_t" {
-                    return "Int(bitPattern: UInt(\(value)))"
+                    return "Int(bitPattern: UInt(\(constantName)))"
+                } else if constant.value == "NAN" {
+                    return ".nan"
                 } else {
-                    return "\(swiftName)(\(value))"
+                    return "\(swiftName)(\(constantName))"
                 }
             }
-        
+            
             if value == "NAN" {
                 return ".nan"
             }
-            
+
             if name == "float" && value.hasSuffix("f") {
                 return String(value.dropLast())
             }
