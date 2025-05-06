@@ -205,6 +205,10 @@ class RecordMember {
         if isOptional {
             return "nil"
         }
+
+        if annotation == .none, let type = type as? EnumType, type.hasUndefinedValue {
+            return type.swiftValue(from: "undefined")
+        }
         
         if annotation == .none, !isString, let type = type as? StructureType, type.hasDefaultSwiftInitializer {
             return "\(type.swiftName)()"

@@ -41,4 +41,8 @@ class EnumType: Type {
     var isStatus: Bool {
         return values.contains { $0.name == "success" }
     }
+
+    var hasUndefinedValue: Bool {
+        return values.contains { $0.name == "undefined" }
+    }
 }
