@@ -63,8 +63,8 @@ try withGLFW {
             entryPoint: "main",
             buffers: [
                 VertexBufferLayout(
-                    arrayStride: UInt64(MemoryLayout<Vertex>.stride),
                     stepMode: .vertex,
+                    arrayStride: UInt64(MemoryLayout<Vertex>.stride),
                     attributes: [
                         VertexAttribute(
                             format: .float32x3,

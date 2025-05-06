@@ -58,8 +58,8 @@ try withGLFW {
                 entryPoint: "vert_main",
                 buffers: [
                     VertexBufferLayout(
-                        arrayStride: UInt64(MemoryLayout<Particle>.stride),
                         stepMode: .instance,
+                        arrayStride: UInt64(MemoryLayout<Particle>.stride),
                         attributes: [
                             VertexAttribute(
                                 format: .float32x2,
@@ -70,8 +70,8 @@ try withGLFW {
                                 offset: UInt64(MemoryLayout.offset(of: \Particle.velocity)!),
                                 shaderLocation: 1)]),
                     VertexBufferLayout(
-                        arrayStride: UInt64(MemoryLayout<Vector2>.stride),
                         stepMode: .vertex,
+                        arrayStride: UInt64(MemoryLayout<Vector2>.stride),
                         attributes: [
                             VertexAttribute(
                                 format: .float32x2,
