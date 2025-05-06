@@ -13,8 +13,11 @@ extension DeviceDescriptor {
 
 extension Surface {
     public func getCurrentTexture() throws -> SurfaceTexture {
+        // TODO: surfaceTexture.texture isn't marked as optional upstream, which is why this extension is needed
         var surfaceTexture = WGPUSurfaceTexture()
-        getCurrentTexture(surfaceTexture: &surfaceTexture)
+        withUnsafeHandle { handle in
+            wgpuSurfaceGetCurrentTexture(handle, &surfaceTexture)
+        }
         guard surfaceTexture.texture != nil else {
             throw RequestError(status: SurfaceGetCurrentTextureStatus(cValue: surfaceTexture.status), message: "Could not get current surface texture")
         }
