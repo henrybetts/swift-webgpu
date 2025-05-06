@@ -206,13 +206,8 @@ class RecordMember {
             return "nil"
         }
         
-        if annotation == .none, !isString, let type = type as? StructureType {
-            if type.name.hasSuffix(" binding layout") {
-                // TODO: Patch until this is expressed in dawn.json. The binding layout structs need to be zero-initialised when not set explicitly.
-                return "\(type.swiftName).zero"
-            } else if type.hasDefaultSwiftInitializer {
-                return "\(type.swiftName)()"
-            }
+        if annotation == .none, !isString, let type = type as? StructureType, type.hasDefaultSwiftInitializer {
+            return "\(type.swiftName)()"
         }
         
         if let type = type as? CallbackInfoType, type.hasDefaultSwiftInitializer {

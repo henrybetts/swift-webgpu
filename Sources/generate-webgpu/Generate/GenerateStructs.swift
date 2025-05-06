@@ -64,9 +64,8 @@ func generateStructs(model: Model) -> String {
                         }
                     }
                     ""
-                }
-                
-                if type.name.hasSuffix(" binding layout") {
+
+                    // TODO: This may be unsafe for certain structs - add some conditional logic
                     "public static var zero = \(type.swiftName)(cValue: \(type.cName)())"
                     ""
                 }

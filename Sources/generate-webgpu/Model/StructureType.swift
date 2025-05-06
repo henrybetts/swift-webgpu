@@ -24,6 +24,10 @@ class StructureType: Type {
     
     override func swiftValue(from value: Any) -> String {
         if let value = value as? String {
+            if value == "zero" {
+                return ".zero"
+            }
+
             let values = value.trimmingCharacters(in: .init(charactersIn: "{}")).split(separator: ",")
             let params = zip(members, values).map { (member, value) -> String in
                 let value = value.trimmingCharacters(in: .whitespaces)
