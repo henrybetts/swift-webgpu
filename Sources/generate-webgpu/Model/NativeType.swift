@@ -54,8 +54,15 @@ class NativeType: Type {
                 return ".nan"
             }
 
-            if name == "float" && value.hasSuffix("f") {
-                return String(value.dropLast())
+            if name == "float" {
+                var floatString = value
+                if floatString.hasSuffix("f") {
+                    floatString.removeLast()
+                }
+                if floatString.hasSuffix(".") {
+                    floatString.removeLast()
+                }
+                return floatString
             }
         }
         return super.swiftValue(from: value)
