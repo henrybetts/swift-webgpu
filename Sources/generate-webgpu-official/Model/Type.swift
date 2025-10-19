@@ -1,0 +1,16 @@
+/// A base class for all types in the WebGPU model.
+class Type {
+    let name: String
+    
+    init(name: String) {
+        self.name = name
+    }
+    
+    var cName: String {
+        return "WGPU" + name.pascalCased(preservingCasing: true)
+    }
+    
+    var swiftName: String {
+        return name.pascalCased()
+    }
+}

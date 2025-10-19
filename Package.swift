@@ -46,6 +46,11 @@ let package = Package(
             capability: .buildTool(),
             dependencies: ["generate-webgpu"]
         ),
+
+        .executableTarget(
+            name: "generate-webgpu-official",
+            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]
+        ),
         
         .systemLibrary(
             name: "CGLFW",
