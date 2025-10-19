@@ -8,6 +8,10 @@ struct WebGPUModel {
         for enumData in data.enums {
             types[enumData.name] = EnumType(data: enumData)
         }
+
+        for bitflagData in data.bitflags {
+            types[bitflagData.name] = BitflagType(data: bitflagData)
+        }
         
         self.types = types
     }

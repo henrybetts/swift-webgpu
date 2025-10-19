@@ -13,7 +13,17 @@ struct WebGPUData: Decodable {
         @DefaultFallback var entries: [Entry?]
     }
 
+    struct Bitflag: Decodable {
+        var name: String
+        @DefaultFallback var entries: [Entry]
+        
+        struct Entry: Decodable {
+            var name: String
+        }
+    }
+
     var enums: [Enum]
+    var bitflags: [Bitflag]
 
     init(jsonData: Data) throws {
         let decoder = JSONDecoder()

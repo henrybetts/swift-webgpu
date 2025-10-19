@@ -1,7 +1,4 @@
 class EnumType: Type {
-    let requiresPrefix: Bool
-    let entries: [Entry]
-    
     struct Entry {
         let name: String
         let value: Int
@@ -12,6 +9,9 @@ class EnumType: Type {
             return name.camelCased()
         }
     }
+
+    let requiresPrefix: Bool
+    let entries: [Entry]
     
     init(data: WebGPUData.Enum) {
         // We can't have enum cases that start with a number, so if any do, we add a prefix to all cases for consistency.

@@ -19,6 +19,7 @@ struct GenerateWebGPU: ParsableCommand {
         try FileManager.default.createDirectory(at: outputPath, withIntermediateDirectories: true)
         
         try writeSource(generateEnums(model: model), toFileNamed: "Enums.swift")
+        try writeSource(generateBitflags(model: model), toFileNamed: "Bitflags.swift")
     }
     
     func writeSource(_ source: String, toFileNamed fileName: String) throws {
