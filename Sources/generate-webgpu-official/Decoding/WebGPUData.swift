@@ -22,8 +22,26 @@ struct WebGPUData: Decodable {
         }
     }
 
+    struct Struct: Decodable {
+        enum `Type`: String, Decodable {
+            case extensible
+            case extensibleCallbackArg = "extensible_callback_arg"
+            case `extension`
+            case standalone
+        }
+
+        var name: String
+        var type: `Type`
+    }
+
+    struct Object: Decodable {
+        var name: String
+    }
+
     var enums: [Enum]
     var bitflags: [Bitflag]
+    var structs: [Struct]
+    var objects: [Object]
 
     init(jsonData: Data) throws {
         let decoder = JSONDecoder()

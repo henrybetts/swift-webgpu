@@ -20,6 +20,8 @@ struct GenerateWebGPU: ParsableCommand {
         
         try writeSource(generateEnums(model: model), toFileNamed: "Enums.swift")
         try writeSource(generateBitflags(model: model), toFileNamed: "Bitflags.swift")
+        try writeSource(generateStructs(model: model), toFileNamed: "Structs.swift")
+        try writeSource(generateObjects(model: model), toFileNamed: "Objects.swift")
     }
     
     func writeSource(_ source: String, toFileNamed fileName: String) throws {

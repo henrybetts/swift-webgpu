@@ -12,6 +12,14 @@ struct WebGPUModel {
         for bitflagData in data.bitflags {
             types[bitflagData.name] = BitflagType(data: bitflagData)
         }
+
+        for structData in data.structs {
+            types[structData.name] = StructType(data: structData)
+        }
+
+        for objectData in data.objects {
+            types[objectData.name] = ObjectType(data: objectData)
+        }
         
         self.types = types
     }
