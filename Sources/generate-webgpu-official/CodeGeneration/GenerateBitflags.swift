@@ -28,7 +28,7 @@ func generateBitflags(model: WebGPUModel) -> String {
                 ""
                 
                 for entry in type.entries {
-                    "public static let \(entry.swiftName) = \(type.swiftName)(rawValue: \(type.cName(of: entry)).rawValue)"
+                    "public static let \(entry.swiftName) = \(type.swiftName)(rawValue: \(type.cName(of: entry)))"
                 }
             }
             ""

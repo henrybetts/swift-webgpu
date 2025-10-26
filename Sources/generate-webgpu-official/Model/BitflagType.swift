@@ -21,15 +21,7 @@ class BitflagType: Type {
         super.init(name: data.name)
     }
     
-    var cEnumName: String {
-        return super.cName
-    }
-    
-    override var cName: String {
-        return cEnumName + "Flags"
-    }
-    
     func cName(of entry: Entry) -> String {
-        return cEnumName + "_" + entry.name.pascalCased(preservingCasing: true)
+        return cName + "_" + entry.name.pascalCased(preservingCasing: true)
     }
 }

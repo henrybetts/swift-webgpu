@@ -22,6 +22,92 @@ struct WebGPUData: Decodable {
         }
     }
 
+    enum Pointer: String, Decodable {
+        case immutable
+        case mutable
+    }
+
+    enum `Type`: Decodable, Equatable {        
+        enum PrimitiveType: String {
+            case bool
+            case optionalString = "nullable_string"
+            case string = "string_with_default_empty"
+            case outString = "out_string"
+            case uint16
+            case uint32
+            case uint64
+            case usize
+            case int16
+            case int32
+            case float32
+            case optionalFloat32 = "nullable_float32"
+            case float64
+            case float64Super = "float64_supertype"
+        }
+        
+        enum ComplexType: String {
+            case typedef
+            case `enum`
+            case bitflag
+            case `struct`
+            case functionType = "function_type"
+            case object
+        }
+
+        case void
+        case primitive(PrimitiveType)
+        case primitiveArray(PrimitiveType)
+        case complex(ComplexType, String)
+        case complexArray(ComplexType, String)
+        case callback(String)
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            var typeString = try container.decode(String.self)
+            
+            if typeString == "c_void" {
+                self = .void
+                return
+            }
+            
+            let isArray: Bool
+            if typeString.hasPrefix("array<") && typeString.hasSuffix(">") {
+                isArray = true
+                typeString = String(typeString.dropFirst(6).dropLast(1))
+            } else {
+                isArray = false
+            }
+
+            if let primitiveType = PrimitiveType(rawValue: typeString) {
+                self = isArray ? .primitiveArray(primitiveType) : .primitive(primitiveType)
+                return
+            }
+            
+            let components = typeString.split(separator: ".", maxSplits: 1)
+            if components.count == 2 {
+                if let complexType = ComplexType(rawValue: String(components[0])) {
+                    let name = String(components[1])
+                    self = isArray ? .complexArray(complexType, name) : .complex(complexType, name)
+                    return
+                }
+
+                if components[0] == "callback" && !isArray {
+                    self = .callback(String(components[1]))
+                    return
+                }
+            }
+
+            throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Unknown type: \(typeString)"))
+        }
+    }
+
+    struct Parameter: Decodable {
+        var name: String
+        var type: Type
+        var pointer: Pointer?
+        @DefaultFallback var optional: Bool
+    }
+
     struct Struct: Decodable {
         enum `Type`: String, Decodable {
             case extensible
@@ -32,6 +118,7 @@ struct WebGPUData: Decodable {
 
         var name: String
         var type: `Type`
+        @DefaultFallback var members: [Parameter]
     }
 
     struct Object: Decodable {

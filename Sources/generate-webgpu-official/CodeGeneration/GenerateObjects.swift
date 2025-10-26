@@ -7,6 +7,7 @@ func generateObjects(model: WebGPUModel) -> String {
         for type in model.types(of: ObjectType.self) {
             block("public class \(type.swiftName): ConvertibleFromC, ConvertibleToCWithClosure") {
                 "typealias CType = \(type.cName)?"
+                ""
                 
                 "private let _object: \(type.cName)"
                 ""
@@ -27,7 +28,7 @@ func generateObjects(model: WebGPUModel) -> String {
                 ""
                 
                 block("deinit") {
-                    "\(type.releaseFunctionName)(object)"
+                    "\(type.releaseFunctionName)(_object)"
                 }
                 ""
                 

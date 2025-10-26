@@ -22,6 +22,10 @@ struct WebGPUModel {
         }
         
         self.types = types
+
+        for type in types.values {
+            type.link(model: self)
+        }
     }
     
     func types<T: Type>(of _: T.Type) -> [T] {

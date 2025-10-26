@@ -5,6 +5,8 @@ class Type {
     init(name: String) {
         self.name = name
     }
+
+    func link(model: WebGPUModel) {}
     
     var cName: String {
         return "WGPU" + name.pascalCased(preservingCasing: true)
