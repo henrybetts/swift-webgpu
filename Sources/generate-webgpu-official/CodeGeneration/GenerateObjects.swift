@@ -47,6 +47,11 @@ func generateObjects(model: WebGPUModel) -> String {
                 block("func withCValue<R>(_ body: (\(type.cName)?) throws -> R) rethrows -> R") {
                     "return try withUnsafeObject(body)"
                 }
+
+                for method in type.methods {
+                    ""
+                    generateFunction(method)
+                }
             }
             ""
         }

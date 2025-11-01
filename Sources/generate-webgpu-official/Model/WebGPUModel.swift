@@ -17,6 +17,10 @@ struct WebGPUModel {
             types[structData.name] = StructType(data: structData)
         }
 
+        for functionData in data.functions {
+            types[functionData.name] = FunctionType(data: functionData)
+        }
+
         for objectData in data.objects {
             types[objectData.name] = ObjectType(data: objectData)
         }

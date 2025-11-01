@@ -121,13 +121,27 @@ struct WebGPUData: Decodable {
         @DefaultFallback var members: [Parameter]
     }
 
+    struct Function: Decodable {
+        struct Returns: Decodable {
+            var type: Type
+            @DefaultFallback var optional: Bool
+            var pointer: Pointer?
+        }
+
+        var name: String
+        var returns: Returns?
+        @DefaultFallback var args: [Parameter]
+    }
+
     struct Object: Decodable {
         var name: String
+        @DefaultFallback var methods: [Function]
     }
 
     var enums: [Enum]
     var bitflags: [Bitflag]
     var structs: [Struct]
+    var functions: [Function]
     var objects: [Object]
 
     init(jsonData: Data) throws {
