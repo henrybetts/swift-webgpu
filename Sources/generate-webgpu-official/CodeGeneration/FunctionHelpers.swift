@@ -8,7 +8,7 @@ fileprivate func generateParameters(function: FunctionType) -> [String] {
             if index == 0 && function.hideFirstArgumentLabel {
                 "_ "
             }
-            "\(arg.swiftName): \(arg.type.cType)"
+            "\(arg.swiftName): \(arg.type.swiftType)"
         }
     })
 }
@@ -22,29 +22,31 @@ fileprivate func generateStandard(function: FunctionType) -> String {
         let functionDefinition = line {
             "public func \(function.swiftName)(\(functionParams))"
             if let returnType = function.returnType {
-                " -> \(returnType.cType)"
+                " -> \(returnType.swiftType)"
             }
         }
     
         block(functionDefinition) {
             block("return withUnsafeObject", "_object in", condition: function is ObjectType.Method) {
-                let functionArgs = commaSeparated {
-                    if function is ObjectType.Method { "_object" }
-                    for arg in function.arguments {
-                        if arg.type.isArray { "0" }
-                        arg.swiftName
+                convertSwiftToC(parameters: function.arguments) { cValues in
+                    let functionArgs = commaSeparated {
+                        if function is ObjectType.Method { "_object" }
+                        for cValue in cValues {
+                            cValue.count
+                            cValue.value
+                        }
                     }
-                }
-                
-                line {
-                    if function.returnType != nil {
-                        "let _result = "
+                    
+                    line {
+                        if function.returnType != nil {
+                            "let _result = "
+                        }
+                        "\(function.cName)(\(functionArgs))"
                     }
-                    "\(function.cName)(\(functionArgs))"
-                }
-                
-                if function.returnType != nil {
-                    "return _result"
+                    
+                    if let returnType = function.returnType {
+                        "return \(convertCToSwift(type: returnType, cValue: "_result"))"
+                    }
                 }
             }
         }

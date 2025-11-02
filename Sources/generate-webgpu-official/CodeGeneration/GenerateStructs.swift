@@ -22,7 +22,7 @@ func generateStructs(model: WebGPUModel) -> String {
                 ""
                 
                 for member in type.members {
-                    "public var \(member.swiftName): \(member.type.cType)"
+                    "public var \(member.swiftName): \(member.type.swiftType)"
                 }
                 if type.type == .extensible || type.type == .extension {
                     "public var nextInChain: Chained?"
@@ -31,7 +31,7 @@ func generateStructs(model: WebGPUModel) -> String {
                 
                 let initParams = commaSeparated {
                     for member in type.members {
-                        "\(member.swiftName): \(member.type.cType)"
+                        "\(member.swiftName): \(member.type.swiftType)"
                     }
                     if type.type == .extensible || type.type == .extension {
                         "nextInChain: Chained? = nil"
@@ -50,35 +50,37 @@ func generateStructs(model: WebGPUModel) -> String {
 
                 block("init(cValue: \(type.cName))") {
                     for member in type.members {
-                        "self.\(member.swiftName) = cValue.\(member.cName)"
+                        "self.\(member.swiftName) = \(convertCToSwift(parameter: member, prefix: "cValue."))"
                     }
                 }
                 ""
 
                 block("func withCValue<R>(_ body: (\(type.cName)) throws -> R) rethrows -> R") {
                     block("return try self.nextInChain.withChainedStruct", "chainedStruct in", condition: type.type == .extensible || type.type == .extension) {
-                        let structArgs = commaSeparated {
-                            switch type.type {
-                            case .extensible:
-                                "nextInChain: UnsafeMutablePointer(mutating: chainedStruct)"
-                            case .extensibleCallbackArg:
-                                "nextInChain: nil"
-                            case .extension:
-                                "chain: WGPUChainedStruct(next: UnsafeMutablePointer(mutating: chainedStruct), sType: \(type.sType))"
-                            case .standalone:
-                                ()
-                            }
-                            
-                            for member in type.members {
-                                if let cCountName = member.cCountName {
-                                    "\(cCountName): 0"
+                        convertSwiftToC(parameters: type.members, prefix: "self.", throws: true) { cValues in
+                            let structArgs = commaSeparated {
+                                switch type.type {
+                                case .extensible:
+                                    "nextInChain: UnsafeMutablePointer(mutating: chainedStruct)"
+                                case .extensibleCallbackArg:
+                                    "nextInChain: nil"
+                                case .extension:
+                                    "chain: WGPUChainedStruct(next: UnsafeMutablePointer(mutating: chainedStruct), sType: \(type.sType))"
+                                case .standalone:
+                                    ()
                                 }
-                                "\(member.cName): self.\(member.swiftName)"
+                                
+                                for (member, cValue) in zip(type.members, cValues) {
+                                    if let cCountName = member.cCountName {
+                                        "\(cCountName): \(cValue.count!)"
+                                    }
+                                    "\(member.cName): \(cValue.value)"
+                                }
                             }
-                        }
                             
-                        "let cStruct = \(type.cName)(\(structArgs))"
-                        "return try body(cStruct)"
+                            "let cStruct = \(type.cName)(\(structArgs))"
+                            "return try body(cStruct)"
+                        }
                     }
                 }
                 

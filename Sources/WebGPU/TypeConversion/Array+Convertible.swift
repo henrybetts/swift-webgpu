@@ -1,17 +1,21 @@
-extension Array where Element: ConvertibleFromC {
-    init<S: Sequence>(cValues: S) where S.Element == Element.CType {
-        self = cValues.map { .init(cValue: $0) }
+extension Array {    
+    init(cValue: UnsafeBufferPointer<Element>) {
+        self.init(cValue)
     }
-}
-
-extension Array where Element: ConvertibleToC {
-    func withCValues<R>(_ body: (UnsafeBufferPointer<Element.CType>) throws -> R) rethrows -> R {
+    
+    init(cValue: UnsafeBufferPointer<Element.CType>) where Element: ConvertibleFromC {
+        self = cValue.map { .init(cValue: $0) }
+    }
+    
+    func withCValue<R>(_ body: (UnsafeBufferPointer<Element>) throws -> R) rethrows -> R {
+        return try withUnsafeBufferPointer(body)
+    }
+    
+    func withCValue<R>(_ body: (UnsafeBufferPointer<Element.CType>) throws -> R) rethrows -> R where Element: ConvertibleToC {
         return try self.map { $0.cValue }.withUnsafeBufferPointer(body)
     }
-}
-
-extension Array where Element: ConvertibleToCWithClosure {
-    func withCValues<R>(_ body: (UnsafeBufferPointer<Element.CType>) throws -> R) rethrows -> R {
+    
+    func withCValue<R>(_ body: (UnsafeBufferPointer<Element.CType>) throws -> R) rethrows -> R where Element: ConvertibleToCWithClosure {
         var cValues: [Element.CType] = []
         cValues.reserveCapacity(count)
         var iterator = makeIterator()
@@ -29,12 +33,5 @@ func _withCValues<I: IteratorProtocol, R>(_ cValues: inout [I.Element.CType], ap
         return try cValues.withUnsafeBufferPointer { buffer in
             try body(buffer)
         }
-    }
-}
-
-// UnsafeRawBufferPointer is treated like an array
-extension UnsafeRawBufferPointer {
-    func withUnsafeBufferPointer<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-        return try body(self)
     }
 }

@@ -1,4 +1,4 @@
-// generates the Swift classes that wrap WebGPU objects.
+/// generates the Swift classes that wrap WebGPU objects.
 func generateObjects(model: WebGPUModel) -> String {
     return code {
         "import CWebGPU"
