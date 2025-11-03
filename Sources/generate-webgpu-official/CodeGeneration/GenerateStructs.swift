@@ -31,7 +31,12 @@ func generateStructs(model: WebGPUModel) -> String {
                 
                 let initParams = commaSeparated {
                     for member in type.members {
-                        "\(member.swiftName): \(member.type.swiftType)"
+                        line {
+                            "\(member.swiftName): \(member.type.swiftType)"
+                            if let defaultValue = member.type.defaultSwiftValue {
+                                " = \(defaultValue)"
+                            }
+                        }
                     }
                     if type.type == .extensible || type.type == .extension {
                         "nextInChain: Chained? = nil"
@@ -54,6 +59,11 @@ func generateStructs(model: WebGPUModel) -> String {
                     }
                 }
                 ""
+                
+                if type.needsZeroInitializer {
+                    "public static var zero = Self(cValue: .init())"
+                    ""
+                }
 
                 block("func withCValue<R>(_ body: (\(type.cName)) throws -> R) rethrows -> R") {
                     block("return try self.nextInChain.withChainedStruct", "chainedStruct in", condition: type.type == .extensible || type.type == .extension) {

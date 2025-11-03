@@ -4,7 +4,7 @@ struct Parameter {
     
     init(data: WebGPUData.Parameter) {
         name = data.name
-        type = TypeAnnotation(type: data.type, pointer: data.pointer, isOptional: data.optional)
+        type = TypeAnnotation(type: data.type, pointer: data.pointer, isOptional: data.optional, defaultValue: data.default)
     }
 
     mutating func link(model: WebGPUModel) {

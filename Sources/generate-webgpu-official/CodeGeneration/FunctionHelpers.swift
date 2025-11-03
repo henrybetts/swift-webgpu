@@ -15,6 +15,9 @@ fileprivate func generateParameters(function: FunctionType) -> [String] {
                 "_ "
             }
             "\(arg.swiftName): \(arg.type.swiftType)"
+            if let defaultValue = arg.type.defaultSwiftValue {
+                " = \(defaultValue)"
+            }
         }
     })
 }

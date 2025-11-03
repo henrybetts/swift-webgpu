@@ -25,4 +25,9 @@ class EnumType: Type {
         
         super.init(name: data.name)
     }
+    
+    override func swiftValue(from value: String) -> String? {
+        let name = requiresPrefix ? "type_" + value : value
+        return "." + name.camelCased()
+    }
 }

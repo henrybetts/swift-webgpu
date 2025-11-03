@@ -106,6 +106,38 @@ struct WebGPUData: Decodable {
         var type: Type
         var pointer: Pointer?
         @DefaultFallback var optional: Bool
+        var `default`: DefaultValue?
+        
+        struct DefaultValue: Decodable {
+            // a default value can be a string, number or bool, but we only really need the textual representation
+            var stringValue: String
+            
+            init(from decoder: any Decoder) throws {
+                let container = try decoder.singleValueContainer()
+                
+                do {
+                    stringValue = try container.decode(String.self)
+                    return
+                } catch DecodingError.typeMismatch {}
+                
+                do {
+                    stringValue = String(try container.decode(Int.self))
+                    return
+                } catch DecodingError.typeMismatch {}
+                
+                do {
+                    stringValue = String(try container.decode(Double.self))
+                    return
+                } catch DecodingError.typeMismatch {}
+                
+                do {
+                    stringValue = String(try container.decode(Bool.self))
+                    return
+                } catch DecodingError.typeMismatch {}
+                
+                throw DecodingError.typeMismatch(DefaultValue.self, .init(codingPath: decoder.codingPath, debugDescription: "Expected a String, Number or Bool type."))
+            }
+        }
     }
 
     struct Struct: Decodable {

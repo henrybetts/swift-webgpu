@@ -24,4 +24,9 @@ class BitflagType: Type {
     func cName(of entry: Entry) -> String {
         return cName + "_" + entry.name.pascalCased(preservingCasing: true)
     }
+    
+    override func swiftValue(from value: String) -> String? {
+        let name = requiresPrefix ? "type_" + value : value
+        return "." + name.camelCased()
+    }
 }

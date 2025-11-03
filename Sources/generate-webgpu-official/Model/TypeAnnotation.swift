@@ -3,13 +3,15 @@ struct TypeAnnotation {
     var type: WebGPUData.`Type`
     var pointer: WebGPUData.Pointer?
     var isOptional: Bool
+    var defaultValue: WebGPUData.Parameter.DefaultValue?
     
     weak var linkedType: Type?
     
-    init(type: WebGPUData.`Type`, pointer: WebGPUData.Pointer?, isOptional: Bool) {
+    init(type: WebGPUData.`Type`, pointer: WebGPUData.Pointer?, isOptional: Bool, defaultValue: WebGPUData.Parameter.DefaultValue? = nil) {
         self.type = type
         self.pointer = pointer
         self.isOptional = isOptional
+        self.defaultValue = defaultValue
     }
     
     mutating func link(model: WebGPUModel) {
@@ -163,6 +165,37 @@ struct TypeAnnotation {
     /// The Swift representation of the type.
     var swiftType: String {
         return isSwiftTypeOptional ? unwrappedSwiftType + "?" : unwrappedSwiftType
+    }
+    
+    var defaultSwiftValue: String? {
+        if let defaultValue = defaultValue?.stringValue {
+            switch type {
+            case .primitive(.optionalFloat32):
+                // the NAN constant that would have been used doesn't work currently as Swift cannot import it
+                return "nil"
+            case .primitive(_):
+                if defaultValue.hasPrefix("constant.") {
+                    return "WGPU_" + defaultValue.dropFirst(9).uppercased()
+                } else {
+                    return defaultValue
+                }
+            case .complex(_, _):
+                if let swiftValue = linkedType?.swiftValue(from: defaultValue) {
+                    return swiftValue
+                } else {
+                    print("Warning: Unhandled default value: \(defaultValue)")
+                    return nil
+                }
+            default:
+                break
+            }
+        }
+        
+        if isOptional {
+            return "nil"
+        }
+        
+        return nil
     }
     
     /// The conversion strategy between C and Swift representations.

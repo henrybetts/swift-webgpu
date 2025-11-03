@@ -15,4 +15,8 @@ class Type {
     var swiftName: String {
         return name.pascalCased()
     }
+    
+    func swiftValue(from value: String) -> String? {
+        return nil
+    }
 }
