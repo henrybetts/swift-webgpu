@@ -29,6 +29,8 @@ struct TypeAnnotation {
             case .object:
                 linkedType = model.lookup(\.objects, name)
             }
+        case .callback(let name):
+            linkedType = model.lookup(\.callbacks, name)
         default:
             break
         }
@@ -101,8 +103,11 @@ struct TypeAnnotation {
         case .primitive(let primitive), .primitiveArray(let primitive):
             cType = primitive.cType
             
-        case .complex(_, _), .complexArray(_, _), .callback(_):
+        case .complex(_, _), .complexArray(_, _):
             cType = linkedType?.cName ?? "Unknown"
+            
+        case .callback(_):
+            cType = (linkedType as? CallbackType)?.cInfoName ?? "Unkwown"
         }
         
         if let pointer = pointer {
@@ -146,10 +151,12 @@ struct TypeAnnotation {
             return "[\(primitiveType.swiftType)]"
         case .complex(.enum, "optional_bool"):
             return "Bool"
-        case .complex(_, _), .callback(_):
+        case .complex(_, _):
             return linkedType?.swiftName ?? "Unknown"
         case .complexArray(_, _):
             return "[\(linkedType?.swiftName ?? "Unknown")]"
+        case .callback(_):
+            return unwrappedCType
         }
     }
     
