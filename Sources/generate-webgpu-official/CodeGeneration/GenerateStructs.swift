@@ -4,7 +4,7 @@ func generateStructs(model: WebGPUModel) -> String {
         "import CWebGPU"
         ""
         
-        for type in model.types(of: StructType.self) {
+        for type in model.structs {
             
             let adoptions = commaSeparated {
                 "ConvertibleFromC"

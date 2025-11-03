@@ -4,7 +4,7 @@ func generateFunctions(model: WebGPUModel) -> String {
         "import CWebGPU"
         ""
         
-        for type in model.types(of: FunctionType.self) {
+        for type in model.functions {
             generateFunction(type)
             ""
         }

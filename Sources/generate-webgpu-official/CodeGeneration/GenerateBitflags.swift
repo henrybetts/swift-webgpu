@@ -4,7 +4,7 @@ func generateBitflags(model: WebGPUModel) -> String {
         "import CWebGPU"
         ""
         
-        for type in model.types(of: BitflagType.self) {
+        for type in model.bitflags {
             block("public struct \(type.swiftName): OptionSet, ConvertibleFromC, ConvertibleToC") {
                 "typealias CType = \(type.cName)"
                 ""

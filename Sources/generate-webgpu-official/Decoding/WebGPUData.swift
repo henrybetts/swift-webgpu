@@ -120,6 +120,17 @@ struct WebGPUData: Decodable {
         var type: `Type`
         @DefaultFallback var members: [Parameter]
     }
+    
+    struct Callback: Decodable {
+        enum Style: String, Decodable {
+            case callbackMode = "callback_mode"
+            case immediate
+        }
+        
+        var name: String
+        var style: Style
+        @DefaultFallback var args: [Parameter]
+    }
 
     struct Function: Decodable {
         struct Returns: Decodable {
@@ -130,6 +141,7 @@ struct WebGPUData: Decodable {
 
         var name: String
         var returns: Returns?
+        var callback: String?
         @DefaultFallback var args: [Parameter]
     }
 
@@ -141,6 +153,7 @@ struct WebGPUData: Decodable {
     var enums: [Enum]
     var bitflags: [Bitflag]
     var structs: [Struct]
+    var callbacks: [Callback]
     var functions: [Function]
     var objects: [Object]
 

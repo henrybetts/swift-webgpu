@@ -14,8 +14,21 @@ struct TypeAnnotation {
     
     mutating func link(model: WebGPUModel) {
         switch type {
-        case .complex(_, let name), .complexArray(_, let name):
-            linkedType = model.type(named: name)
+        case .complex(let complexType, let name), .complexArray(let complexType, let name):
+            switch complexType {
+            case .typedef:
+                break
+            case .enum:
+                linkedType = model.lookup(\.enums, name)
+            case .bitflag:
+                linkedType = model.lookup(\.bitflags, name)
+            case .struct:
+                linkedType = model.lookup(\.structs, name)
+            case .functionType:
+                break
+            case .object:
+                linkedType = model.lookup(\.objects, name)
+            }
         default:
             break
         }
@@ -107,23 +120,20 @@ struct TypeAnnotation {
     
     /// The C representation of the type.
     var cType: String {
-        if isPointer {
-            return unwrappedCType + "!"
-        }
-        return unwrappedCType
+        return isPointer ? unwrappedCType + "!" : unwrappedCType
     }
     
-    /// The Swift representation of the type without an optional wrapper, or nil if no Swift representation is supported.
-    var unwrappedSwiftTypeIfSupported: String? {
+    /// The Swift representation of the type without an optional wrapper.
+    var unwrappedSwiftType: String {
         // don't attempt to convert mutable types
         if pointer == .mutable {
-            return nil
+            return unwrappedCType
         }
         
         // don't attempt to convert non-array pointers, except for struct types
         if pointer == .immutable && !isArray {
             guard case .complex(.struct, _) = type else {
-                return nil
+                return unwrappedCType
             }
         }
         
@@ -143,18 +153,9 @@ struct TypeAnnotation {
         }
     }
     
-    /// The Swift representation of the type without an optional wrapper.
-    var unwrappedSwiftType: String {
-        return unwrappedSwiftTypeIfSupported ?? unwrappedCType
-    }
-    
     /// The Swift representation of the type.
     var swiftType: String {
-        if let unwrappedSwiftType = unwrappedSwiftTypeIfSupported {
-            return isSwiftTypeOptional ? unwrappedSwiftType + "?" : unwrappedSwiftType
-        } else {
-            return cType
-        }
+        return isSwiftTypeOptional ? unwrappedSwiftType + "?" : unwrappedSwiftType
     }
     
     /// The conversion strategy between C and Swift representations.

@@ -1,47 +1,30 @@
 /// A model representing the WebGPU API.
 struct WebGPUModel {
-    let types: [String: Type]
+    let enums: [EnumType]
+    let bitflags: [BitflagType]
+    let structs: [StructType]
+    let callbacks: [CallbackType]
+    let functions: [FunctionType]
+    let objects: [ObjectType]
     
     init(data: WebGPUData) {
-        var types = [String: Type]()
+        enums = data.enums.map { EnumType(data: $0) }
+        bitflags = data.bitflags.map { BitflagType(data: $0) }
+        structs = data.structs.map { StructType(data: $0) }
+        callbacks = data.callbacks.map { CallbackType(data: $0) }
+        functions = data.functions.map { FunctionType(data: $0) }
+        objects = data.objects.map { ObjectType(data: $0) }
         
-        for enumData in data.enums {
-            types[enumData.name] = EnumType(data: enumData)
-        }
-
-        for bitflagData in data.bitflags {
-            types[bitflagData.name] = BitflagType(data: bitflagData)
-        }
-
-        for structData in data.structs {
-            types[structData.name] = StructType(data: structData)
-        }
-
-        for functionData in data.functions {
-            types[functionData.name] = FunctionType(data: functionData)
-        }
-
-        for objectData in data.objects {
-            types[objectData.name] = ObjectType(data: objectData)
-        }
-        
-        self.types = types
-
-        for type in types.values {
-            type.link(model: self)
-        }
+        for type in enums { type.link(model: self)}
+        for type in bitflags { type.link(model: self)}
+        for type in structs { type.link(model: self)}
+        for type in callbacks { type.link(model: self)}
+        for type in functions { type.link(model: self)}
+        for type in objects { type.link(model: self)}
     }
     
-    func types<T: Type>(of _: T.Type) -> [T] {
-        return types.values.compactMap {
-            Swift.type(of: $0) == T.self ? ($0 as! T) : nil
-        }.sorted {
-            $0.name.lowercased() < $1.name.lowercased()
-        }
-    }
-    
-    func type(named name: String) -> Type {
-        guard let type = types[name] else { fatalError("Unknown type '\(name)'") }
-        return type
+    func lookup<T>(_ keyPath: KeyPath<Self, [T]>, _ name: String) -> T? where T: Type {
+        let types = self[keyPath: keyPath]
+        return types.first { $0.name == name }
     }
 }

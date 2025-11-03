@@ -4,7 +4,7 @@ func generateEnums(model: WebGPUModel) -> String {
         "import CWebGPU"
         ""
         
-        for type in model.types(of: EnumType.self) {
+        for type in model.enums {
             block("public enum \(type.swiftName): \(type.cName).RawValue, ConvertibleFromC, ConvertibleToC") {
                 "typealias CType = \(type.cName)"
                 ""

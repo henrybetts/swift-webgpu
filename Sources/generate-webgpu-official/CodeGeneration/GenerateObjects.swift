@@ -4,7 +4,7 @@ func generateObjects(model: WebGPUModel) -> String {
         "import CWebGPU"
         ""
         
-        for type in model.types(of: ObjectType.self) {
+        for type in model.objects {
             block("public class \(type.swiftName): ConvertibleFromC, ConvertibleToCWithClosure") {
                 "typealias CType = \(type.cName)?"
                 ""
