@@ -18,7 +18,7 @@ extension DeviceDescriptor {
             self.uncapturedErrorCallbackInfo.callback = WebGPU.uncapturedErrorCallback
             // uncaptured error callback is a special case, since it can be called multiple times
             // TODO: The userdata is currently leaked - need some way of managing the memory for this
-            self.uncapturedErrorCallbackInfo.userdata1 = Unmanaged.passRetained(UserData(uncapturedErrorCallbackInfo)).toOpaque()
+            self.uncapturedErrorCallbackInfo.userdata1 = Unmanaged.passRetained(UserData(uncapturedErrorCallback)).toOpaque()
         }
     }
 }
