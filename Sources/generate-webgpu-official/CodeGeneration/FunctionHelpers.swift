@@ -1,5 +1,13 @@
 /// Generates an appropriate Swift function for the given function type.
 func generateFunction(_ function: FunctionType) -> String {
+    if function.isGetter {
+        return generateGetter(function: function)
+    }
+    
+    if function.isExtensibleGetter {
+        return generateExtensibleGetter(function: function)
+    }
+    
     if let callback = function.callback {
         return code {
             generateWithCallback(function: function)
@@ -10,9 +18,9 @@ func generateFunction(_ function: FunctionType) -> String {
                 generateAsync(function: function)
             }
         }
-    } else {
-        return generateStandard(function: function)
     }
+    
+    return generateStandard(function: function)
 }
 
 /// Generates the Swift function parameters for a given function.
@@ -47,7 +55,7 @@ fileprivate func generateStandard(function: FunctionType) -> String {
         block(functionDefinition) {
             block("return withUnsafeObject", "_object in", condition: function is ObjectType.Method) {
                 convertSwiftToC(parameters: function.arguments) { cValues in
-                    let functionArgs = commaSeparated {
+                    let functionCallArgs = commaSeparated {
                         if function is ObjectType.Method { "_object" }
                         for cValue in cValues {
                             cValue.count
@@ -59,13 +67,48 @@ fileprivate func generateStandard(function: FunctionType) -> String {
                         if function.returnType != nil {
                             "let _result = "
                         }
-                        "\(function.cName)(\(functionArgs))"
+                        "\(function.cName)(\(functionCallArgs))"
                     }
                     
                     if let returnType = function.returnType {
                         "return \(convertCToSwift(type: returnType, cValue: "_result"))"
                     }
                 }
+            }
+        }
+    }
+}
+
+/// Generates a property getter (no arguments).
+fileprivate func generateGetter(function: FunctionType) -> String {
+    code {
+        let returnType = function.returnType!
+        let functionCallArgs = function is ObjectType.Method ? "_object" : ""
+        
+        block("public var \(function.swiftName): \(returnType.swiftType)") {
+            block("return withUnsafeObject", "_object in", condition: function is ObjectType.Method) {
+                "let _result = \(function.cName)(\(functionCallArgs))"
+                "return \(convertCToSwift(type: returnType, cValue: "_result"))"
+            }
+        }
+    }
+}
+
+/// Generates a extensible property getter. For now it looks the same as a regular getter, but in the future it may need to support extensions.
+fileprivate func generateExtensibleGetter(function: FunctionType) -> String {
+    code {
+        let structType = function.arguments[0].type.linkedType as! StructType
+        
+        let functionCallArgs = commaSeparated {
+            if function is ObjectType.Method { "_object" }
+            "&_cStruct"
+        }
+        
+        block("public var \(function.swiftName): \(structType.swiftName)") {
+            block("return withUnsafeObject", "_object in", condition: function is ObjectType.Method) {
+                "var _cStruct = \(structType.cName)()"
+                "\(function.cName)(\(functionCallArgs))"
+                "return \(structType.swiftName)(cValue: _cStruct)"
             }
         }
     }
@@ -92,7 +135,7 @@ fileprivate func generateWithCallback(function: FunctionType) -> String {
                     "callbackInfo.userdata1 = UserData.passRetained(callback)"
                     ""
                     
-                    let functionArgs = commaSeparated {
+                    let functionCallArgs = commaSeparated {
                         if function is ObjectType.Method { "_object" }
                         for cValue in cValues {
                             cValue.count
@@ -101,7 +144,7 @@ fileprivate func generateWithCallback(function: FunctionType) -> String {
                         "callbackInfo"
                     }
                     
-                    "let _result = \(function.cName)(\(functionArgs))"
+                    "let _result = \(function.cName)(\(functionCallArgs))"
                     "return Future(cValue: _result)"
                 }
             }
