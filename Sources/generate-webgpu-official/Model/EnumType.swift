@@ -26,6 +26,10 @@ class EnumType: Type {
         super.init(name: data.name)
     }
     
+    var isStatus: Bool {
+        return entries.contains { $0.name == "success" }
+    }
+    
     override func swiftValue(from value: String) -> String? {
         let name = requiresPrefix ? "type_" + value : value
         return "." + name.camelCased()
