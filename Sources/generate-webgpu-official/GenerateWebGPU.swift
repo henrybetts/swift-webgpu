@@ -13,10 +13,11 @@ struct GenerateWebGPU: ParsableCommand {
     
     mutating func run() throws {
         let jsonData = try Data(contentsOf: jsonPath)
-        let webgpuData = try WebGPUData(jsonData: jsonData)
         
+        var webgpuData = try WebGPUData(jsonData: jsonData)
+        applyPatches(to: &webgpuData)
+
         let model = WebGPUModel(data: webgpuData)
-        applyPatches(to: model)
         
         try FileManager.default.createDirectory(at: outputPath, withIntermediateDirectories: true)
         
