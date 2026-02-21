@@ -48,3 +48,11 @@ extension Surface {
         return SurfaceCapabilities(cValue: capabilities)
     }
 }
+
+extension Queue {
+    public func writeBuffer(_ buffer: Buffer, bufferOffset: UInt64 = 0, data: UnsafeRawBufferPointer) {
+        if let baseAddress = data.baseAddress {
+            writeBuffer(buffer, bufferOffset: bufferOffset, data: baseAddress, size: data.count)
+        }
+    }
+}
