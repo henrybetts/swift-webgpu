@@ -57,6 +57,11 @@ func applyPatches(to data: inout WebGPUData) {
             }
         }
     }
+
+    // binding_array_size should probably default to 0.
+    data.patch(struct: "bind_group_layout_entry", member: "binding_array_size") { member in
+        member.default = .init(stringValue: "0")
+    }
 }
 
 fileprivate extension WebGPUData {
