@@ -25,6 +25,10 @@ class EnumType: Type {
         
         super.init(name: data.name)
     }
+
+    var hasUndefinedEntry: Bool {
+        return entries.contains { $0.name == "undefined" }
+    }
     
     var isStatus: Bool {
         return entries.contains { $0.name == "success" }

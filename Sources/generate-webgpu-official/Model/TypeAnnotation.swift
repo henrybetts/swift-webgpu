@@ -188,6 +188,18 @@ struct TypeAnnotation {
                 break
             }
         }
+
+        if !isPointer {
+            // optional bool defaults to nil
+            if type == .complex(.enum, "optional_bool") {
+                return "nil"
+            }
+
+            // if enum has an "undefined" value, we assume this is the default
+            if let enumType = linkedType as? EnumType, enumType.hasUndefinedEntry {
+                return enumType.swiftValue(from: "undefined")
+            }
+        }
         
         if isOptional {
             return isArray ? "[]" : "nil"
