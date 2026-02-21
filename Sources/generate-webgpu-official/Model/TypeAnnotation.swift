@@ -69,21 +69,17 @@ struct TypeAnnotation {
     
     /// Whether the type will be an optional in Swift, either because of an explicit optional annotation, or because the type is naturally optional.
     var isSwiftTypeOptional: Bool {
-        if isOptional {
-            return true
-        }
-        
-        if pointer != nil {
-            return false
-        }
-        
-        switch type {
-        case .primitive(let primitiveType):
-            return primitiveType.isSwiftTypeOptional
-        case .complex(.enum, "optional_bool"):
-            return true
-        default:
-            return false
+        if isPointer {
+            return isOptional && !isArray
+        } else {
+            switch type {
+            case .primitive(let primitiveType):
+                return primitiveType.isSwiftTypeOptional
+            case .complex(.enum, "optional_bool"):
+                return true
+            default:
+                return false
+            }
         }
     }
     
@@ -192,7 +188,7 @@ struct TypeAnnotation {
         }
         
         if isOptional {
-            return "nil"
+            return isArray ? "[]" : "nil"
         }
         
         return nil
