@@ -169,6 +169,8 @@ struct TypeAnnotation {
             case .primitive(.optionalFloat32):
                 // the NAN constant that would have been used doesn't work currently as Swift cannot import it
                 return "nil"
+            case .primitive(.string):
+                return "\"\(defaultValue)\""
             case .primitive(_):
                 if defaultValue.hasPrefix("constant.") {
                     return "WGPU_" + defaultValue.dropFirst(9).uppercased()

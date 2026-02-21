@@ -42,6 +42,21 @@ func applyPatches(to data: inout WebGPUData) {
     data.patch(struct: "surface_configuration", member: "view_formats") { member in
         member.optional = true
     }
+
+
+    /*
+    Labels should have a default empty value.
+    Although this is already expressed in webgpu.yml by the "string_with_default_empty" type, this is more to do with
+    how the C API will interpret null values. We don't necessarily want to set a default for all of these types, since
+    in some cases a user is expected to provide a value.
+    */
+    for (structIndex, `struct`) in data.structs.enumerated() {
+        for (memberIndex, member) in `struct`.members.enumerated() {
+            if member.name == "label" {
+                data.structs[structIndex].members[memberIndex].default = .init(stringValue: "")
+            }
+        }
+    }
 }
 
 fileprivate extension WebGPUData {

@@ -112,6 +112,10 @@ struct WebGPUData: Decodable {
             // a default value can be a string, number or bool, but we only really need the textual representation
             var stringValue: String
             
+            init(stringValue: String) {
+                self.stringValue = stringValue
+            }
+
             init(from decoder: any Decoder) throws {
                 let container = try decoder.singleValueContainer()
                 
