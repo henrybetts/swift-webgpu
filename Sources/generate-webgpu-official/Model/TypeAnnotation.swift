@@ -173,7 +173,13 @@ struct TypeAnnotation {
                 return "\"\(defaultValue)\""
             case .primitive(_):
                 if defaultValue.hasPrefix("constant.") {
-                    return "WGPU_" + defaultValue.dropFirst(9).uppercased()
+                    let constant = "WGPU_" + defaultValue.dropFirst(9).uppercased()
+                    if type == .primitive(.usize) {
+                        // usize is converted to Int in Swift, but the constant will still be unsigned, so we need to do a bit cast
+                        return "Int(bitPattern: \(constant))"
+                    } else {
+                        return constant
+                    }
                 } else {
                     return defaultValue
                 }
