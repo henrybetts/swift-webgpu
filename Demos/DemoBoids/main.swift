@@ -48,7 +48,6 @@ try withGLFW {
     
     let renderShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
-            label: nil,
             nextInChain: ShaderSourceWgsl(code: renderShaderSource)))
     
     let renderPipeline = device.createRenderPipeline(
@@ -85,7 +84,6 @@ try withGLFW {
     
     let computeShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
-            label: nil,
             nextInChain: ShaderSourceWgsl(code: computeShaderSource)))
     
     let computePipeline = device.createComputePipeline(
@@ -102,7 +100,7 @@ try withGLFW {
             mappedAtCreation: true)) else {
                 fatalError("Failed to create buffer")
             }
-        buffer.getMappedRange().copyMemory(from: bytes.baseAddress!, byteCount: bytes.count)
+        buffer.getMappedRange()?.copyMemory(from: bytes.baseAddress!, byteCount: bytes.count)
         buffer.unmap()
         return buffer
     }
@@ -114,7 +112,7 @@ try withGLFW {
             mappedAtCreation: true)) else {
                 fatalError("Failed to create buffer")
             }
-        buffer.getMappedRange().copyMemory(from: bytes.baseAddress!, byteCount: bytes.count)
+        buffer.getMappedRange()?.copyMemory(from: bytes.baseAddress!, byteCount: bytes.count)
         buffer.unmap()
         return buffer
     }
@@ -138,7 +136,7 @@ try withGLFW {
                 mappedAtCreation: true)) else {
                     fatalError("Failed to create buffer")
                 }
-            buffer.getMappedRange().copyMemory(from: bytes.baseAddress!, byteCount: bytes.count)
+            buffer.getMappedRange()?.copyMemory(from: bytes.baseAddress!, byteCount: bytes.count)
             buffer.unmap()
             particleBuffers.append(buffer)
         }

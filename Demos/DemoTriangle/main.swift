@@ -49,12 +49,10 @@ try withGLFW {
     
     let vertexShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
-            label: nil,
             nextInChain: ShaderSourceWgsl(code: vertexShaderSource)))
     
     let fragmentShader = device.createShaderModule(
         descriptor: ShaderModuleDescriptor(
-            label: nil,
             nextInChain: ShaderSourceWgsl(code: fragmentShaderSource)))
     
     let pipeline = device.createRenderPipeline(descriptor: RenderPipelineDescriptor(
