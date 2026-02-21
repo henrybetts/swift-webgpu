@@ -199,6 +199,11 @@ struct TypeAnnotation {
             if let enumType = linkedType as? EnumType, enumType.hasUndefinedEntry {
                 return enumType.swiftValue(from: "undefined")
             }
+
+            // if struct has a default/empty initializer, use that as the default
+            if let structType = linkedType as? StructType, structType.hasDefaultInitializer {
+                return ".init()"
+            }
         }
         
         if isOptional {

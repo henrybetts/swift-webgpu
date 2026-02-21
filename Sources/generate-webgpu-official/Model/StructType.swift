@@ -26,6 +26,10 @@ class StructType: Type {
     var sType: String {
         return "WGPUSType_" + name.pascalCased(preservingCasing: true)
     }
+
+    var hasDefaultInitializer: Bool {
+        return members.allSatisfy { $0.type.defaultSwiftValue != nil }
+    }
     
     override func swiftValue(from value: String) -> String? {
         if value == "zero" {
