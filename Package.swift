@@ -25,7 +25,7 @@ let package = Package(
         .target(
             name: "WebGPU",
             dependencies: ["CWebGPU"],
-            plugins: [.plugin(name: "GenerateWebGPUPlugin")]
+            plugins: [.plugin(name: "GenerateWebGPUOfficialPlugin")]
         ),
         
         .target(
@@ -41,15 +41,16 @@ let package = Package(
             name: "generate-webgpu",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]
         ),
-        .plugin(
-            name: "GenerateWebGPUPlugin",
-            capability: .buildTool(),
-            dependencies: ["generate-webgpu"]
-        ),
 
         .executableTarget(
             name: "generate-webgpu-official",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]
+        ),
+
+        .plugin(
+            name: "GenerateWebGPUOfficialPlugin",
+            capability: .buildTool(),
+            dependencies: ["generate-webgpu-official"]
         ),
         
         .systemLibrary(
